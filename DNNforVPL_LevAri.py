@@ -441,7 +441,7 @@ def main():
 #                            plt.close()
                         
                 # Define the main learning parameters
-                lr = 0.00001
+                lr = 0.0001
                 momentum = 0.9
                 weight_decay = 0.0001
                 
