@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from scipy import stats
 from scipy.io import loadmat, savemat
 
-os.mkdir('E:/Tuning_Analysis_Results')
-saving_folder_1 = 'E:/Tuning_Analysis_Results'
+os.mkdir('P:/ENI Projects/Caspar/Python Programs/PyTorch/Tuning_Analysis_Results')
+saving_folder_1 = 'P:/ENI Projects/Caspar/Python Programs/PyTorch/Tuning_Analysis_Results'
 
 all_groups_central_unit_activity_mean_channels_SF_analysis_layer_1 = np.zeros((4, 3))
 all_groups_central_unit_activity_mean_channels_SF_analysis_layer_2 = np.zeros((4, 3))
@@ -79,8 +79,8 @@ for group_training in ['group1', 'group2', 'group3', 'group4']:
     for num_simulation in range(0, 100):
         print(num_simulation)
           
-        data_folder_before = 'E:/100 Simulations_Central Units of Channels per Layer/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/before_training'
-        data_folder_after = 'E:/100 Simulations_Central Units of Channels per Layer/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training'
+        data_folder_before = 'P:/ENI Projects/Caspar/Python Programs/PyTorch/100 Simulations_Central Units of Channels per Layer/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/before_training'
+        data_folder_after = 'P:/ENI Projects/Caspar/Python Programs/PyTorch/100 Simulations_Central Units of Channels per Layer/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training'
         
         data_feature = loadmat(data_folder_before + '/feature_sample_artiphysiology.mat')
         data_feature_matrix = data_feature['feature_sample_artiphysiology']
