@@ -565,7 +565,7 @@ def main():
 #                            plt.close()
                         
                 # Define the main learning parameters
-                lr = 0.0001
+                lr = 0.00001
                 momentum = 0.9
                 weight_decay = 0.0001
                 
@@ -581,7 +581,7 @@ def main():
                 start_session = 0
                 sessions = 1
                 
-                z_val_shuffle = z_val_training
+                z_val_shuffle = copy.deepcopy(z_val_training)
                     
                 for i in range(len(SF_training)):
                     for j in range(len(Ori_training)):
@@ -602,6 +602,7 @@ def main():
                             
                     for epoch in range(epochs):                       
                         z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, epoch])
+                        random.shuffle(z_val_shuffle_1D)
                         indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)                        
                         
                         step = int(np.floor(len(SF_training) * len(Ori_training) / 40))
@@ -757,7 +758,7 @@ def main():
                     
                 for session in range(start_session, sessions):
                     
-                    z_val_shuffle = z_val_transfer
+                    z_val_shuffle = copy.deepcopy(z_val_transfer)
                     
                     for j in range(len(SF_transfer)):
                         for k in range(len(Ori_transfer)):
