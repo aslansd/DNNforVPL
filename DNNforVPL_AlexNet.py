@@ -80,7 +80,7 @@ def main():
         
     os.mkdir('New_Results')
     
-    for num_simulation in range(0, 100):
+    for num_simulation in range(0, 50):
         print('Simulation:   ', num_simulation + 1)
         
         os.mkdir('New_Results/Simulation_' + str(num_simulation + 1))
@@ -100,32 +100,328 @@ def main():
             
             os.mkdir('New_Results/Simulation_' + str(num_simulation + 1) + '/' + group_training)
             
+            ### Training
+            
+            # The structure of image names in different groups                    
+            if group_training == 'group1':
+                SF_training = [170]
+                Ori_training = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
+                                23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
+            
+            elif group_training == 'group2':
+                SF_training = [53, 170, 276]
+                Ori_training = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
+                                23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
+                
+            elif group_training == 'group3':
+                SF_training = [170]
+                Ori_training = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
+                                23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
+                    
+            elif group_training == 'group4':
+                SF_training = [53, 170, 276]
+                Ori_training = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
+                                23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
+                
+            # Reading all images                    
+            if group_training == 'group1' or group_training == 'group2':
+                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group1&2/*.TIFF')
+            elif group_training == 'group3' or group_training == 'group4':
+                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group3&4/*.TIFF')
+            
+            file_names = [os.path.basename(x) for x in file_name_paths]
+            
+            # Define the main variables
+            x_val_training = np.zeros((len(SF_training) * len(Ori_training) * 180, 224, 224, 3), dtype = np.float32)
+            y_val_training = np.zeros((len(SF_training) * len(Ori_training) * 180, 1), dtype = np.int64)
+            z_val_training = np.zeros((len(SF_training), len(Ori_training), 180), dtype = np.int64)
+            
+            x_tensor_training = []
+            y_tensor_training = []
+            
+            counter = -1
+            
+            for i in range(len(file_names)):
+                 
+                # Construct the main descriptive variables
+                name_digits = file_names[i].split('_')
+                
+                flag_image_name = False
+                
+                for j in range(len(SF_training)):
+                    for k in range(len(Ori_training)):
+                        SFplusOri = str(SF_training[j]) + str(Ori_training[k])
+                        
+                        if (SFplusOri) in name_digits[0]:
+                            Phase = int(name_digits[0].replace(SFplusOri,''))
+                            
+                            if Phase % 2 == 1:
+                                counter = counter + 1
+                                flag_image_name = True
+                                
+                                if k <= int(len(Ori_training) / 2 - 1):
+                                    y_val_training[counter] = 0
+                                else:
+                                    y_val_training[counter] = 1
+                                    
+                                z_val_training[j][k][((Phase + 1) // 2) - 1] = counter
+                
+                if flag_image_name:
+                      
+                    # Load image
+                    img = Image.open(file_name_paths[i]).convert('RGB')
+                    
+                    # Resize image
+                    width, height = img.size
+                    new_width = width * 256 // min(img.size)
+                    new_height = height * 256 // min(img.size)
+                    img = img.resize((new_width, new_height), Image.BILINEAR)
+                    
+                    # Center crop image
+                    width, height = img.size
+                    startx = width // 2 - (224 // 2)
+                    starty = height // 2 - (224 // 2)
+                    img = np.asarray(img).reshape(height, width, 3)
+                    img = img[starty:starty + 224, startx:startx + 224]
+                    assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
+                    
+                    # Save image
+                    x_val_training[counter, :, :, :] = img[:, :, :]
+                    
+                    # Convert image to tensor and normalize
+                    x_temp = torch.from_numpy(np.transpose(x_val_training[counter, :, :, :], (2, 0, 1)))
+                    normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+                    x_tensor_training.append(normalize(x_temp))
+                    
+                    # Convert target to tensor
+                    y_tensor_training.append(torch.from_numpy(y_val_training[counter]))
+                
+            x_tensor_training = torch.stack(x_tensor_training)
+            y_tensor_training = torch.stack(y_tensor_training)
+            print(x_tensor_training.shape, y_tensor_training.shape)
+            
+            # Save main variables
+            np.save('x_val_training_' + group_training + '.npy', x_val_training)
+            np.save('y_val_training_' + group_training + '.npy', y_val_training)
+            np.save('z_val_training_' + group_training + '.npy', z_val_training)
+            
+            # Get five sample tensors of training/validation images and show them
+            indices = torch.tensor(np.random.permutation(len(SF_training) * len(Ori_training) * 180), dtype = torch.long)
+            x_sample = torch.index_select(x_tensor_training, 0, indices[:5])
+            y_sample = torch.index_select(y_tensor_training, 0, indices[:5])
+            x_sample = make_grid([x_sample[0], x_sample[1], x_sample[2], x_sample[3], x_sample[4]])
+            y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
+            imshow(x_sample, y_sample)
+            
+            ### SF Transfer
+            
+            # The structure of image names in different groups
+            if group_training == 'group1':
+                group_transfer = 'group1'
+                SF_transfer = [96]
+                Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
+                                23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
+            
+            elif group_training == 'group2':
+                group_transfer = 'group2'
+                SF_transfer= [96]
+                Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
+                                23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
+                
+            elif group_training == 'group3':
+                group_transfer = 'group3'
+                SF_transfer = [96]
+                Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
+                                23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
+                    
+            elif group_training == 'group4':
+                group_transfer = 'group4'
+                SF_transfer = [96]
+                Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
+                                23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
+            
+            # Reading all images                   
+            if group_transfer == 'group1' or group_transfer == 'group2':
+                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group1&2/*.TIFF')
+            elif group_transfer == 'group3' or group_transfer == 'group4':
+                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group3&4/*.TIFF')
+            
+            file_names = [os.path.basename(x) for x in file_name_paths]
+            
+            # Define the main variables
+            x_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 180, 224, 224, 3), dtype = np.float32)
+            y_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 180, 1), dtype = np.int64)
+            z_val_transfer = np.zeros((len(SF_transfer), len(Ori_transfer), 180), dtype = np.int64)
+            
+            x_tensor_transfer = []
+            y_tensor_transfer = []
+            
+            counter = -1
+            
+            for i in range(len(file_names)):
+                 
+                # Construct the main descriptive variables
+                name_digits = file_names[i].split('_')
+                
+                flag_image_name = False
+                
+                for j in range(len(SF_transfer)):
+                    for k in range(len(Ori_transfer)):
+                        SFplusOri = str(SF_transfer[j]) + str(Ori_transfer[k])
+                        if (SFplusOri) in name_digits[0]:
+                            
+                            Phase = int(name_digits[0].replace(SFplusOri,''))
+                            
+                            if Phase % 2 == 1:
+                                counter = counter + 1
+                                flag_image_name = True
+                                
+                                if k <= int(len(Ori_transfer) / 2 - 1):
+                                    y_val_transfer[counter] = 0
+                                else:
+                                    y_val_transfer[counter] = 1
+                                    
+                                z_val_transfer[j][k][((Phase + 1) // 2) - 1] = counter
+                
+                if flag_image_name:
+                      
+                    # Load image
+                    img = Image.open(file_name_paths[i]).convert('RGB')
+                    
+                    # Resize image
+                    width, height = img.size
+                    new_width = width * 256 // min(img.size)
+                    new_height = height * 256 // min(img.size)
+                    img = img.resize((new_width, new_height), Image.BILINEAR)
+                    
+                    # Center crop image
+                    width, height = img.size
+                    startx = width // 2 - (224 // 2)
+                    starty = height // 2 - (224 // 2)
+                    img = np.asarray(img).reshape(height, width, 3)
+                    img = img[starty:starty + 224, startx:startx + 224]
+                    assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
+                    
+                    # Save image
+                    x_val_transfer[counter, :, :, :] = img[:, :, :]
+                    
+                    # Convert image to tensor and normalize
+                    x_temp = torch.from_numpy(np.transpose(x_val_transfer[counter, :, :, :], (2, 0, 1)))
+                    normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+                    x_tensor_transfer.append(normalize(x_temp))
+                    
+                    # Convert target to tensor
+                    y_tensor_transfer.append(torch.from_numpy(y_val_transfer[counter]))
+                
+            x_tensor_transfer = torch.stack(x_tensor_transfer)
+            y_tensor_transfer = torch.stack(y_tensor_transfer)
+            print(x_tensor_transfer.shape, y_tensor_transfer.shape)
+            
+            # Save main variables
+            np.save('x_val_transfer_' + group_transfer + '.npy', x_val_transfer)
+            np.save('y_val_transfer_' + group_transfer + '.npy', y_val_transfer)
+            np.save('z_val_transfer_' + group_transfer + '.npy', z_val_transfer)
+            
+            # Get five sample tensors of training/validation images and show them
+            indices = torch.tensor(np.random.permutation(len(SF_transfer) * len(Ori_transfer) * 180), dtype = torch.long)
+            x_sample = torch.index_select(x_tensor_transfer, 0, indices[:5])
+            y_sample = torch.index_select(y_tensor_transfer, 0, indices[:5])
+            x_sample = make_grid([x_sample[0], x_sample[1], x_sample[2], x_sample[3], x_sample[4]])
+            y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
+            imshow(x_sample, y_sample)
+            
+            ### Tuning
+                            
+            if group_training == 'group1' or group_training == 'group2':
+                SF_tuning = [53, 170, 276]
+                Ori_tuning = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
+                              23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
+            
+            elif group_training == 'group3' or group_training == 'group4':
+                SF_tuning = [53, 170, 276]
+                Ori_tuning = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
+                              23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
+           
+            # Reading all images             
+            if group_training == 'group1' or group_training == 'group2':
+                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group1&2/*.TIFF')
+            elif group_training == 'group3' or group_training == 'group4':
+                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group3&4/*.TIFF')
+            
+            file_names = [os.path.basename(x) for x in file_name_paths]
+            
+            # Define the main variables
+            x_val_tuning = np.zeros((len(SF_tuning) * len(Ori_tuning) * 180, 224, 224, 3), dtype = np.float32)
+            y_val_tuning = np.zeros((len(SF_tuning) * len(Ori_tuning) * 180, 1), dtype = np.int64)
+            z_val_tuning = np.zeros((len(SF_tuning), len(Ori_tuning), 180), dtype = np.int64)
+            
+            x_tensor_tuning = []
+            y_tensor_tuning = []
+            
+            counter = -1
+            
+            for i in range(len(file_names)):
+                 
+                # Construct the main descriptive variables
+                name_digits = file_names[i].split('_')
+                
+                flag_image_name = False
+                
+                for j in range(len(SF_tuning)):
+                    for k in range(len(Ori_tuning)):
+                        SFplusOri = str(SF_tuning[j]) + str(Ori_tuning[k])
+                        
+                        if (SFplusOri) in name_digits[0]:
+                            Phase = int(name_digits[0].replace(SFplusOri,''))
+                            
+                            if Phase % 2 == 1:
+                                counter = counter + 1
+                                flag_image_name = True
+                                
+                                if k <= int(len(Ori_tuning) / 2 - 1):
+                                    y_val_tuning[counter] = 0
+                                else:
+                                    y_val_tuning[counter] = 1
+                                    
+                                z_val_tuning[j][k][((Phase + 1) // 2) - 1] = counter
+                
+                if flag_image_name:
+                      
+                    # Load image
+                    img = Image.open(file_name_paths[i]).convert('RGB')
+                    
+                    # Resize image
+                    width, height = img.size
+                    new_width = width * 256 // min(img.size)
+                    new_height = height * 256 // min(img.size)
+                    img = img.resize((new_width, new_height), Image.BILINEAR)
+                    
+                    # Center crop image
+                    width, height = img.size
+                    startx = width // 2 - (224 // 2)
+                    starty = height // 2 - (224 // 2)
+                    img = np.asarray(img).reshape(height, width, 3)
+                    img = img[starty:starty + 224, startx:startx + 224]
+                    assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
+                    
+                    # Save image
+                    x_val_tuning[counter, :, :, :] = img[:, :, :]
+                    
+                    # Convert image to tensor and normalize
+                    x_temp = torch.from_numpy(np.transpose(x_val_tuning[counter, :, :, :], (2, 0, 1)))
+                    normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+                    x_tensor_tuning.append(normalize(x_temp))
+                    
+                    # Convert target to tensor
+                    y_tensor_tuning.append(torch.from_numpy(y_val_tuning[counter]))
+                
+            x_tensor_tuning = torch.stack(x_tensor_tuning)
+            y_tensor_tuning = torch.stack(y_tensor_tuning)
+            print(x_tensor_tuning.shape, y_tensor_tuning.shape)
+                
             for layer_freeze in [None]: # [0, 3, 6, 8, 10]
                 print('Freezed Layer:   ', layer_freeze)
-            
-                ### Training
                 
-                # The structure of image names in different groups                    
-                if group_training == 'group1':
-                    SF_training = [170]
-                    Ori_training = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
-                                    23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
-                
-                elif group_training == 'group2':
-                    SF_training = [53, 170, 276]
-                    Ori_training = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
-                                    23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
-                    
-                elif group_training == 'group3':
-                    SF_training = [170]
-                    Ori_training = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
-                                    23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
-                        
-                elif group_training == 'group4':
-                    SF_training = [53, 170, 276]
-                    Ori_training = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
-                                    23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
-                    
                 # Reading the reference image
                 file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
                 
@@ -162,96 +458,6 @@ def main():
                     
                 x_tensor_ref = torch.stack(x_tensor_ref)
                 print(x_tensor_ref.shape)
-                
-                # Reading all images                    
-                if group_training == 'group1' or group_training == 'group2':
-                    file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group1&2/*.TIFF')
-                elif group_training == 'group3' or group_training == 'group4':
-                    file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group3&4/*.TIFF')
-                
-                file_names = [os.path.basename(x) for x in file_name_paths]
-                
-                # Define the main variables
-                x_val_training = np.zeros((len(SF_training) * len(Ori_training) * 180, 224, 224, 3), dtype = np.float32)
-                y_val_training = np.zeros((len(SF_training) * len(Ori_training) * 180, 1), dtype = np.int64)
-                z_val_training = np.zeros((len(SF_training), len(Ori_training), 180), dtype = np.int64)
-                
-                x_tensor_training = []
-                y_tensor_training = []
-                
-                counter = -1
-                
-                for i in range(len(file_names)):
-                     
-                    # Construct the main descriptive variables
-                    name_digits = file_names[i].split('_')
-                    
-                    flag_image_name = False
-                    
-                    for j in range(len(SF_training)):
-                        for k in range(len(Ori_training)):
-                            SFplusOri = str(SF_training[j]) + str(Ori_training[k])
-                            if (SFplusOri) in name_digits[0]:
-                                
-                                Phase = int(name_digits[0].replace(SFplusOri,''))
-                                
-                                if Phase % 2 == 1:
-                                    counter = counter + 1
-                                    flag_image_name = True
-                                    
-                                    if k <= int(len(Ori_training) / 2 - 1):
-                                        y_val_training[counter] = 0
-                                    else:
-                                        y_val_training[counter] = 1
-                                        
-                                    z_val_training[j][k][((Phase + 1) // 2) - 1] = counter
-                    
-                    if flag_image_name:
-                          
-                        # Load image
-                        img = Image.open(file_name_paths[i]).convert('RGB')
-                        
-                        # Resize image
-                        width, height = img.size
-                        new_width = width * 256 // min(img.size)
-                        new_height = height * 256 // min(img.size)
-                        img = img.resize((new_width, new_height), Image.BILINEAR)
-                        
-                        # Center crop image
-                        width, height = img.size
-                        startx = width // 2 - (224 // 2)
-                        starty = height // 2 - (224 // 2)
-                        img = np.asarray(img).reshape(height, width, 3)
-                        img = img[starty:starty + 224, startx:startx + 224]
-                        assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
-                        
-                        # Save image
-                        x_val_training[counter, :, :, :] = img[:, :, :]
-                        
-                        # Convert image to tensor and normalize
-                        x_temp = torch.from_numpy(np.transpose(x_val_training[counter, :, :, :], (2, 0, 1)))
-                        normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                        x_tensor_training.append(normalize(x_temp))
-                        
-                        # Convert target to tensor
-                        y_tensor_training.append(torch.from_numpy(y_val_training[counter]))
-                    
-                x_tensor_training = torch.stack(x_tensor_training)
-                y_tensor_training = torch.stack(y_tensor_training)
-                print(x_tensor_training.shape, y_tensor_training.shape)
-                
-                # Save main variables
-                np.save('x_val_training_' + group_training + '.npy', x_val_training)
-                np.save('y_val_training_' + group_training + '.npy', y_val_training)
-                np.save('z_val_training_' + group_training + '.npy', z_val_training)
-                
-                # Get five sample tensors of training/validation images and show them
-                indices = torch.tensor(np.random.permutation(len(SF_training) * len(Ori_training) * 180), dtype = torch.long)
-                x_sample = torch.index_select(x_tensor_training, 0, indices[:5])
-                y_sample = torch.index_select(y_tensor_training, 0, indices[:5])
-                x_sample = make_grid([x_sample[0], x_sample[1], x_sample[2], x_sample[3], x_sample[4]])
-                y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
-                imshow(x_sample, y_sample)
                 
                 # Select GPU
                 global device
@@ -294,95 +500,6 @@ def main():
                 print(model)
                     
                 cudnn.benchmark = True
-                
-                ### Tuning
-                                
-                if group_training == 'group1' or group_training == 'group2':
-                    SF_tuning = [53, 170, 276]
-                    Ori_tuning = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
-                                  23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
-                
-                elif group_training == 'group3' or group_training == 'group4':
-                    SF_tuning = [53, 170, 276]
-                    Ori_tuning = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
-                                  23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
-               
-                # Reading all images             
-                if group_training == 'group1' or group_training == 'group2':
-                    file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group1&2/*.TIFF')
-                elif group_training == 'group3' or group_training == 'group4':
-                    file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/learning_group3&4/*.TIFF')
-                
-                file_names = [os.path.basename(x) for x in file_name_paths]
-                
-                # Define the main variables
-                x_val_tuning = np.zeros((len(SF_tuning) * len(Ori_tuning) * 180, 224, 224, 3), dtype = np.float32)
-                y_val_tuning = np.zeros((len(SF_tuning) * len(Ori_tuning) * 180, 1), dtype = np.int64)
-                z_val_tuning = np.zeros((len(SF_tuning), len(Ori_tuning), 180), dtype = np.int64)
-                
-                x_tensor_tuning = []
-                y_tensor_tuning = []
-                
-                counter = -1
-                
-                for i in range(len(file_names)):
-                     
-                    # Construct the main descriptive variables
-                    name_digits = file_names[i].split('_')
-                    
-                    flag_image_name = False
-                    
-                    for j in range(len(SF_tuning)):
-                        for k in range(len(Ori_tuning)):
-                            SFplusOri = str(SF_tuning[j]) + str(Ori_tuning[k])
-                            if (SFplusOri) in name_digits[0]:
-                                
-                                Phase = int(name_digits[0].replace(SFplusOri,''))
-                                
-                                if Phase % 2 == 1:
-                                    counter = counter + 1
-                                    flag_image_name = True
-                                    
-                                    if k <= int(len(Ori_tuning) / 2 - 1):
-                                        y_val_tuning[counter] = 0
-                                    else:
-                                        y_val_tuning[counter] = 1
-                                        
-                                    z_val_tuning[j][k][((Phase + 1) // 2) - 1] = counter
-                    
-                    if flag_image_name:
-                          
-                        # Load image
-                        img = Image.open(file_name_paths[i]).convert('RGB')
-                        
-                        # Resize image
-                        width, height = img.size
-                        new_width = width * 256 // min(img.size)
-                        new_height = height * 256 // min(img.size)
-                        img = img.resize((new_width, new_height), Image.BILINEAR)
-                        
-                        # Center crop image
-                        width, height = img.size
-                        startx = width // 2 - (224 // 2)
-                        starty = height // 2 - (224 // 2)
-                        img = np.asarray(img).reshape(height, width, 3)
-                        img = img[starty:starty + 224, startx:startx + 224]
-                        assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
-                        
-                        # Save image
-                        x_val_tuning[counter, :, :, :] = img[:, :, :]
-                        
-                        # Convert image to tensor and normalize
-                        x_temp = torch.from_numpy(np.transpose(x_val_tuning[counter, :, :, :], (2, 0, 1)))
-                        normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                        x_tensor_tuning.append(normalize(x_temp))
-                        
-                        # Convert target to tensor
-                        y_tensor_tuning.append(torch.from_numpy(y_val_tuning[counter]))
-                    
-                x_tensor_tuning = torch.stack(x_tensor_tuning)
-                y_tensor_tuning = torch.stack(y_tensor_tuning)
-                print(x_tensor_tuning.shape, y_tensor_tuning.shape)
                 
 #                ### ’Artiphysiology’ reveals V4-like shape tuning in a deep network trained for image classification
 #                
@@ -585,55 +702,7 @@ def main():
                         weight_change_2[epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
                         weight_change_3[epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
                         weight_change_4[epoch] = (torch.pow(torch.sum(torch.pow(model.features[8].weight - Conv2d_4_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[8].weight, 2)), 0.5)).item()
-                        weight_change_5[epoch] = (torch.pow(torch.sum(torch.pow(model.features[10].weight - Conv2d_5_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[10].weight, 2)), 0.5)).item()
-                
-#                    # Evaluate on a validation set
-#                    validation_accuracy_temp = np.zeros((180 - epochs), dtype=np.float32)
-#                    
-#                    for epoch in range(epochs, 180):
-#                        
-#                        z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, epoch])
-#                        indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)
-#                        x_valid = torch.index_select(x_tensor_training, 0, indices)
-#                        y_valid = torch.index_select(y_tensor_training, 0, indices)
-#                        y_valid = y_valid.squeeze(1)
-#                        
-#                        batch_time = AverageMeter('Time', ':6.3f')
-#                        losses = AverageMeter('Loss', ':.4e')
-#                        top1 = AverageMeter('Accuracy', ':6.2f')
-#                        progress = ProgressMeter(180 - epochs, [batch_time, losses, top1], prefix=("Validation >>> Session:   " + str(session) + "   Epoch: [{}]").format(epoch - epochs))
-#                    
-#                        # Switch to evaluating mode
-#                        model.eval()
-#                    
-#                        with torch.no_grad():
-#                            end = time.time()
-#                            
-#                            x_ref = x_tensor_training_ref.cuda(gpu)
-#                            x_valid = x_valid.cuda(gpu)
-#                            y_valid = y_valid.cuda(gpu)
-#                
-#                            # Compute output
-#                            output = model(x_valid, x_ref)
-#                            loss = criterion(output, y_valid)
-#                
-#                            # Measure accuracy and record loss
-#                            acc1 = accuracy(output, y_valid, topk = 1)
-#                            losses.update(loss.item(), x_valid.size(0))
-#                            top1.update(acc1[0], x_valid.size(0))
-#                            
-#                            # Save the validation accuracy for plotting
-#                            validation_accuracy_temp[epoch - epochs] = acc1[0].item()
-#                
-#                            # Measure elapsed time
-#                            batch_time.update(time.time() - end)
-#                
-#                            progress.display(epoch - epochs)
-#                            
-#                    # Remember the best accuracy
-#                    validation_accuracy[session - start_session] = np.mean(validation_accuracy_temp)
-#                    is_best = validation_accuracy[session - start_session] >= best_acc1
-#                    best_acc1 = max(validation_accuracy[session - start_session], best_acc1)        
+                        weight_change_5[epoch] = (torch.pow(torch.sum(torch.pow(model.features[10].weight - Conv2d_5_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[10].weight, 2)), 0.5)).item()       
                            
                 os.mkdir('New_Results/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training_' + str(layer_freeze))
                 saving_folder = 'New_Results/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
@@ -677,123 +746,7 @@ def main():
                     'optimizer' : optimizer.state_dict(),
                 }, is_best, group_training, 'DNNforVPL_' + group_training + '.pth.tar')
                 
-                ### SF Transfer
-                
-                # The structure of image names in different groups
-                if group_training == 'group1':
-                    group_transfer = 'group1'
-                    SF_transfer = [96]
-                    Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
-                                    23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
-                
-                elif group_training == 'group2':
-                    group_transfer = 'group2'
-                    SF_transfer= [96]
-                    Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
-                                    23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
-                    
-                elif group_training == 'group3':
-                    group_transfer = 'group3'
-                    SF_transfer = [96]
-                    Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
-                                    23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
-                        
-                elif group_training == 'group4':
-                    group_transfer = 'group4'
-                    SF_transfer = [96]
-                    Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
-                                    23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
-                
-                # Reading all images                   
-                if group_transfer == 'group1' or group_transfer == 'group2':
-                    file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group1&2/*.TIFF')
-                elif group_transfer == 'group3' or group_transfer == 'group4':
-                    file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group3&4/*.TIFF')
-                
-                file_names = [os.path.basename(x) for x in file_name_paths]
-                
-                # Define the main variables
-                x_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 180, 224, 224, 3), dtype = np.float32)
-                y_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 180, 1), dtype = np.int64)
-                z_val_transfer = np.zeros((len(SF_transfer), len(Ori_transfer), 180), dtype = np.int64)
-                
-                x_tensor_transfer = []
-                y_tensor_transfer = []
-                
-                counter = -1
-                
-                for i in range(len(file_names)):
-                     
-                    # Construct the main descriptive variables
-                    name_digits = file_names[i].split('_')
-                    
-                    flag_image_name = False
-                    
-                    for j in range(len(SF_transfer)):
-                        for k in range(len(Ori_transfer)):
-                            SFplusOri = str(SF_transfer[j]) + str(Ori_transfer[k])
-                            if (SFplusOri) in name_digits[0]:
-                                
-                                Phase = int(name_digits[0].replace(SFplusOri,''))
-                                
-                                if Phase % 2 == 1:
-                                    counter = counter + 1
-                                    flag_image_name = True
-                                    
-                                    if k <= int(len(Ori_transfer) / 2 - 1):
-                                        y_val_transfer[counter] = 0
-                                    else:
-                                        y_val_transfer[counter] = 1
-                                        
-                                    z_val_transfer[j][k][((Phase + 1) // 2) - 1] = counter
-                    
-                    if flag_image_name:
-                          
-                        # Load image
-                        img = Image.open(file_name_paths[i]).convert('RGB')
-                        
-                        # Resize image
-                        width, height = img.size
-                        new_width = width * 256 // min(img.size)
-                        new_height = height * 256 // min(img.size)
-                        img = img.resize((new_width, new_height), Image.BILINEAR)
-                        
-                        # Center crop image
-                        width, height = img.size
-                        startx = width // 2 - (224 // 2)
-                        starty = height // 2 - (224 // 2)
-                        img = np.asarray(img).reshape(height, width, 3)
-                        img = img[starty:starty + 224, startx:startx + 224]
-                        assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
-                        
-                        # Save image
-                        x_val_transfer[counter, :, :, :] = img[:, :, :]
-                        
-                        # Convert image to tensor and normalize
-                        x_temp = torch.from_numpy(np.transpose(x_val_transfer[counter, :, :, :], (2, 0, 1)))
-                        normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                        x_tensor_transfer.append(normalize(x_temp))
-                        
-                        # Convert target to tensor
-                        y_tensor_transfer.append(torch.from_numpy(y_val_transfer[counter]))
-                    
-                x_tensor_transfer = torch.stack(x_tensor_transfer)
-                y_tensor_transfer = torch.stack(y_tensor_transfer)
-                print(x_tensor_transfer.shape, y_tensor_transfer.shape)
-                
-                # Save main variables
-                np.save('x_val_transfer_' + group_transfer + '.npy', x_val_transfer)
-                np.save('y_val_transfer_' + group_transfer + '.npy', y_val_transfer)
-                np.save('z_val_transfer_' + group_transfer + '.npy', z_val_transfer)
-                
-                # Get five sample tensors of training/validation images and show them
-                indices = torch.tensor(np.random.permutation(len(SF_transfer) * len(Ori_transfer) * 180), dtype = torch.long)
-                x_sample = torch.index_select(x_tensor_transfer, 0, indices[:5])
-                y_sample = torch.index_select(y_tensor_transfer, 0, indices[:5])
-                x_sample = make_grid([x_sample[0], x_sample[1], x_sample[2], x_sample[3], x_sample[4]])
-                y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
-                imshow(x_sample, y_sample)
-                
+                # Reading the reference image
                 file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
                         
                 # Define the main reference variables
