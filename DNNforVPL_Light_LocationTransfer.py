@@ -211,120 +211,120 @@ def main():
             y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
             imshow(x_sample, y_sample)
             
-            ### SF Transfer
+            # ### SF Transfer
                 
-            # The structure of image names in different groups
-            if group_training == 'group1':
-                group_transfer = 'group1'
-                SF_transfer = [96]
-                Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
-                                23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
+            # # The structure of image names in different groups
+            # if group_training == 'group1':
+            #     group_transfer = 'group1'
+            #     SF_transfer = [96]
+            #     Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
+            #                     23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
             
-            elif group_training == 'group2':
-                group_transfer = 'group2'
-                SF_transfer= [96]
-                Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
-                                23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
+            # elif group_training == 'group2':
+            #     group_transfer = 'group2'
+            #     SF_transfer= [96]
+            #     Ori_transfer = [23325, 23350, 23375, 23400, 23425, 23450, 23475, 23500, 23525, 23550,
+            #                     23650, 23675, 23700, 23725, 23750, 23775, 23800, 23825, 23850, 23875]
                 
-            elif group_training == 'group3':
-                group_transfer = 'group3'
-                SF_transfer = [96]
-                Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
-                                23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
+            # elif group_training == 'group3':
+            #     group_transfer = 'group3'
+            #     SF_transfer = [96]
+            #     Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
+            #                     23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
                     
-            elif group_training == 'group4':
-                group_transfer = 'group4'
-                SF_transfer = [96]
-                Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
-                                23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
+            # elif group_training == 'group4':
+            #     group_transfer = 'group4'
+            #     SF_transfer = [96]
+            #     Ori_transfer = [23075, 23100, 23125, 23150, 23175, 23200, 23225, 23250, 23275, 23300,
+            #                     23900, 23925, 23950, 23975, 24000, 24025, 24050, 24075, 24100, 24125]
             
-            # Reading all images                   
-            if group_transfer == 'group1' or group_transfer == 'group2':
-                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group1&2/*.TIFF')
-            elif group_transfer == 'group3' or group_transfer == 'group4':
-                file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group3&4/*.TIFF')
+            # # Reading all images                   
+            # if group_transfer == 'group1' or group_transfer == 'group2':
+            #     file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group1&2/*.TIFF')
+            # elif group_transfer == 'group3' or group_transfer == 'group4':
+            #     file_name_paths = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/transfer_SF_group3&4/*.TIFF')
             
-            file_names = [os.path.basename(x) for x in file_name_paths]
+            # file_names = [os.path.basename(x) for x in file_name_paths]
             
-            # Define the main variables
-            x_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 360, 112, 112, 3), dtype = np.float32)
-            y_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 360, 1), dtype = np.int64)
-            z_val_transfer = np.zeros((len(SF_transfer), len(Ori_transfer), 360), dtype = np.int64)
+            # # Define the main variables
+            # x_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 360, 112, 112, 3), dtype = np.float32)
+            # y_val_transfer = np.zeros((len(SF_transfer) * len(Ori_transfer) * 360, 1), dtype = np.int64)
+            # z_val_transfer = np.zeros((len(SF_transfer), len(Ori_transfer), 360), dtype = np.int64)
             
-            x_tensor_transfer = []
-            y_tensor_transfer = []
+            # x_tensor_transfer = []
+            # y_tensor_transfer = []
             
-            counter = -1
+            # counter = -1
             
-            for i in range(len(file_names)):
+            # for i in range(len(file_names)):
                  
-                # Construct the main descriptive variables
-                name_digits = file_names[i].split('_')
+            #     # Construct the main descriptive variables
+            #     name_digits = file_names[i].split('_')
                 
-                flag_image_name = False
+            #     flag_image_name = False
                 
-                for j in range(len(SF_transfer)):
-                    for k in range(len(Ori_transfer)):
-                        SFplusOri = str(SF_transfer[j]) + str(Ori_transfer[k])
+            #     for j in range(len(SF_transfer)):
+            #         for k in range(len(Ori_transfer)):
+            #             SFplusOri = str(SF_transfer[j]) + str(Ori_transfer[k])
                         
-                        if (SFplusOri) in name_digits[0]:
-                            Phase = int(name_digits[0].replace(SFplusOri, ''))
-                            counter = counter + 1
-                            flag_image_name = True
+            #             if (SFplusOri) in name_digits[0]:
+            #                 Phase = int(name_digits[0].replace(SFplusOri, ''))
+            #                 counter = counter + 1
+            #                 flag_image_name = True
                             
-                            if k <= int(len(Ori_transfer) / 2 - 1):
-                                y_val_transfer[counter] = 0
-                            else:
-                                y_val_transfer[counter] = 1
+            #                 if k <= int(len(Ori_transfer) / 2 - 1):
+            #                     y_val_transfer[counter] = 0
+            #                 else:
+            #                     y_val_transfer[counter] = 1
                                 
-                            z_val_transfer[j][k][Phase - 1] = counter
+            #                 z_val_transfer[j][k][Phase - 1] = counter
                 
-                if flag_image_name:
+            #     if flag_image_name:
                       
-                    # Load image
-                    img = Image.open(file_name_paths[i]).convert('RGB')
+            #         # Load image
+            #         img = Image.open(file_name_paths[i]).convert('RGB')
                     
-                    # Resize image
-                    width, height = img.size
-                    new_width = width * 256 // min(img.size)
-                    new_height = height * 256 // min(img.size)
-                    img = img.resize((new_width, new_height), Image.BILINEAR)
+            #         # Resize image
+            #         width, height = img.size
+            #         new_width = width * 256 // min(img.size)
+            #         new_height = height * 256 // min(img.size)
+            #         img = img.resize((new_width, new_height), Image.BILINEAR)
                     
-                    # Center crop image
-                    width, height = img.size
-                    startx = width // 2 - (112 // 2)
-                    starty = height // 2 - (112 // 2)
-                    img = np.asarray(img).reshape(height, width, 3)
-                    img = img[starty:starty + 112, startx:startx + 112]
-                    assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
+            #         # Center crop image
+            #         width, height = img.size
+            #         startx = width // 2 - (112 // 2)
+            #         starty = height // 2 - (112 // 2)
+            #         img = np.asarray(img).reshape(height, width, 3)
+            #         img = img[starty:starty + 112, startx:startx + 112]
+            #         assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
                     
-                    # Save image
-                    x_val_transfer[counter, :, :, :] = img[:, :, :]
+            #         # Save image
+            #         x_val_transfer[counter, :, :, :] = img[:, :, :]
                     
-                    # Convert image to tensor and normalize
-                    x_temp = torch.from_numpy(np.transpose(x_val_transfer[counter, :, :, :], (2, 0, 1)))
-                    normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                    x_tensor_transfer.append(normalize(x_temp))
+            #         # Convert image to tensor and normalize
+            #         x_temp = torch.from_numpy(np.transpose(x_val_transfer[counter, :, :, :], (2, 0, 1)))
+            #         normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+            #         x_tensor_transfer.append(normalize(x_temp))
                     
-                    # Convert target to tensor
-                    y_tensor_transfer.append(torch.from_numpy(y_val_transfer[counter]))
+            #         # Convert target to tensor
+            #         y_tensor_transfer.append(torch.from_numpy(y_val_transfer[counter]))
                 
-            x_tensor_transfer = torch.stack(x_tensor_transfer)
-            y_tensor_transfer = torch.stack(y_tensor_transfer)
-            print(x_tensor_transfer.shape, y_tensor_transfer.shape)
+            # x_tensor_transfer = torch.stack(x_tensor_transfer)
+            # y_tensor_transfer = torch.stack(y_tensor_transfer)
+            # print(x_tensor_transfer.shape, y_tensor_transfer.shape)
             
-            # Save main variables
-            np.save('x_val_transfer_' + group_transfer + '.npy', x_val_transfer)
-            np.save('y_val_transfer_' + group_transfer + '.npy', y_val_transfer)
-            np.save('z_val_transfer_' + group_transfer + '.npy', z_val_transfer)
+            # # Save main variables
+            # np.save('x_val_transfer_' + group_transfer + '.npy', x_val_transfer)
+            # np.save('y_val_transfer_' + group_transfer + '.npy', y_val_transfer)
+            # np.save('z_val_transfer_' + group_transfer + '.npy', z_val_transfer)
             
-            # Get five sample tensors of training/validation images and show them
-            indices = torch.tensor(np.random.permutation(len(SF_transfer) * len(Ori_transfer) * 360), dtype = torch.long)
-            x_sample = torch.index_select(x_tensor_transfer, 0, indices[:5])
-            y_sample = torch.index_select(y_tensor_transfer, 0, indices[:5])
-            x_sample = make_grid([x_sample[0], x_sample[1], x_sample[2], x_sample[3], x_sample[4]])
-            y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
-            imshow(x_sample, y_sample)
+            # # Get five sample tensors of training/validation images and show them
+            # indices = torch.tensor(np.random.permutation(len(SF_transfer) * len(Ori_transfer) * 360), dtype = torch.long)
+            # x_sample = torch.index_select(x_tensor_transfer, 0, indices[:5])
+            # y_sample = torch.index_select(y_tensor_transfer, 0, indices[:5])
+            # x_sample = make_grid([x_sample[0], x_sample[1], x_sample[2], x_sample[3], x_sample[4]])
+            # y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
+            # imshow(x_sample, y_sample)
             
             ### Tuning
                                       
@@ -419,7 +419,7 @@ def main():
                 print('Freezed Layer:   ', layer_freeze)
                 
                 # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
+                file_name_path_ref = glob.glob('VPL Stimuli/6 x 40 x 360 Stimuli (32)/ref_training.TIFF')
                 
                 # Define the main reference variables
                 x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
@@ -696,7 +696,7 @@ def main():
                 }, is_best, group_training, 'DNNforVPL_' + group_training + '.pth.tar')
                 
                 # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
+                file_name_path_ref = glob.glob('VPL Stimuli/6 x 40 x 360 Stimuli (32)/ref_transfer.TIFF')
                         
                 # Define the main reference variables
                 x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
@@ -726,7 +726,7 @@ def main():
                 x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
                 normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
                 
-                for i in range(0, 20):
+                for i in range(0, 40):
                     x_tensor_ref.append(normalize(x_temp))
                     
                 x_tensor_ref = torch.stack(x_tensor_ref)
@@ -757,54 +757,62 @@ def main():
                     
                 for session in range(start_session, sessions):
                     
-                    z_val_shuffle = copy.deepcopy(z_val_transfer)
+                    z_val_shuffle = copy.deepcopy(z_val_training)
                     
-                    for j in range(len(SF_transfer)):
-                        for k in range(len(Ori_transfer)):
+                    for j in range(len(SF_training)):
+                        for k in range(len(Ori_training)):
                             random.shuffle(z_val_shuffle[j, k, :])
-                
-                    # Evaluate on a validation set
+                            
                     z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, session])
+                    random.shuffle(z_val_shuffle_1D)
                     indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)
-                    x_valid = torch.index_select(x_tensor_transfer, 0, indices)
-                    y_valid = torch.index_select(y_tensor_transfer, 0, indices)
-                    y_valid = y_valid.squeeze(1)
-                           
-                    batch_time = AverageMeter('Time', ':6.3f')
-                    losses = AverageMeter('Loss', ':.4e')
-                    top1 = AverageMeter('Accuracy', ':6.2f')
-                    progress = ProgressMeter(1, [batch_time, losses, top1], prefix=("Transfer >>> Session:   " + str(session) + "   Epoch: [{}]").format(1))
+                     
+                    step = int(np.floor(len(SF_training) * len(Ori_training) / 40))
+                    validation_accuracy_step = np.zeros(step, dtype = np.float32)
+                    
+                    # Evaluate on a validation set
+                    for i in range(0, step):
+                        index = torch.index_select(indices, 0, torch.tensor(np.arange(i * 40, (i + 1) * 40), dtype = torch.long))
+                        x_valid = torch.index_select(x_tensor_training, 0, index)
+                        y_valid = torch.index_select(y_tensor_training, 0, index)
+                        y_valid = y_valid.squeeze(1)
+                               
+                        batch_time = AverageMeter('Time', ':6.3f')
+                        losses = AverageMeter('Loss', ':.4e')
+                        top1 = AverageMeter('Accuracy', ':6.2f')
+                        progress = ProgressMeter(1, [batch_time, losses, top1], prefix=("Transfer >>> Session:   " + str(session) + "   Epoch: [{}]").format(1))
+                    
+                        # Switch to evaluating mode
+                        model.eval()
+                    
+                        with torch.no_grad():
+                            end = time.time()
+                            
+                            x_ref = x_tensor_ref.cuda(gpu)
+                            x_valid = x_valid.cuda(gpu)
+                            y_valid = y_valid.cuda(gpu)
                 
-                    # Switch to evaluating mode
-                    model.eval()
+                            # Compute output
+                            output = model(x_valid, x_ref)
+                            loss = criterion(output, y_valid)
                 
-                    with torch.no_grad():
-                        end = time.time()
-                        
-                        x_ref = x_tensor_ref.cuda(gpu)
-                        x_valid = x_valid.cuda(gpu)
-                        y_valid = y_valid.cuda(gpu)
-            
-                        # Compute output
-                        output = model(x_valid, x_ref)
-                        loss = criterion(output, y_valid)
-            
-                        # Measure accuracy and record loss
-                        acc1 = accuracy(output, y_valid, topk = 1)
-                        losses.update(loss.item(), x_valid.size(0))
-                        top1.update(acc1[0], x_valid.size(0))
-                        
-                        # Save the validation accuracy for plotting
-                        validation_accuracy[session - start_session] = acc1[0].item()
-            
-                        # Measure elapsed time
-                        batch_time.update(time.time() - end)
-            
-                        progress.display(1)
+                            # Measure accuracy and record loss
+                            acc1 = accuracy(output, y_valid, topk = 1)
+                            losses.update(loss.item(), x_valid.size(0))
+                            top1.update(acc1[0], x_valid.size(0))
+                            
+                            # Save the validation accuracy for plotting
+                            validation_accuracy_step[i] = acc1[0].item()
+                
+                            # Measure elapsed time
+                            batch_time.update(time.time() - end)
+                
+                            progress.display(1)
                         
                     # Remember the best accuracy and save checkpoint
-                    is_best = acc1[0].item() >= best_acc1
-                    best_acc1 = max(acc1[0].item(), best_acc1)
+                    validation_accuracy[session - start_session] = np.mean(validation_accuracy_step)
+                    is_best = validation_accuracy[session - start_session] >= best_acc1
+                    best_acc1 = max(validation_accuracy[session - start_session], best_acc1)
                     
                 np.savetxt(saving_folder + '/Transfer_Accuracy.txt', validation_accuracy, fmt = '%d')
                                               
