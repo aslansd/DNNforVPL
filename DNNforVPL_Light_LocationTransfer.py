@@ -553,8 +553,8 @@ def main():
                     #     Phase_box_central_unit_activity_Conv2d_2 = []
                         
                     #     for i in range(0, 360):
-                    #         Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-                    #         Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                    #         Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i + 1, :], axis = 1))
+                    #         Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i + 1, :], axis = 1))
                             
                     #     for feature in ['SF', 'Ori', 'Phase']:
                     #         for conv_layer_num in [1, 2]:
@@ -874,8 +874,8 @@ def main():
                     # Phase_box_central_unit_activity_Conv2d_2 = []
                     
                     # for i in range(0, 360):
-                    #     Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-                    #     Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                    #     Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i + 1, :], axis = 1))
+                    #     Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i + 1, :], axis = 1))
                         
                     # for feature in ['SF', 'Ori', 'Phase']:
                     #     for conv_layer_num in [1, 2]:
@@ -987,8 +987,8 @@ def main():
                     # Phase_box_channel_importance_Conv2d_2 = []
                     
                     # for i in range(0, 360):
-                    #     Phase_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-                    #     Phase_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                    #     Phase_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 2] == i + 1, :], axis = 1))
+                    #     Phase_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 2] == i + 1, :], axis = 1))
                         
                     # for feature in ['SF', 'Ori', 'Phase']:
                     #     for conv_layer_num in [1, 2]:
@@ -1047,7 +1047,7 @@ def main():
                     #     y_title = ['SF = ' + str(SF_training[SF_index]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index_1]) + ' ***** ' + 'Ph = ' + str(Phase_index),
                     #               'SF = ' + str(SF_training[SF_index]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index_2]) + ' ***** ' + 'Ph = ' + str(Phase_index)]
                     
-                    #     visualize_layer_indices = [1, 2]
+                    #     visualize_layer_indices = [2, 5]
                         
                     #     for layer in model.features:
                     #         if isinstance(layer, torch.nn.MaxPool2d):
@@ -1086,7 +1086,7 @@ def main():
                     #         y_title = ['SF = ' + str(SF_training[SF_index_1]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index]) + ' ***** ' + 'Ph = ' + str(Phase_index),
                     #                   'SF = ' + str(SF_training[SF_index_2]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index]) + ' ***** ' + 'Ph = ' + str(Phase_index)]
                         
-                    #         visualize_layer_indices = [1, 2]
+                    #         visualize_layer_indices = [2, 5]
                             
                     #         for layer in model.features:
                     #             if isinstance(layer, torch.nn.MaxPool2d):
@@ -1216,36 +1216,36 @@ def visualize(x_img_greybackground, x_img, title):
     for i in range(0, len(x_img)):
         x_img[i] = x_img[i].cpu()       
     
-#    x_img_input = make_grid(x_img[0:len(title)], nrow = len(title))
-#    x_img_input = x_img_input.detach().numpy().transpose((1, 2, 0)) 
-#    mean = np.array([0.485, 0.456, 0.406])
-#    std = np.array([0.229, 0.224, 0.225])
-#    x_img_input = (std * x_img_input + mean) / 255.0
-#    x_img_input = np.clip(x_img_input, 0, 1)
-#    plt.figure()
-#    plt.imshow(x_img_input)
-#    plt.title(title)
+    # x_img_input = make_grid(x_img[0:len(title)], nrow = len(title))
+    # x_img_input = x_img_input.detach().numpy().transpose((1, 2, 0)) 
+    # mean = np.array([0.485, 0.456, 0.406])
+    # std = np.array([0.229, 0.224, 0.225])
+    # x_img_input = (std * x_img_input + mean) / 255.0
+    # x_img_input = np.clip(x_img_input, 0, 1)
+    # plt.figure()
+    # plt.imshow(x_img_input)
+    # plt.title(title)
     
     x_img_layers = []
     for i in range(len(title), len(x_img)):
         x_img_layers.append((x_img[i] - x_img[i].min()) * 255 / (x_img[i].max() - x_img[i].min()))
         
-#    x_img_1 = make_grid(x_img_layers, nrow = len(title))
-#    x_img_1 = x_img_1.detach().numpy().transpose((1, 2, 0)).astype('uint8')
-#    plt.figure()
-#    plt.imshow(x_img_1)
-#    plt.title(title)
+    # x_img_1 = make_grid(x_img_layers, nrow = len(title))
+    # x_img_1 = x_img_1.detach().numpy().transpose((1, 2, 0)).astype('uint8')
+    # plt.figure()
+    # plt.imshow(x_img_1)
+    # plt.title(title)
     
-#    x_img_layers_background = []
-#    for i in range(len(title), len(x_img)):
-#        x_img_temp = x_img[i] - x_img_greybackground[i - len(title)]
-#        x_img_layers_background.append((x_img_temp - x_img_temp.min()) * 255 / (x_img_temp.max() - x_img_temp.min()))
-#    
-#    x_img_2 = make_grid(x_img_layers_background, nrow = len(title))
-#    x_img_2 = x_img_2.detach().numpy().transpose((1, 2, 0)).astype('uint8')
-#    plt.figure()
-#    plt.imshow(x_img_2)
-#    plt.title(title)
+    # x_img_layers_background = []
+    # for i in range(len(title), len(x_img)):
+    #     x_img_temp = x_img[i] - x_img_greybackground[i - len(title)]
+    #     x_img_layers_background.append((x_img_temp - x_img_temp.min()) * 255 / (x_img_temp.max() - x_img_temp.min()))
+    
+    # x_img_2 = make_grid(x_img_layers_background, nrow = len(title))
+    # x_img_2 = x_img_2.detach().numpy().transpose((1, 2, 0)).astype('uint8')
+    # plt.figure()
+    # plt.imshow(x_img_2)
+    # plt.title(title)
    
     x_img_difference = []
     counter = -1
@@ -1256,13 +1256,13 @@ def visualize(x_img_greybackground, x_img, title):
         # x_img_difference[counter] = (x_img_layers[i - len(title) + 1] - x_img_layers[i - len(title)]).pow(2).sum().pow(0.5).detach().numpy()
         x_img_difference[counter] = (x_img[i + 1] - x_img[i]).pow(2).sum().pow(0.5).detach().numpy()
     
-#    plt.figure()
-#    plt.title("Euclidean Distance of Mapped Pixles in Consecutive Layers")
-#    plt.xlabel("Convolutional Layer Number")
-#    plt.ylabel("Euclidean Distance")
-#    plt.plot(range(1, 3), x_img_difference)
-#    plt.xticks(np.arange(1, 3, 1.0))
-#    plt.show()
+    # plt.figure()
+    # plt.title("Euclidean Distance of Mapped Pixles in Consecutive Layers")
+    # plt.xlabel("Convolutional Layer Number")
+    # plt.ylabel("Euclidean Distance")
+    # plt.plot(range(1, 3), x_img_difference)
+    # plt.xticks(np.arange(1, 3, 1.0))
+    # plt.show()
         
     return x_img_difference
     
