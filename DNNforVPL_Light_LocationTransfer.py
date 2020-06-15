@@ -415,713 +415,718 @@ def main():
             y_tensor_tuning = torch.stack(y_tensor_tuning)
             print(x_tensor_tuning.shape, y_tensor_tuning.shape)
             
-            for layer_freeze in [None, 0, 3]:
-                print('Freezed Layer:   ', layer_freeze)
+            for location_transfer in [1, 2]:
+                print('Location transfer:   ', location_transfer)
                 
-                # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/6 x 40 x 360 Stimuli (32)/ref_training.TIFF')
-                
-                # Define the main reference variables
-                x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
-                x_tensor_ref = []
-                
-                # Load image
-                img = Image.open(file_name_path_ref[0]).convert('RGB')
-                
-                # Resize image
-                width, height = img.size
-                new_width = width * 256 // min(img.size)
-                new_height = height * 256 // min(img.size)
-                img = img.resize((new_width, new_height), Image.BILINEAR)
-                
-                # Center crop image
-                width, height = img.size
-                startx = width // 2 - (112 // 2)
-                starty = height // 2 - (112 // 2)
-                img = np.asarray(img).reshape(height, width, 3)
-                img = img[starty:starty + 112, startx:startx + 112]
-                assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
-                
-                # Save image
-                x_val_ref[:, :, :] = img[:, :, :]
-                
-                # Convert image to tensor and normalize and copy
-                x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
-                normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                
-                for i in range(0, 40):
-                    x_tensor_ref.append(normalize(x_temp))
+                os.mkdir('New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/Location_' + str(location_transfer))
+            
+                for layer_freeze in [None, 0, 3]:                   
+                    print('Freezed Layer:   ', layer_freeze)
                     
-                x_tensor_ref = torch.stack(x_tensor_ref)
-                print(x_tensor_ref.shape)
-                
-                # Select GPU
-                global device
-                gpu = 0
-                os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
-                device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-                print("Use GPU: {} for training".format(gpu))
-                
-                # Load the PyTorch model
-                model = DNNforVPL()
-                
-                # Initialize the weights of all layers of the model
-                nn.init.xavier_uniform_(model.features[0].weight)
-                nn.init.zeros_(model.features[0].bias)
-                
-                nn.init.xavier_uniform_(model.features[3].weight)
-                nn.init.zeros_(model.features[3].bias)
-                
-                nn.init.xavier_uniform_(model.classifier[0].weight)
-                nn.init.zeros_(model.classifier[0].bias)
-                
-                # Set all the parameters of the model to be trained
-                for param in model.parameters():
-                    param.requires_grad = True
+                    # Reading the reference image
+                    file_name_path_ref = glob.glob('VPL Stimuli/6 x 40 x 360 Stimuli (32)/ref_training_' + str(location_transfer) + '.TIFF')
                     
-                if layer_freeze != None:
-                    model.features[layer_freeze].weight.requires_grad = False
-                    model.features[layer_freeze].bias.requires_grad = False
-                
-                # Send the model to GPU/CPU
-                model = model.to(device)
-                
-                # Model summary
-                print(model)
+                    # Define the main reference variables
+                    x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
+                    x_tensor_ref = []
                     
-                cudnn.benchmark = True
-                
-#                ### ’Artiphysiology’ reveals V4-like shape tuning in a deep network trained for image classification
-#                
-#                # The Convolutional layers: (0, 3)
-#                # The size of consecutive convolutional layers: (112, 110)
-#                # The central units of consecutive convolutional layers: (55, 54)
-#                # The number of channels of consecutive convolutional layers: (6, 16)
-#                
-#                if layer_freeze == None:
-#                    os.mkdir('New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/before_training')
-#                    saving_folder = 'New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/before_training'
-#                    
-#                    feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
-#                    
-#                    all_central_unit_activity_Conv2d_1 = np.zeros((num_sample_artiphysiology, 6), dtype = np.float32)
-#                    all_central_unit_activity_Conv2d_2 = np.zeros((num_sample_artiphysiology, 16), dtype = np.float32)
-#                            
-#                    for i in range(0, num_sample_artiphysiology):                    
-#                        feature_sample_artiphysiology[i, :] = [SF_tuning[x_sample_artiphysiology_index[i, 0]], Ori_tuning[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
-#                        
-#                        index = torch.tensor(z_val_tuning[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
-#                        x_sample = torch.index_select(x_tensor_tuning, 0, index)
-#                        x_sample = x_sample.cuda(gpu)
-#                        
-#                        unit_activity_layer_0 = model.features[0](x_sample)
-#                        unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-#                        unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-#                        unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-#                        unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-#                        unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-#                        
-#                        all_central_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0, :, 55, 55].detach().cpu().clone().numpy()
-#                        all_central_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0, :, 54, 54].detach().cpu().clone().numpy()
-#                        
-#                    scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})
-#                    
-#                    scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_1.mat', mdict = {'all_central_unit_activity_Conv2d_1': all_central_unit_activity_Conv2d_1})
-#                    scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_2.mat', mdict = {'all_central_unit_activity_Conv2d_2': all_central_unit_activity_Conv2d_2})
-#                                  
-#                    # Boxplotting the tuning curves of central units of three features of convolutional layers
-#                    SF_box_central_unit_activity_Conv2d_1 = []
-#                    SF_box_central_unit_activity_Conv2d_2 = []
-#                    
-#                    for i in range(0, len(SF_tuning)):                        
-#                        SF_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
-#                        SF_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
-#                        
-#                    Ori_box_central_unit_activity_Conv2d_1 = []
-#                    Ori_box_central_unit_activity_Conv2d_2 = []
-#                    
-#                    for i in range(0, len(Ori_tuning)):
-#                        Ori_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
-#                        Ori_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
-#                    
-#                    Phase_box_central_unit_activity_Conv2d_1 = []
-#                    Phase_box_central_unit_activity_Conv2d_2 = []
-#                    
-#                    for i in range(0, 360):
-#                        Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-#                        Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-#                        
-#                    for feature in ['SF', 'Ori', 'Phase']:
-#                        for conv_layer_num in [1, 2]:
-#                            plt.figure()
-#                            plt.title("%s Boxplot Tuning Curve of the Convolutional Layer %d" % (feature, conv_layer_num))
-#                            plt.xlabel(feature)
-#                            plt.ylabel("Central Unit Activity")
-#                            variable_name = feature + '_box_central_unit_activity_Conv2d_' + str(conv_layer_num)
-#                            plt.boxplot(vars()[variable_name])
-#                            plt.show()
-#                            plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
-#                            plt.close()
+                    # Load image
+                    img = Image.open(file_name_path_ref[0]).convert('RGB')
+                    
+                    # Resize image
+                    width, height = img.size
+                    new_width = width * 256 // min(img.size)
+                    new_height = height * 256 // min(img.size)
+                    img = img.resize((new_width, new_height), Image.BILINEAR)
+                    
+                    # Center crop image
+                    width, height = img.size
+                    startx = width // 2 - (112 // 2)
+                    starty = height // 2 - (112 // 2)
+                    img = np.asarray(img).reshape(height, width, 3)
+                    img = img[starty:starty + 112, startx:startx + 112]
+                    assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
+                    
+                    # Save image
+                    x_val_ref[:, :, :] = img[:, :, :]
+                    
+                    # Convert image to tensor and normalize and copy
+                    x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
+                    normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+                    
+                    for i in range(0, 40):
+                        x_tensor_ref.append(normalize(x_temp))
                         
-                # Define the main learning parameters
-                lr = 0.0001
-                momentum = 0.9
-                weight_decay = 0.0001
-                
-                # Define the loss function (criterion) and optimizer
-                criterion = nn.CrossEntropyLoss().cuda(gpu)
-                optimizer = torch.optim.SGD(model.parameters(), lr, momentum = momentum, weight_decay = weight_decay)
-                   
-                # Save the initial weights of the convolutional layers of the model
-                Conv2d_1_0 = copy.deepcopy(model.features[0].weight)
-                Conv2d_2_0 = copy.deepcopy(model.features[3].weight)
-                   
-                # Define the main training/validation parameters
-                start_session = 0
-                sessions = 1
-                
-                z_val_shuffle = copy.deepcopy(z_val_training)
+                    x_tensor_ref = torch.stack(x_tensor_ref)
+                    print(x_tensor_ref.shape)
                     
-                for i in range(len(SF_training)):
-                    for j in range(len(Ori_training)):
-                        random.shuffle(z_val_shuffle[i, j, :])
+                    # Select GPU
+                    global device
+                    gpu = 0
+                    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
+                    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+                    print("Use GPU: {} for training".format(gpu))
                     
-                for session in range(start_session, sessions):
+                    # Load the PyTorch model
+                    model = DNNforVPL()
                     
-                    # Adjust the learning rate
-                    adjust_learning_rate(optimizer, session, lr)
+                    # Initialize the weights of all layers of the model
+                    nn.init.xavier_uniform_(model.features[0].weight)
+                    nn.init.zeros_(model.features[0].bias)
                     
-                    # Train on a training set        
-                    epochs = 360
+                    nn.init.xavier_uniform_(model.features[3].weight)
+                    nn.init.zeros_(model.features[3].bias)
                     
-                    validation_accuracy = np.zeros(epochs, dtype = np.float32)
+                    nn.init.xavier_uniform_(model.classifier[0].weight)
+                    nn.init.zeros_(model.classifier[0].bias)
                     
-                    weight_change_1 = np.zeros(epochs, dtype = np.float32)
-                    weight_change_2 = np.zeros(epochs, dtype = np.float32)
+                    # Set all the parameters of the model to be trained
+                    for param in model.parameters():
+                        param.requires_grad = True
+                        
+                    if layer_freeze != None:
+                        model.features[layer_freeze].weight.requires_grad = False
+                        model.features[layer_freeze].bias.requires_grad = False
+                    
+                    # Send the model to GPU/CPU
+                    model = model.to(device)
+                    
+                    # Model summary
+                    print(model)
+                        
+                    cudnn.benchmark = True
+                    
+                    # ### ’Artiphysiology’ reveals V4-like shape tuning in a deep network trained for image classification
+                    
+                    # # The Convolutional layers: (0, 3)
+                    # # The size of consecutive convolutional layers: (112, 110)
+                    # # The central units of consecutive convolutional layers: (55, 54)
+                    # # The number of channels of consecutive convolutional layers: (6, 16)
+                    
+                    # if layer_freeze == None:
+                    #     os.mkdir('New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/Location_' + str(location_transfer) + '/before_training')
+                    #     saving_folder = 'New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/Location_' + str(location_transfer) + '/before_training'
+                        
+                    #     feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
+                        
+                    #     all_central_unit_activity_Conv2d_1 = np.zeros((num_sample_artiphysiology, 6), dtype = np.float32)
+                    #     all_central_unit_activity_Conv2d_2 = np.zeros((num_sample_artiphysiology, 16), dtype = np.float32)
+                                
+                    #     for i in range(0, num_sample_artiphysiology):                    
+                    #         feature_sample_artiphysiology[i, :] = [SF_tuning[x_sample_artiphysiology_index[i, 0]], Ori_tuning[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
                             
-                    for epoch in range(epochs):                       
-                        z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, epoch])
-                        random.shuffle(z_val_shuffle_1D)
-                        indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)                        
+                    #         index = torch.tensor(z_val_tuning[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                    #         x_sample = torch.index_select(x_tensor_tuning, 0, index)
+                    #         x_sample = x_sample.cuda(gpu)
+                            
+                    #         unit_activity_layer_0 = model.features[0](x_sample)
+                    #         unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                    #         unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                    #         unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                    #         unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                    #         unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                            
+                    #         all_central_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0, :, 55, 55].detach().cpu().clone().numpy()
+                    #         all_central_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0, :, 54, 54].detach().cpu().clone().numpy()
+                            
+                    #     scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})
                         
+                    #     scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_1.mat', mdict = {'all_central_unit_activity_Conv2d_1': all_central_unit_activity_Conv2d_1})
+                    #     scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_2.mat', mdict = {'all_central_unit_activity_Conv2d_2': all_central_unit_activity_Conv2d_2})
+                                      
+                    #     # Boxplotting the tuning curves of central units of three features of convolutional layers
+                    #     SF_box_central_unit_activity_Conv2d_1 = []
+                    #     SF_box_central_unit_activity_Conv2d_2 = []
+                        
+                    #     for i in range(0, len(SF_tuning)):                        
+                    #         SF_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
+                    #         SF_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
+                            
+                    #     Ori_box_central_unit_activity_Conv2d_1 = []
+                    #     Ori_box_central_unit_activity_Conv2d_2 = []
+                        
+                    #     for i in range(0, len(Ori_tuning)):
+                    #         Ori_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
+                    #         Ori_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
+                        
+                    #     Phase_box_central_unit_activity_Conv2d_1 = []
+                    #     Phase_box_central_unit_activity_Conv2d_2 = []
+                        
+                    #     for i in range(0, 360):
+                    #         Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                    #         Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                            
+                    #     for feature in ['SF', 'Ori', 'Phase']:
+                    #         for conv_layer_num in [1, 2]:
+                    #             plt.figure()
+                    #             plt.title("%s Boxplot Tuning Curve of the Convolutional Layer %d" % (feature, conv_layer_num))
+                    #             plt.xlabel(feature)
+                    #             plt.ylabel("Central Unit Activity")
+                    #             variable_name = feature + '_box_central_unit_activity_Conv2d_' + str(conv_layer_num)
+                    #             plt.boxplot(vars()[variable_name])
+                    #             plt.show()
+                    #             plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
+                    #             plt.close()
+                            
+                    # Define the main learning parameters
+                    lr = 0.0001
+                    momentum = 0.9
+                    weight_decay = 0.0001
+                    
+                    # Define the loss function (criterion) and optimizer
+                    criterion = nn.CrossEntropyLoss().cuda(gpu)
+                    optimizer = torch.optim.SGD(model.parameters(), lr, momentum = momentum, weight_decay = weight_decay)
+                       
+                    # Save the initial weights of the convolutional layers of the model
+                    Conv2d_1_0 = copy.deepcopy(model.features[0].weight)
+                    Conv2d_2_0 = copy.deepcopy(model.features[3].weight)
+                       
+                    # Define the main training/validation parameters
+                    start_session = 0
+                    sessions = 1
+                    
+                    z_val_shuffle = copy.deepcopy(z_val_training)
+                        
+                    for i in range(len(SF_training)):
+                        for j in range(len(Ori_training)):
+                            random.shuffle(z_val_shuffle[i, j, :])
+                        
+                    for session in range(start_session, sessions):
+                        
+                        # Adjust the learning rate
+                        adjust_learning_rate(optimizer, session, lr)
+                        
+                        # Train on a training set        
+                        epochs = 360
+                        
+                        validation_accuracy = np.zeros(epochs, dtype = np.float32)
+                        
+                        weight_change_1 = np.zeros(epochs, dtype = np.float32)
+                        weight_change_2 = np.zeros(epochs, dtype = np.float32)
+                                
+                        for epoch in range(epochs):                       
+                            z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, epoch])
+                            random.shuffle(z_val_shuffle_1D)
+                            indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)                        
+                            
+                            step = int(np.floor(len(SF_training) * len(Ori_training) / 40))
+                            validation_accuracy_step = np.zeros(step, dtype = np.float32)
+                            
+                            for i in range(0, step):
+                                index = torch.index_select(indices, 0, torch.tensor(np.arange(i * 40, (i + 1) * 40), dtype = torch.long))
+                                x_train = torch.index_select(x_tensor_training, 0, index)
+                                y_train = torch.index_select(y_tensor_training, 0, index)
+                                y_train = y_train.squeeze(1)
+                                
+                                batch_time = AverageMeter('Time', ':6.3f')
+                                losses = AverageMeter('Loss', ':.4e')
+                                top1 = AverageMeter('Accuracy', ':6.2f')
+                                progress = ProgressMeter(epochs, [batch_time, losses, top1], prefix = ("Training >>> Session:   " + str(session) + "   Epoch: [{}]").format(epoch))
+                            
+                                # Switch to training mode
+                                model.train()
+                                
+                                with torch.set_grad_enabled(True):
+                                    end = time.time()
+                            
+                                    x_ref = x_tensor_ref.cuda(gpu)
+                                    x_train = x_train.cuda(gpu)
+                                    y_train = y_train.cuda(gpu)
+                            
+                                    # Compute output
+                                    output = model(x_train, x_ref)
+                                    loss = criterion(output, y_train)
+                            
+                                    # Measure accuracy and record loss
+                                    acc1 = accuracy(output, y_train, topk = 1)
+                                    losses.update(loss.item(), x_train.size(0))
+                                    top1.update(acc1[0], x_train.size(0))
+                            
+                                    # Compute gradient and do SGD step
+                                    optimizer.zero_grad()
+                                    loss.backward()
+                                    optimizer.step()
+                            
+                                    # Save the validation accuracy for plotting
+                                    validation_accuracy_step[i] = acc1[0].item()
+                                    
+                                    # Measure elapsed time
+                                    batch_time.update(time.time() - end)
+                            
+                                    progress.display(epoch)
+                                
+                            # Remember the best accuracy
+                            validation_accuracy[epoch] = np.mean(validation_accuracy_step)
+                            is_best = validation_accuracy[epoch] >= best_acc1
+                            best_acc1 = max(validation_accuracy[epoch], best_acc1)
+                            
+                            weight_change_1[epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
+                            weight_change_2[epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()       
+                               
+                    os.mkdir('New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/Location_' + str(location_transfer) + '/after_training_' + str(layer_freeze))
+                    saving_folder = 'New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/Location_' + str(location_transfer) + '/after_training_' + str(layer_freeze)
+                    
+                    np.savetxt(saving_folder + '/Training_Accuracy.txt', validation_accuracy, fmt = '%d')
+                
+                    # Plot the validation accuracy vs. number of training sessions
+                    plt.figure()
+                    plt.title("Training Accuracy vs. Number of Training Sessions")
+                    plt.xlabel("Training Sessions")
+                    plt.ylabel("Training Accuracy")
+                    plt.plot(range(0, epochs), validation_accuracy)
+                    plt.ylim((0, 105.))
+                    plt.xticks(np.arange(-1, epochs + 1, 1.0))
+                    plt.show()
+                    plt.savefig(saving_folder + '/Training_Accuracy.tif')
+                    plt.close()
+                    
+                    # Plot the weight change in convolutional layers vs. number of training sessions
+                    plt.figure()
+                    plt.title("Weight Change in Convolutional Layers vs. Number of Training Sessions")
+                    plt.xlabel("Training Sessions")
+                    plt.ylabel("Weight Change")
+                    plt.plot(range(0, epochs), weight_change_1, "-b", label = "Conv Layer 1")
+                    plt.plot(range(0, epochs), weight_change_2, "-g", label = "Conv Layer 2")
+                    plt.xticks(np.arange(-1, epochs + 1, 1.0))
+                    plt.show()
+                    plt.savefig(saving_folder + '/Weight_Change.tif')
+                    plt.close()
+                    
+                    # Save the checkpoint
+                    save_checkpoint({
+                        'session': session + 1,
+                        'state_dict': model.state_dict(),
+                        'best_acc1': best_acc1,
+                        'optimizer' : optimizer.state_dict(),
+                    }, is_best, group_training, 'DNNforVPL_' + group_training + '.pth.tar')
+                    
+                    # Reading the reference image
+                    file_name_path_ref = glob.glob('VPL Stimuli/6 x 40 x 360 Stimuli (32)/ref_transfer.TIFF')
+                            
+                    # Define the main reference variables
+                    x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
+                    x_tensor_ref = []
+                    
+                    # Load image
+                    img = Image.open(file_name_path_ref[0]).convert('RGB')
+                    
+                    # Resize image
+                    width, height = img.size
+                    new_width = width * 256 // min(img.size)
+                    new_height = height * 256 // min(img.size)
+                    img = img.resize((new_width, new_height), Image.BILINEAR)
+                    
+                    # Center crop image
+                    width, height = img.size
+                    startx = width // 2 - (112 // 2)
+                    starty = height // 2 - (112 // 2)
+                    img = np.asarray(img).reshape(height, width, 3)
+                    img = img[starty:starty + 112, startx:startx + 112]
+                    assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
+                    
+                    # Save image
+                    x_val_ref[:, :, :] = img[:, :, :]
+                    
+                    # Convert image to tensor and normalize and copy
+                    x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
+                    normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+                    
+                    for i in range(0, 40):
+                        x_tensor_ref.append(normalize(x_temp))
+                        
+                    x_tensor_ref = torch.stack(x_tensor_ref)
+                    print(x_tensor_ref.shape)
+                    
+                    # Select GPU
+                    gpu = 0
+                    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
+                    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+                    print("Use GPU: {} for transfer".format(gpu))
+                    
+                    # Set all the parameters of the model to be trained
+                    for param in model.parameters():
+                        param.requires_grad = False
+                    
+                    # Send the model to GPU/CPU
+                    model = model.to(device)
+                    
+                    # Model summary
+                    print(model)
+                    
+                    cudnn.benchmark = True
+                    
+                    # Define the main training/validation parameters
+                    start_session = 0
+                    sessions = 10
+                    validation_accuracy = np.zeros((sessions - start_session), dtype = np.float32)
+                        
+                    for session in range(start_session, sessions):
+                        
+                        z_val_shuffle = copy.deepcopy(z_val_training)
+                        
+                        for j in range(len(SF_training)):
+                            for k in range(len(Ori_training)):
+                                random.shuffle(z_val_shuffle[j, k, :])
+                                
+                        z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, session])
+                        random.shuffle(z_val_shuffle_1D)
+                        indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)
+                         
                         step = int(np.floor(len(SF_training) * len(Ori_training) / 40))
                         validation_accuracy_step = np.zeros(step, dtype = np.float32)
                         
+                        # Evaluate on a validation set
                         for i in range(0, step):
                             index = torch.index_select(indices, 0, torch.tensor(np.arange(i * 40, (i + 1) * 40), dtype = torch.long))
-                            x_train = torch.index_select(x_tensor_training, 0, index)
-                            y_train = torch.index_select(y_tensor_training, 0, index)
-                            y_train = y_train.squeeze(1)
-                            
+                            x_valid = torch.index_select(x_tensor_training, 0, index)
+                            y_valid = torch.index_select(y_tensor_training, 0, index)
+                            y_valid = y_valid.squeeze(1)
+                                   
                             batch_time = AverageMeter('Time', ':6.3f')
                             losses = AverageMeter('Loss', ':.4e')
                             top1 = AverageMeter('Accuracy', ':6.2f')
-                            progress = ProgressMeter(epochs, [batch_time, losses, top1], prefix = ("Training >>> Session:   " + str(session) + "   Epoch: [{}]").format(epoch))
+                            progress = ProgressMeter(1, [batch_time, losses, top1], prefix=("Transfer >>> Session:   " + str(session) + "   Epoch: [{}]").format(1))
                         
-                            # Switch to training mode
-                            model.train()
-                            
-                            with torch.set_grad_enabled(True):
+                            # Switch to evaluating mode
+                            model.eval()
+                        
+                            with torch.no_grad():
                                 end = time.time()
-                        
+                                
                                 x_ref = x_tensor_ref.cuda(gpu)
-                                x_train = x_train.cuda(gpu)
-                                y_train = y_train.cuda(gpu)
-                        
+                                x_valid = x_valid.cuda(gpu)
+                                y_valid = y_valid.cuda(gpu)
+                    
                                 # Compute output
-                                output = model(x_train, x_ref)
-                                loss = criterion(output, y_train)
-                        
+                                output = model(x_valid, x_ref)
+                                loss = criterion(output, y_valid)
+                    
                                 # Measure accuracy and record loss
-                                acc1 = accuracy(output, y_train, topk = 1)
-                                losses.update(loss.item(), x_train.size(0))
-                                top1.update(acc1[0], x_train.size(0))
-                        
-                                # Compute gradient and do SGD step
-                                optimizer.zero_grad()
-                                loss.backward()
-                                optimizer.step()
-                        
+                                acc1 = accuracy(output, y_valid, topk = 1)
+                                losses.update(loss.item(), x_valid.size(0))
+                                top1.update(acc1[0], x_valid.size(0))
+                                
                                 # Save the validation accuracy for plotting
                                 validation_accuracy_step[i] = acc1[0].item()
-                                
+                    
                                 # Measure elapsed time
                                 batch_time.update(time.time() - end)
-                        
-                                progress.display(epoch)
+                    
+                                progress.display(1)
                             
-                        # Remember the best accuracy
-                        validation_accuracy[epoch] = np.mean(validation_accuracy_step)
-                        is_best = validation_accuracy[epoch] >= best_acc1
-                        best_acc1 = max(validation_accuracy[epoch], best_acc1)
+                        # Remember the best accuracy and save checkpoint
+                        validation_accuracy[session - start_session] = np.mean(validation_accuracy_step)
+                        is_best = validation_accuracy[session - start_session] >= best_acc1
+                        best_acc1 = max(validation_accuracy[session - start_session], best_acc1)
                         
-                        weight_change_1[epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
-                        weight_change_2[epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()       
-                           
-                os.mkdir('New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training_' + str(layer_freeze))
-                saving_folder = 'New_Results_Light/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
-                
-                np.savetxt(saving_folder + '/Training_Accuracy.txt', validation_accuracy, fmt = '%d')
-            
-                # Plot the validation accuracy vs. number of training sessions
-                plt.figure()
-                plt.title("Training Accuracy vs. Number of Training Sessions")
-                plt.xlabel("Training Sessions")
-                plt.ylabel("Training Accuracy")
-                plt.plot(range(0, epochs), validation_accuracy)
-                plt.ylim((0, 105.))
-                plt.xticks(np.arange(-1, epochs + 1, 1.0))
-                plt.show()
-                plt.savefig(saving_folder + '/Training_Accuracy.tif')
-                plt.close()
-                
-                # Plot the weight change in convolutional layers vs. number of training sessions
-                plt.figure()
-                plt.title("Weight Change in Convolutional Layers vs. Number of Training Sessions")
-                plt.xlabel("Training Sessions")
-                plt.ylabel("Weight Change")
-                plt.plot(range(0, epochs), weight_change_1, "-b", label = "Conv Layer 1")
-                plt.plot(range(0, epochs), weight_change_2, "-g", label = "Conv Layer 2")
-                plt.xticks(np.arange(-1, epochs + 1, 1.0))
-                plt.show()
-                plt.savefig(saving_folder + '/Weight_Change.tif')
-                plt.close()
-                
-                # Save the checkpoint
-                save_checkpoint({
-                    'session': session + 1,
-                    'state_dict': model.state_dict(),
-                    'best_acc1': best_acc1,
-                    'optimizer' : optimizer.state_dict(),
-                }, is_best, group_training, 'DNNforVPL_' + group_training + '.pth.tar')
-                
-                # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/6 x 40 x 360 Stimuli (32)/ref_transfer.TIFF')
-                        
-                # Define the main reference variables
-                x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
-                x_tensor_ref = []
-                
-                # Load image
-                img = Image.open(file_name_path_ref[0]).convert('RGB')
-                
-                # Resize image
-                width, height = img.size
-                new_width = width * 256 // min(img.size)
-                new_height = height * 256 // min(img.size)
-                img = img.resize((new_width, new_height), Image.BILINEAR)
-                
-                # Center crop image
-                width, height = img.size
-                startx = width // 2 - (112 // 2)
-                starty = height // 2 - (112 // 2)
-                img = np.asarray(img).reshape(height, width, 3)
-                img = img[starty:starty + 112, startx:startx + 112]
-                assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
-                
-                # Save image
-                x_val_ref[:, :, :] = img[:, :, :]
-                
-                # Convert image to tensor and normalize and copy
-                x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
-                normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                
-                for i in range(0, 40):
-                    x_tensor_ref.append(normalize(x_temp))
+                    np.savetxt(saving_folder + '/Transfer_Accuracy.txt', validation_accuracy, fmt = '%d')
+                                                  
+                    # ### ’Artiphysiology’ reveals V4-like shape tuning in a deep network trained for image classification
                     
-                x_tensor_ref = torch.stack(x_tensor_ref)
-                print(x_tensor_ref.shape)
-                
-                # Select GPU
-                gpu = 0
-                os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
-                device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-                print("Use GPU: {} for transfer".format(gpu))
-                
-                # Set all the parameters of the model to be trained
-                for param in model.parameters():
-                    param.requires_grad = False
-                
-                # Send the model to GPU/CPU
-                model = model.to(device)
-                
-                # Model summary
-                print(model)
-                
-                cudnn.benchmark = True
-                
-                # Define the main training/validation parameters
-                start_session = 0
-                sessions = 10
-                validation_accuracy = np.zeros((sessions - start_session), dtype = np.float32)
+                    # # The Convolutional layers: (0, 3)
+                    # # The size of consecutive convolutional layers: (112, 110)
+                    # # The central units of consecutive convolutional layers: (55, 54)
+                    # # The number of channels of consecutive convolutional layers: (6, 16)
                     
-                for session in range(start_session, sessions):
+                    # feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
                     
-                    z_val_shuffle = copy.deepcopy(z_val_training)
-                    
-                    for j in range(len(SF_training)):
-                        for k in range(len(Ori_training)):
-                            random.shuffle(z_val_shuffle[j, k, :])
+                    # all_central_unit_activity_Conv2d_1 = np.zeros((num_sample_artiphysiology, 6), dtype = np.float32)
+                    # all_central_unit_activity_Conv2d_2 = np.zeros((num_sample_artiphysiology, 16), dtype = np.float32)
                             
-                    z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, session])
-                    random.shuffle(z_val_shuffle_1D)
-                    indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)
-                     
-                    step = int(np.floor(len(SF_training) * len(Ori_training) / 40))
-                    validation_accuracy_step = np.zeros(step, dtype = np.float32)
-                    
-                    # Evaluate on a validation set
-                    for i in range(0, step):
-                        index = torch.index_select(indices, 0, torch.tensor(np.arange(i * 40, (i + 1) * 40), dtype = torch.long))
-                        x_valid = torch.index_select(x_tensor_training, 0, index)
-                        y_valid = torch.index_select(y_tensor_training, 0, index)
-                        y_valid = y_valid.squeeze(1)
-                               
-                        batch_time = AverageMeter('Time', ':6.3f')
-                        losses = AverageMeter('Loss', ':.4e')
-                        top1 = AverageMeter('Accuracy', ':6.2f')
-                        progress = ProgressMeter(1, [batch_time, losses, top1], prefix=("Transfer >>> Session:   " + str(session) + "   Epoch: [{}]").format(1))
-                    
-                        # Switch to evaluating mode
-                        model.eval()
-                    
-                        with torch.no_grad():
-                            end = time.time()
-                            
-                            x_ref = x_tensor_ref.cuda(gpu)
-                            x_valid = x_valid.cuda(gpu)
-                            y_valid = y_valid.cuda(gpu)
-                
-                            # Compute output
-                            output = model(x_valid, x_ref)
-                            loss = criterion(output, y_valid)
-                
-                            # Measure accuracy and record loss
-                            acc1 = accuracy(output, y_valid, topk = 1)
-                            losses.update(loss.item(), x_valid.size(0))
-                            top1.update(acc1[0], x_valid.size(0))
-                            
-                            # Save the validation accuracy for plotting
-                            validation_accuracy_step[i] = acc1[0].item()
-                
-                            # Measure elapsed time
-                            batch_time.update(time.time() - end)
-                
-                            progress.display(1)
+                    # for i in range(0, num_sample_artiphysiology):
+                    #     feature_sample_artiphysiology[i, :] = [SF_tuning[x_sample_artiphysiology_index[i, 0]], Ori_tuning[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
                         
-                    # Remember the best accuracy and save checkpoint
-                    validation_accuracy[session - start_session] = np.mean(validation_accuracy_step)
-                    is_best = validation_accuracy[session - start_session] >= best_acc1
-                    best_acc1 = max(validation_accuracy[session - start_session], best_acc1)
-                    
-                np.savetxt(saving_folder + '/Transfer_Accuracy.txt', validation_accuracy, fmt = '%d')
-                                              
-#                ### ’Artiphysiology’ reveals V4-like shape tuning in a deep network trained for image classification
-#                
-#                # The Convolutional layers: (0, 3)
-#                # The size of consecutive convolutional layers: (112, 110)
-#                # The central units of consecutive convolutional layers: (55, 54)
-#                # The number of channels of consecutive convolutional layers: (6, 16)
-#                
-#                feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
-#                
-#                all_central_unit_activity_Conv2d_1 = np.zeros((num_sample_artiphysiology, 6), dtype = np.float32)
-#                all_central_unit_activity_Conv2d_2 = np.zeros((num_sample_artiphysiology, 16), dtype = np.float32)
-#                        
-#                for i in range(0, num_sample_artiphysiology):
-#                    feature_sample_artiphysiology[i, :] = [SF_tuning[x_sample_artiphysiology_index[i, 0]], Ori_tuning[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
-#                    
-#                    index = torch.tensor(z_val_tuning[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
-#                    x_sample = torch.index_select(x_tensor_tuning, 0, index)
-#                    x_sample = x_sample.cuda(gpu)
-#                    
-#                    unit_activity_layer_0 = model.features[0](x_sample)
-#                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-#                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-#                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-#                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-#                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-#                    
-#                    all_central_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0, :, 55, 55].detach().cpu().clone().numpy()
-#                    all_central_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0, :, 54, 54].detach().cpu().clone().numpy()
-#                    
-#                scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict={'feature_sample_artiphysiology': feature_sample_artiphysiology})
-#                
-#                scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_1.mat', mdict = {'all_central_unit_activity_Conv2d_1': all_central_unit_activity_Conv2d_1})
-#                scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_2.mat', mdict = {'all_central_unit_activity_Conv2d_2': all_central_unit_activity_Conv2d_2})
-#                              
-#                # Boxplotting the tuning curves of central units of three features of convolutional layers
-#                SF_box_central_unit_activity_Conv2d_1 = []
-#                SF_box_central_unit_activity_Conv2d_2 = []
-#                
-#                for i in range(0, len(SF_tuning)):                        
-#                    SF_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
-#                    SF_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
-#                    
-#                Ori_box_central_unit_activity_Conv2d_1 = []
-#                Ori_box_central_unit_activity_Conv2d_2 = []
-#                
-#                for i in range(0, len(Ori_tuning)):
-#                    Ori_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
-#                    Ori_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
-#                
-#                Phase_box_central_unit_activity_Conv2d_1 = []
-#                Phase_box_central_unit_activity_Conv2d_2 = []
-#                
-#                for i in range(0, 360):
-#                    Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-#                    Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-#                    
-#                for feature in ['SF', 'Ori', 'Phase']:
-#                    for conv_layer_num in [1, 2]:
-#                        plt.figure()
-#                        plt.title("%s Boxplot Tuning Curve of the Convolutional Layer %d" % (feature, conv_layer_num))
-#                        plt.xlabel(feature)
-#                        plt.ylabel("Central Unit Activity")
-#                        variable_name = feature + '_box_central_unit_activity_Conv2d_' + str(conv_layer_num)
-#                        plt.boxplot(vars()[variable_name])
-#                        plt.show()
-#                        plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
-#                        plt.close()
-                    
-                ### Axiomatic Attribution for Deep Networks
-                ### How Important Is a Neuron?
-                ### From deep learning to mechanistic understanding in neuroscience: the structure of retinal prediction
-                
-                # The Convolutional layers: (0, 3)
-                # The size of consecutive convolutional layers: (112, 110)
-                # The central units of consecutive convolutional layers: (55, 54)
-                # The number of channels of consecutive convolutional layers: (6, 16)
-                
-                feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
-                
-                all_channel_importance_Conv2d_1 = np.zeros((num_sample_artiphysiology, 6, 112, 112), dtype = np.float32)
-                all_channel_importance_Conv2d_2 = np.zeros((num_sample_artiphysiology, 16, 110, 110), dtype = np.float32)
+                    #     index = torch.tensor(z_val_tuning[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                    #     x_sample = torch.index_select(x_tensor_tuning, 0, index)
+                    #     x_sample = x_sample.cuda(gpu)
                         
-                for i in range(0, num_sample_artiphysiology):
-                    torch.cuda.empty_cache()
+                    #     unit_activity_layer_0 = model.features[0](x_sample)
+                    #     unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                    #     unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                    #     unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                    #     unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                    #     unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                        
+                    #     all_central_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0, :, 55, 55].detach().cpu().clone().numpy()
+                    #     all_central_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0, :, 54, 54].detach().cpu().clone().numpy()
+                        
+                    # scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict={'feature_sample_artiphysiology': feature_sample_artiphysiology})
                     
-                    feature_sample_artiphysiology[i, :] = [SF_tuning[x_sample_artiphysiology_index[i, 0]], Ori_tuning[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
+                    # scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_1.mat', mdict = {'all_central_unit_activity_Conv2d_1': all_central_unit_activity_Conv2d_1})
+                    # scipy.io.savemat(saving_folder + '/all_central_unit_activity_Conv2d_2.mat', mdict = {'all_central_unit_activity_Conv2d_2': all_central_unit_activity_Conv2d_2})
+                                  
+                    # # Boxplotting the tuning curves of central units of three features of convolutional layers
+                    # SF_box_central_unit_activity_Conv2d_1 = []
+                    # SF_box_central_unit_activity_Conv2d_2 = []
                     
-                    index = torch.tensor(z_val_tuning[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
-                    x_sample = torch.index_select(x_tensor_tuning, 0, index)
-                    x_sample = x_sample.squeeze(0).cuda(gpu)
+                    # for i in range(0, len(SF_tuning)):                        
+                    #     SF_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
+                    #     SF_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
+                        
+                    # Ori_box_central_unit_activity_Conv2d_1 = []
+                    # Ori_box_central_unit_activity_Conv2d_2 = []
                     
-                    x_baseline = torch.index_select(x_tensor_ref, 0, torch.tensor(0, dtype = torch.long))
-                    x_baseline = x_baseline.squeeze(0).cuda(gpu)
+                    # for i in range(0, len(Ori_tuning)):
+                    #     Ori_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
+                    #     Ori_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
                     
-                    bin_size = 50
+                    # Phase_box_central_unit_activity_Conv2d_1 = []
+                    # Phase_box_central_unit_activity_Conv2d_2 = []
                     
-                    x_alpha = [x_baseline + (float(j) / bin_size) * (x_sample - x_baseline) for j in range(0, bin_size + 1)]
-                    x_alpha = torch.stack(x_alpha)
-                    x_alpha.requires_grad = True
+                    # for i in range(0, 360):
+                    #     Phase_box_central_unit_activity_Conv2d_1.append(np.mean(all_central_unit_activity_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                    #     Phase_box_central_unit_activity_Conv2d_2.append(np.mean(all_central_unit_activity_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                        
+                    # for feature in ['SF', 'Ori', 'Phase']:
+                    #     for conv_layer_num in [1, 2]:
+                    #         plt.figure()
+                    #         plt.title("%s Boxplot Tuning Curve of the Convolutional Layer %d" % (feature, conv_layer_num))
+                    #         plt.xlabel(feature)
+                    #         plt.ylabel("Central Unit Activity")
+                    #         variable_name = feature + '_box_central_unit_activity_Conv2d_' + str(conv_layer_num)
+                    #         plt.boxplot(vars()[variable_name])
+                    #         plt.show()
+                    #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
+                    #         plt.close()
+                        
+                    ### Axiomatic Attribution for Deep Networks
+                    ### How Important Is a Neuron?
+                    ### From deep learning to mechanistic understanding in neuroscience: the structure of retinal prediction
                     
-                    unit_activity_layer_0 = model.features[0](x_alpha)
-                    unit_activity_layer_0.retain_grad()
+                    # The Convolutional layers: (0, 3)
+                    # The size of consecutive convolutional layers: (112, 110)
+                    # The central units of consecutive convolutional layers: (55, 54)
+                    # The number of channels of consecutive convolutional layers: (6, 16)
                     
-                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                    unit_activity_layer_1.retain_grad()
+                    feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
                     
-                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                    unit_activity_layer_2.retain_grad()
-                    
-                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                    unit_activity_layer_3.retain_grad()
-                    
-                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                    unit_activity_layer_4.retain_grad()
-                    
-                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                    unit_activity_layer_5.retain_grad()
-                    
-                    unit_activity_layer_6 = model.avgpool(unit_activity_layer_5)
-                    unit_activity_layer_6.retain_grad()
-                    
-                    unit_activity_layer_7 = torch.flatten(unit_activity_layer_6, 1)
-                    unit_activity_layer_7.retain_grad()
-                    
-                    unit_activity_layer_8 = model.classifier(unit_activity_layer_7)
-                    unit_activity_layer_8.retain_grad()
-                    
-                    for j in range(0, 2):
+                    all_channel_importance_Conv2d_1 = np.zeros((num_sample_artiphysiology, 6, 112, 112), dtype = np.float32)
+                    all_channel_importance_Conv2d_2 = np.zeros((num_sample_artiphysiology, 16, 110, 110), dtype = np.float32)
+                            
+                    for i in range(0, num_sample_artiphysiology):
                         torch.cuda.empty_cache()
                         
-                        layers = [0, 3]
-                        y_variable_name = 'unit_activity_layer_' + str(layers[j])
-                        conv_variable_name = 'all_channel_importance_Conv2d_' + str(j + 1)
-                                                   
-                        dF_dy = grad(outputs = unit_activity_layer_8, inputs = vars()[y_variable_name], grad_outputs = torch.ones_like(unit_activity_layer_8), retain_graph = True)
-                        dy_dx = grad(outputs = vars()[y_variable_name], inputs = x_alpha, grad_outputs = torch.ones_like(vars()[y_variable_name]), retain_graph = True)
-                                                    
-                        for k in range(1, bin_size + 1):
-                            base_1 = torch.sum((x_sample - x_baseline) * torch.index_select(dy_dx[0], 0, torch.tensor(k - 1, dtype = torch.long).cuda(gpu))) * torch.index_select(dF_dy[0], 0, torch.tensor(k - 1, dtype = torch.long).cuda(gpu))
-                            base_2 = torch.sum((x_sample - x_baseline) * torch.index_select(dy_dx[0], 0, torch.tensor(k, dtype = torch.long).cuda(gpu))) * torch.index_select(dF_dy[0], 0, torch.tensor(k, dtype = torch.long).cuda(gpu))
-                            vars()[conv_variable_name][i] = vars()[conv_variable_name][i] + 1 / bin_size * ((base_1 + base_2) / 2).detach().cpu().clone().numpy()
-                    
-                scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})
-                
-                scipy.io.savemat(saving_folder + '/all_channel_importance_Conv2d_1.mat', mdict = {'all_channel_importance_Conv2d_1': all_channel_importance_Conv2d_1})
-                scipy.io.savemat(saving_folder + '/all_channel_importance_Conv2d_2.mat', mdict = {'all_channel_importance_Conv2d_2': all_channel_importance_Conv2d_2})
-                              
-#                # Boxplotting the channel importance of three features of convolutional layer
-#                SF_box_channel_importance_Conv2d_1 = []
-#                SF_box_channel_importance_Conv2d_2 = []
-#                
-#                for i in range(0, len(SF_tuning)):                        
-#                    SF_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
-#                    SF_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
-#                    
-#                Ori_box_channel_importance_Conv2d_1 = []
-#                Ori_box_channel_importance_Conv2d_2 = []
-#                
-#                for i in range(0, len(Ori_tuning)):
-#                    Ori_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
-#                    Ori_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
-#                
-#                Phase_box_channel_importance_Conv2d_1 = []
-#                Phase_box_channel_importance_Conv2d_2 = []
-#                
-#                for i in range(0, 360):
-#                    Phase_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-#                    Phase_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
-#                    
-#                for feature in ['SF', 'Ori', 'Phase']:
-#                    for conv_layer_num in [1, 2]:
-#                        plt.figure()
-#                        plt.title("%s Boxplot Channel Importance of the Convolutional Layer %d" % (feature, conv_layer_num))
-#                        plt.xlabel(feature)
-#                        plt.ylabel("Channel Importance")
-#                        variable_name = feature + '_box_channel_importance_Conv2d_' + str(conv_layer_num)
-#                        plt.boxplot(vars()[variable_name])
-#                        plt.show()
-#                        plt.savefig(saving_folder + '/' + feature + ' Boxplot Channel Importance of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
-#                        plt.close()
+                        feature_sample_artiphysiology[i, :] = [SF_tuning[x_sample_artiphysiology_index[i, 0]], Ori_tuning[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
                         
-#                ### Visualizing and Understanding Convolutional Networks
-#                
-#                # Reading the grey background image
-#                file_name_path_ref = glob.glob('VPL Stimuli/greybackground.TIFF')
-#                img = Image.open(file_name_path_ref[0]).convert('RGB')
-#                
-#                x_val_greybackground = np.zeros((112, 112, 3), dtype = np.float32)
-#                x_tensor_greybackground = []
-#                
-#                width, height = img.size
-#                new_width = width * 256 // min(img.size)
-#                new_height = height * 256 // min(img.size)
-#                img = img.resize((new_width, new_height), Image.BILINEAR)
-#                
-#                width, height = img.size
-#                startx = width // 2 - (112 // 2)
-#                starty = height // 2 - (112 // 2)
-#                img = np.asarray(img).reshape(height, width, 3)
-#                img = img[starty:starty + 112, startx:startx + 112]
-#                assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
-#                
-#                x_val_greybackground[:, :, :] = img[:, :, :]
-#                x_temp = torch.from_numpy(np.transpose(x_val_greybackground[:, :, :], (2, 0, 1)))
-#                normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-#                x_tensor_greybackground.append(normalize(x_temp))
-#                x_tensor_greybackground = torch.stack(x_tensor_greybackground)
-#                
-#                print(x_tensor_greybackground.shape)
-#                
-#                x_img_difference_SF = np.zeros((1000, 5), dtype = np.float32)
-#                if group_training == 'group2' or group_training == 'group4':
-#                    x_img_difference_Ori = np.zeros((1000, 5), dtype = np.float32)
-#                    
-#                for i in range(0, 1000):
-#                    # Get two sample tensors of training/validation images with the same phase and spatial frequency but different orientation to visualize and quantify the convolutional networks
-#                    SF_index = random.randrange(len(SF_training))
-#                    Ori_index_1 = random.randrange(int(len(Ori_training) / 2))
-#                    Ori_index_2 = random.randrange(int(len(Ori_training) / 2), len(Ori_training))
-#                    Phase_index = random.randrange(360)
-#                    
-#                    indices = torch.tensor(np.array([z_val_training[SF_index, Ori_index_1, Phase_index], z_val_training[SF_index, Ori_index_2, Phase_index]]), dtype = torch.long)
-#                    x_sample = torch.index_select(x_tensor_training, 0, indices)
-#                    y_title = ['SF = ' + str(SF_training[SF_index]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index_1]) + ' ***** ' + 'Ph = ' + str(Phase_index),
-#                               'SF = ' + str(SF_training[SF_index]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index_2]) + ' ***** ' + 'Ph = ' + str(Phase_index)]
-#                
-#                    visualize_layer_indices = [1, 2]
-#                    
-#                    for layer in model.features:
-#                        if isinstance(layer, torch.nn.MaxPool2d):
-#                            layer.return_indices = True
-#                    
-#                    x_img_greybackground = []
-#                    x_img = [x_sample[0], x_sample[1]]
-#                    
-#                    for layer_max_count in visualize_layer_indices:
-#                        x_tensor_greybackground.squeeze_(0)
-#                        
-#                        raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_tensor_greybackground, layer_max_count)
-#                        x_img_greybackground_temp = backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list)
-#                        
-#                        for i in range(0, x_sample.size(0)):
-#                            print("layer...%s" % layer_max_count)
-#                            
-#                            x_img_greybackground.append(x_img_greybackground_temp)
-#                                                   
-#                            raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_sample[i], layer_max_count)
-#                            x_img.append(backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list))
-#                            
-#                    x_img_difference_SF[i, :] = x_img_difference_SF[i, :] + visualize(x_img_greybackground, x_img, y_title)
-#                    
-#                    # Get two sample tensors of training/validation images with the same phase and orientation but different spatial frequency to visualize and quantify the convolutional networks
-#                    if group_training == 'group2' or group_training == 'group4':      
-#                        SF_index = np.array(range(0, len(SF_training)))
-#                        random.shuffle(SF_index)
-#                        SF_index_1 = SF_index[0]
-#                        SF_index_2 = SF_index[1]
-#                        Ori_index = random.randrange(len(Ori_training))
-#                        Phase_index = random.randrange(360)
-#                        
-#                        indices = torch.tensor(np.array([z_val_training[SF_index_1, Ori_index, Phase_index], z_val_training[SF_index_2, Ori_index, Phase_index]]), dtype = torch.long)
-#                        x_sample = torch.index_select(x_tensor_training, 0, indices)
-#                        y_title = ['SF = ' + str(SF_training[SF_index_1]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index]) + ' ***** ' + 'Ph = ' + str(Phase_index),
-#                                   'SF = ' + str(SF_training[SF_index_2]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index]) + ' ***** ' + 'Ph = ' + str(Phase_index)]
-#                    
-#                        visualize_layer_indices = [1, 2]
-#                        
-#                        for layer in model.features:
-#                            if isinstance(layer, torch.nn.MaxPool2d):
-#                                layer.return_indices = True
-#                        
-#                        x_img_greybackground = []
-#                        x_img = [x_sample[0], x_sample[1]]
-#                        
-#                        for layer_max_count in visualize_layer_indices:
-#                            x_tensor_greybackground.squeeze_(0)
-#                            
-#                            raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_tensor_greybackground, layer_max_count)
-#                            x_img_greybackground_temp = backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list)
-#                            
-#                            for i in range(0, x_sample.size(0)):
-#                                print("layer...%s" % layer_max_count)
-#                                
-#                                x_img_greybackground.append(x_img_greybackground_temp)
-#                                                       
-#                                raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_sample[i], layer_max_count)
-#                                x_img.append(backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list))
-#                                
-#                        x_img_difference_Ori[i, :] = x_img_difference_Ori[i, :] + visualize(x_img_greybackground, x_img, y_title)
-#                
-#                plt.figure()
-#                plt.title("Euclidean Distance of Mapped Pixles in Consecutive Layers (Constant SF)")
-#                plt.xlabel("Convolutional Layer Number")
-#                plt.ylabel("Euclidean Distance")
-#                plt.errorbar(range(1, 3), np.mean(x_img_difference_SF, axis = 0), yerr = np.std(x_img_difference_SF, axis = 0))
-#                plt.xticks(np.arange(1, 3, 1.0))
-#                plt.show()
-#                
-#                if group_training == 'group2' or group_training == 'group4':
-#                    plt.figure()
-#                    plt.title("Euclidean Distance of Mapped Pixles in Consecutive Layers (Constant Ori)")
-#                    plt.xlabel("Convolutional Layer Number")
-#                    plt.ylabel("Euclidean Distance")
-#                    plt.errorbar(range(1, 3), np.mean(x_img_difference_Ori, axis = 0), yerr = np.std(x_img_difference_Ori, axis = 0))
-#                    plt.xticks(np.arange(1, 3, 1.0))
-#                    plt.show()
+                        index = torch.tensor(z_val_tuning[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                        x_sample = torch.index_select(x_tensor_tuning, 0, index)
+                        x_sample = x_sample.squeeze(0).cuda(gpu)
+                        
+                        x_baseline = torch.index_select(x_tensor_ref, 0, torch.tensor(0, dtype = torch.long))
+                        x_baseline = x_baseline.squeeze(0).cuda(gpu)
+                        
+                        bin_size = 50
+                        
+                        x_alpha = [x_baseline + (float(j) / bin_size) * (x_sample - x_baseline) for j in range(0, bin_size + 1)]
+                        x_alpha = torch.stack(x_alpha)
+                        x_alpha.requires_grad = True
+                        
+                        unit_activity_layer_0 = model.features[0](x_alpha)
+                        unit_activity_layer_0.retain_grad()
+                        
+                        unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                        unit_activity_layer_1.retain_grad()
+                        
+                        unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                        unit_activity_layer_2.retain_grad()
+                        
+                        unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                        unit_activity_layer_3.retain_grad()
+                        
+                        unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                        unit_activity_layer_4.retain_grad()
+                        
+                        unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                        unit_activity_layer_5.retain_grad()
+                        
+                        unit_activity_layer_6 = model.avgpool(unit_activity_layer_5)
+                        unit_activity_layer_6.retain_grad()
+                        
+                        unit_activity_layer_7 = torch.flatten(unit_activity_layer_6, 1)
+                        unit_activity_layer_7.retain_grad()
+                        
+                        unit_activity_layer_8 = model.classifier(unit_activity_layer_7)
+                        unit_activity_layer_8.retain_grad()
+                        
+                        for j in range(0, 2):
+                            torch.cuda.empty_cache()
+                            
+                            layers = [0, 3]
+                            y_variable_name = 'unit_activity_layer_' + str(layers[j])
+                            conv_variable_name = 'all_channel_importance_Conv2d_' + str(j + 1)
+                                                       
+                            dF_dy = grad(outputs = unit_activity_layer_8, inputs = vars()[y_variable_name], grad_outputs = torch.ones_like(unit_activity_layer_8), retain_graph = True)
+                            dy_dx = grad(outputs = vars()[y_variable_name], inputs = x_alpha, grad_outputs = torch.ones_like(vars()[y_variable_name]), retain_graph = True)
+                                                        
+                            for k in range(1, bin_size + 1):
+                                base_1 = torch.sum((x_sample - x_baseline) * torch.index_select(dy_dx[0], 0, torch.tensor(k - 1, dtype = torch.long).cuda(gpu))) * torch.index_select(dF_dy[0], 0, torch.tensor(k - 1, dtype = torch.long).cuda(gpu))
+                                base_2 = torch.sum((x_sample - x_baseline) * torch.index_select(dy_dx[0], 0, torch.tensor(k, dtype = torch.long).cuda(gpu))) * torch.index_select(dF_dy[0], 0, torch.tensor(k, dtype = torch.long).cuda(gpu))
+                                vars()[conv_variable_name][i] = vars()[conv_variable_name][i] + 1 / bin_size * ((base_1 + base_2) / 2).detach().cpu().clone().numpy()
+                        
+                    scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})
+                    
+                    scipy.io.savemat(saving_folder + '/all_channel_importance_Conv2d_1.mat', mdict = {'all_channel_importance_Conv2d_1': all_channel_importance_Conv2d_1})
+                    scipy.io.savemat(saving_folder + '/all_channel_importance_Conv2d_2.mat', mdict = {'all_channel_importance_Conv2d_2': all_channel_importance_Conv2d_2})
+                                  
+                    # # Boxplotting the channel importance of three features of convolutional layer
+                    # SF_box_channel_importance_Conv2d_1 = []
+                    # SF_box_channel_importance_Conv2d_2 = []
+                    
+                    # for i in range(0, len(SF_tuning)):                        
+                    #     SF_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
+                    #     SF_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 0] == SF_tuning[i], :], axis = 1))
+                        
+                    # Ori_box_channel_importance_Conv2d_1 = []
+                    # Ori_box_channel_importance_Conv2d_2 = []
+                    
+                    # for i in range(0, len(Ori_tuning)):
+                    #     Ori_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
+                    #     Ori_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 1] == Ori_tuning[i], :], axis = 1))
+                    
+                    # Phase_box_channel_importance_Conv2d_1 = []
+                    # Phase_box_channel_importance_Conv2d_2 = []
+                    
+                    # for i in range(0, 360):
+                    #     Phase_box_channel_importance_Conv2d_1.append(np.mean(all_channel_importance_Conv2d_1[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                    #     Phase_box_channel_importance_Conv2d_2.append(np.mean(all_channel_importance_Conv2d_2[feature_sample_artiphysiology[:, 2] == i, :], axis = 1))
+                        
+                    # for feature in ['SF', 'Ori', 'Phase']:
+                    #     for conv_layer_num in [1, 2]:
+                    #         plt.figure()
+                    #         plt.title("%s Boxplot Channel Importance of the Convolutional Layer %d" % (feature, conv_layer_num))
+                    #         plt.xlabel(feature)
+                    #         plt.ylabel("Channel Importance")
+                    #         variable_name = feature + '_box_channel_importance_Conv2d_' + str(conv_layer_num)
+                    #         plt.boxplot(vars()[variable_name])
+                    #         plt.show()
+                    #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Channel Importance of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
+                    #         plt.close()
+                            
+                    # ### Visualizing and Understanding Convolutional Networks
+                    
+                    # # Reading the grey background image
+                    # file_name_path_ref = glob.glob('VPL Stimuli/greybackground.TIFF')
+                    # img = Image.open(file_name_path_ref[0]).convert('RGB')
+                    
+                    # x_val_greybackground = np.zeros((112, 112, 3), dtype = np.float32)
+                    # x_tensor_greybackground = []
+                    
+                    # width, height = img.size
+                    # new_width = width * 256 // min(img.size)
+                    # new_height = height * 256 // min(img.size)
+                    # img = img.resize((new_width, new_height), Image.BILINEAR)
+                    
+                    # width, height = img.size
+                    # startx = width // 2 - (112 // 2)
+                    # starty = height // 2 - (112 // 2)
+                    # img = np.asarray(img).reshape(height, width, 3)
+                    # img = img[starty:starty + 112, startx:startx + 112]
+                    # assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
+                    
+                    # x_val_greybackground[:, :, :] = img[:, :, :]
+                    # x_temp = torch.from_numpy(np.transpose(x_val_greybackground[:, :, :], (2, 0, 1)))
+                    # normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
+                    # x_tensor_greybackground.append(normalize(x_temp))
+                    # x_tensor_greybackground = torch.stack(x_tensor_greybackground)
+                    
+                    # print(x_tensor_greybackground.shape)
+                    
+                    # x_img_difference_SF = np.zeros((1000, 5), dtype = np.float32)
+                    # if group_training == 'group2' or group_training == 'group4':
+                    #     x_img_difference_Ori = np.zeros((1000, 5), dtype = np.float32)
+                        
+                    # for i in range(0, 1000):
+                    #     # Get two sample tensors of training/validation images with the same phase and spatial frequency but different orientation to visualize and quantify the convolutional networks
+                    #     SF_index = random.randrange(len(SF_training))
+                    #     Ori_index_1 = random.randrange(int(len(Ori_training) / 2))
+                    #     Ori_index_2 = random.randrange(int(len(Ori_training) / 2), len(Ori_training))
+                    #     Phase_index = random.randrange(360)
+                        
+                    #     indices = torch.tensor(np.array([z_val_training[SF_index, Ori_index_1, Phase_index], z_val_training[SF_index, Ori_index_2, Phase_index]]), dtype = torch.long)
+                    #     x_sample = torch.index_select(x_tensor_training, 0, indices)
+                    #     y_title = ['SF = ' + str(SF_training[SF_index]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index_1]) + ' ***** ' + 'Ph = ' + str(Phase_index),
+                    #               'SF = ' + str(SF_training[SF_index]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index_2]) + ' ***** ' + 'Ph = ' + str(Phase_index)]
+                    
+                    #     visualize_layer_indices = [1, 2]
+                        
+                    #     for layer in model.features:
+                    #         if isinstance(layer, torch.nn.MaxPool2d):
+                    #             layer.return_indices = True
+                        
+                    #     x_img_greybackground = []
+                    #     x_img = [x_sample[0], x_sample[1]]
+                        
+                    #     for layer_max_count in visualize_layer_indices:
+                    #         x_tensor_greybackground.squeeze_(0)
+                            
+                    #         raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_tensor_greybackground, layer_max_count)
+                    #         x_img_greybackground_temp = backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list)
+                            
+                    #         for i in range(0, x_sample.size(0)):
+                    #             print("layer...%s" % layer_max_count)
+                                
+                    #             x_img_greybackground.append(x_img_greybackground_temp)
+                                                      
+                    #             raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_sample[i], layer_max_count)
+                    #             x_img.append(backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list))
+                                
+                    #     x_img_difference_SF[i, :] = x_img_difference_SF[i, :] + visualize(x_img_greybackground, x_img, y_title)
+                        
+                    #     # Get two sample tensors of training/validation images with the same phase and orientation but different spatial frequency to visualize and quantify the convolutional networks
+                    #     if group_training == 'group2' or group_training == 'group4':      
+                    #         SF_index = np.array(range(0, len(SF_training)))
+                    #         random.shuffle(SF_index)
+                    #         SF_index_1 = SF_index[0]
+                    #         SF_index_2 = SF_index[1]
+                    #         Ori_index = random.randrange(len(Ori_training))
+                    #         Phase_index = random.randrange(360)
+                            
+                    #         indices = torch.tensor(np.array([z_val_training[SF_index_1, Ori_index, Phase_index], z_val_training[SF_index_2, Ori_index, Phase_index]]), dtype = torch.long)
+                    #         x_sample = torch.index_select(x_tensor_training, 0, indices)
+                    #         y_title = ['SF = ' + str(SF_training[SF_index_1]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index]) + ' ***** ' + 'Ph = ' + str(Phase_index),
+                    #                   'SF = ' + str(SF_training[SF_index_2]) + ' ***** ' + 'Ori = ' + str(Ori_training[Ori_index]) + ' ***** ' + 'Ph = ' + str(Phase_index)]
+                        
+                    #         visualize_layer_indices = [1, 2]
+                            
+                    #         for layer in model.features:
+                    #             if isinstance(layer, torch.nn.MaxPool2d):
+                    #                 layer.return_indices = True
+                            
+                    #         x_img_greybackground = []
+                    #         x_img = [x_sample[0], x_sample[1]]
+                            
+                    #         for layer_max_count in visualize_layer_indices:
+                    #             x_tensor_greybackground.squeeze_(0)
+                                
+                    #             raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_tensor_greybackground, layer_max_count)
+                    #             x_img_greybackground_temp = backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list)
+                                
+                    #             for i in range(0, x_sample.size(0)):
+                    #                 print("layer...%s" % layer_max_count)
+                                    
+                    #                 x_img_greybackground.append(x_img_greybackground_temp)
+                                                          
+                    #                 raw_feature_maps, deconv_layers_list, unpool_layers_list = forward_img(gpu, model, x_sample[i], layer_max_count)
+                    #                 x_img.append(backward_feature_maps(raw_feature_maps, deconv_layers_list, unpool_layers_list))
+                                    
+                    #         x_img_difference_Ori[i, :] = x_img_difference_Ori[i, :] + visualize(x_img_greybackground, x_img, y_title)
+                    
+                    # plt.figure()
+                    # plt.title("Euclidean Distance of Mapped Pixles in Consecutive Layers (Constant SF)")
+                    # plt.xlabel("Convolutional Layer Number")
+                    # plt.ylabel("Euclidean Distance")
+                    # plt.errorbar(range(1, 3), np.mean(x_img_difference_SF, axis = 0), yerr = np.std(x_img_difference_SF, axis = 0))
+                    # plt.xticks(np.arange(1, 3, 1.0))
+                    # plt.show()
+                    
+                    # if group_training == 'group2' or group_training == 'group4':
+                    #     plt.figure()
+                    #     plt.title("Euclidean Distance of Mapped Pixles in Consecutive Layers (Constant Ori)")
+                    #     plt.xlabel("Convolutional Layer Number")
+                    #     plt.ylabel("Euclidean Distance")
+                    #     plt.errorbar(range(1, 3), np.mean(x_img_difference_Ori, axis = 0), yerr = np.std(x_img_difference_Ori, axis = 0))
+                    #     plt.xticks(np.arange(1, 3, 1.0))
+                    #     plt.show()
     
 def imshow(x_sample, title):
     """Imshow for Tensor"""
