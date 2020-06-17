@@ -1042,10 +1042,11 @@ def main():
                     unit_activity_layer_15 = model.classifier(unit_activity_layer_14)
                     unit_activity_layer_15.retain_grad()
                     
+                    layers = [0, 3, 6, 8, 10]
+                                        
                     for j in range(0, 5):
                         torch.cuda.empty_cache()
                         
-                        layers = [0, 3, 6, 8, 10]
                         y_variable_name = 'unit_activity_layer_' + str(layers[j])
                         conv_variable_name = 'all_channel_importance_Conv2d_' + str(j + 1)
                                                    
@@ -1116,7 +1117,119 @@ def main():
                 #         plt.show()
                 #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Channel Importance of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
                 #         plt.close()
+                
+                ### Ablation Studies for Outlier Channels Based on Conductance Values
+                
+                mean_channel_importance_Conv2d_1 = np.mean(all_channel_importance_Conv2d_1, axis = (2, 3))
+                mean_channel_importance_Conv2d_2 = np.mean(all_channel_importance_Conv2d_2, axis = (2, 3))
+                mean_channel_importance_Conv2d_3 = np.mean(all_channel_importance_Conv2d_3, axis = (2, 3))
+                mean_channel_importance_Conv2d_4 = np.mean(all_channel_importance_Conv2d_4, axis = (2, 3))
+                mean_channel_importance_Conv2d_5 = np.mean(all_channel_importance_Conv2d_5, axis = (2, 3))
+                
+                abs_mean_channel_importance_Conv2d_1 = np.abs(mean_channel_importance_Conv2d_1)
+                abs_mean_channel_importance_Conv2d_2 = np.abs(mean_channel_importance_Conv2d_2)
+                abs_mean_channel_importance_Conv2d_3 = np.abs(mean_channel_importance_Conv2d_3)
+                abs_mean_channel_importance_Conv2d_4 = np.abs(mean_channel_importance_Conv2d_4)
+                abs_mean_channel_importance_Conv2d_5 = np.abs(mean_channel_importance_Conv2d_5)
+                                
+                ablation_results_real_Conv2d_1 = []
+                ablation_results_real_Conv2d_2 = []
+                ablation_results_real_Conv2d_3 = []
+                ablation_results_real_Conv2d_4 = []
+                ablation_results_real_Conv2d_5 = []
+                
+                ablation_results_abs_Conv2d_1 = []
+                ablation_results_abs_Conv2d_2 = []
+                ablation_results_abs_Conv2d_3 = []
+                ablation_results_abs_Conv2d_4 = []
+                ablation_results_abs_Conv2d_5 = []
+                
+                layers = [0, 3, 6, 8, 10]
+                thresh_mad = 3.0
+                
+                for i in range(0, num_sample_artiphysiology):
+                    torch.cuda.empty_cache()
+                                        
+                    index = torch.tensor(z_val_tuning[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                    x_sample = torch.index_select(x_tensor_tuning, 0, index)
+                    x_sample = x_sample.cuda(gpu)
+                    
+                    x_baseline = torch.index_select(x_tensor_ref, 0, torch.tensor(0, dtype = torch.long))
+                    x_baseline = x_baseline.cuda(gpu)
+                    
+                    ablation_results_real_Conv2d_1.append({'sample' : i + 1})
+                    ablation_results_real_Conv2d_2.append({'sample' : i + 1})
+                    ablation_results_real_Conv2d_3.append({'sample' : i + 1})
+                    ablation_results_real_Conv2d_4.append({'sample' : i + 1})
+                    ablation_results_real_Conv2d_5.append({'sample' : i + 1})
+                    
+                    ablation_results_abs_Conv2d_1.append({'sample' : i + 1})
+                    ablation_results_abs_Conv2d_2.append({'sample' : i + 1})
+                    ablation_results_abs_Conv2d_3.append({'sample' : i + 1})
+                    ablation_results_abs_Conv2d_4.append({'sample' : i + 1})
+                    ablation_results_abs_Conv2d_5.append({'sample' : i + 1})
+                    
+                    for j in range(0, 5):
+                        torch.cuda.empty_cache()
+                                              
+                        # Real mean values
+                        ablation_real_variable_name = 'ablation_results_real_Conv2d_' + str(j + 1)                                               
+                        mean_variable_name = 'mean_channel_importance_Conv2d_' + str(j + 1)                                                
+                                                
+                        median = np.median(vars()[mean_variable_name][i, :])
+                        diff = np.sqrt((vars()[mean_variable_name][i, :] - median) ** 2)
+                        median_abs_deviation = np.median(diff)                 
+                        modified_z_score = 0.6745 * diff / median_abs_deviation
+                        outlier_channels = np.argwhere(modified_z_score > thresh_mad)
                         
+                        vars()[ablation_real_variable_name][i]['outlier_channels'] = outlier_channels + 1
+                        vars()[ablation_real_variable_name][i]['model_output_before_ablation'] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
+                        
+                        model_output = np.zeros((len(outlier_channels), 2))
+                        
+                        for k in range(0, len(outlier_channels)):
+                            bias_old = copy.deepcopy(model.features[layers[j]].bias[outlier_channels[k]])
+                            model.features[layers[j]].bias[outlier_channels[k]] = torch.tensor(-np.inf)
+                            model_output[k] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
+                            model.features[layers[j]].bias[outlier_channels[k]] = copy.deepcopy(bias_old)
+                            
+                        vars()[ablation_real_variable_name][i]['model_output_after_ablation'] = model_output
+                        
+                        # Absolute mean values
+                        ablation_abs_variable_name = 'ablation_results_abs_Conv2d_' + str(j + 1)
+                        abs_mean_variable_name = 'abs_mean_channel_importance_Conv2d_' + str(j + 1)                                                
+                        
+                        median = np.median(vars()[abs_mean_variable_name][i, :])
+                        diff = np.sqrt((vars()[abs_mean_variable_name][i, :] - median) ** 2)
+                        median_abs_deviation = np.median(diff)
+                        modified_z_score = 0.6745 * diff / median_abs_deviation
+                        outlier_channels = np.argwhere(modified_z_score > thresh_mad)
+                        
+                        vars()[ablation_abs_variable_name][i]['outlier_channels'] = outlier_channels + 1
+                        vars()[ablation_abs_variable_name][i]['model_output_before_ablation'] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
+                        
+                        model_output = np.zeros((len(outlier_channels), 2))
+                        
+                        for k in range(0, len(outlier_channels)):
+                            bias_old = copy.deepcopy(model.features[layers[j]].bias[outlier_channels[k]])
+                            model.features[layers[j]].bias[outlier_channels[k]] = torch.tensor(-np.inf)
+                            model_output[k] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
+                            model.features[layers[j]].bias[outlier_channels[k]] = copy.deepcopy(bias_old)
+                            
+                        vars()[ablation_abs_variable_name][i]['model_output_after_ablation'] = model_output
+                                        
+                scipy.io.savemat(saving_folder + '/ablation_results_real_Conv2d_1.mat', mdict = {'ablation_results_real_Conv2d_1': ablation_results_real_Conv2d_1})
+                scipy.io.savemat(saving_folder + '/ablation_results_real_Conv2d_2.mat', mdict = {'ablation_results_real_Conv2d_2': ablation_results_real_Conv2d_2})
+                scipy.io.savemat(saving_folder + '/ablation_results_real_Conv2d_3.mat', mdict = {'ablation_results_real_Conv2d_3': ablation_results_real_Conv2d_3})
+                scipy.io.savemat(saving_folder + '/ablation_results_real_Conv2d_4.mat', mdict = {'ablation_results_real_Conv2d_4': ablation_results_real_Conv2d_4})
+                scipy.io.savemat(saving_folder + '/ablation_results_real_Conv2d_5.mat', mdict = {'ablation_results_real_Conv2d_5': ablation_results_real_Conv2d_5})
+                
+                scipy.io.savemat(saving_folder + '/ablation_results_abs_Conv2d_1.mat', mdict = {'ablation_results_abs_Conv2d_1': ablation_results_abs_Conv2d_1})
+                scipy.io.savemat(saving_folder + '/ablation_results_abs_Conv2d_2.mat', mdict = {'ablation_results_abs_Conv2d_2': ablation_results_abs_Conv2d_2})
+                scipy.io.savemat(saving_folder + '/ablation_results_abs_Conv2d_3.mat', mdict = {'ablation_results_abs_Conv2d_3': ablation_results_abs_Conv2d_3})
+                scipy.io.savemat(saving_folder + '/ablation_results_abs_Conv2d_4.mat', mdict = {'ablation_results_abs_Conv2d_4': ablation_results_abs_Conv2d_4})
+                scipy.io.savemat(saving_folder + '/ablation_results_abs_Conv2d_5.mat', mdict = {'ablation_results_abs_Conv2d_5': ablation_results_abs_Conv2d_5})
+                                       
                 # ### Visualizing and Understanding Convolutional Networks
                 
                 # # Reading the grey background image

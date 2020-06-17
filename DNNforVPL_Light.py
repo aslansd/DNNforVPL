@@ -935,10 +935,11 @@ def main():
                     unit_activity_layer_8 = model.classifier(unit_activity_layer_7)
                     unit_activity_layer_8.retain_grad()
                     
+                    layers = [0, 3]
+                    
                     for j in range(0, 2):
                         torch.cuda.empty_cache()
                         
-                        layers = [0, 3]
                         y_variable_name = 'unit_activity_layer_' + str(layers[j])
                         conv_variable_name = 'all_channel_importance_Conv2d_' + str(j + 1)
                                                    
