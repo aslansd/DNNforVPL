@@ -335,12 +335,12 @@ def main():
                                       
             if group_training == 'group1' or group_training == 'group2':
                 SF_tuning = [33, 53, 140, 170, 340, 480]
-                Ori_tuning = [23325, 23425, 23525,
+                Ori_tuning = [23350, 23450, 23550,
                               23650, 23750, 23850]
             
             elif group_training == 'group3' or group_training == 'group4':
                 SF_tuning = [33, 53, 140, 170, 340, 480]
-                Ori_tuning = [23075, 23175, 23275,
+                Ori_tuning = [23100, 23200, 23300,
                               23900, 24000, 24100]
             
             # Define the main variables
@@ -1145,7 +1145,7 @@ def main():
                 ablation_results_abs_Conv2d_5 = []
                 
                 layers = [0, 3, 6, 8, 10]
-                thresh_mad = 3.0
+                # thresh_mad = 3.0
                 
                 for i in range(0, num_sample_artiphysiology):
                     torch.cuda.empty_cache()
@@ -1180,20 +1180,24 @@ def main():
                         diff = np.sqrt((vars()[mean_variable_name][i, :] - median) ** 2)
                         median_abs_deviation = np.median(diff)                 
                         modified_z_score = 0.6745 * diff / median_abs_deviation
-                        outlier_channels = np.argwhere(modified_z_score > thresh_mad)
+                        # outlier_channels = np.argwhere(modified_z_score > thresh_mad)
+                        outlier_channels = modified_z_score.argsort()[-10:][::-1]
                         
                         vars()[ablation_real_variable_name][i]['outlier_channels'] = outlier_channels + 1
                         vars()[ablation_real_variable_name][i]['model_output_before_ablation'] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
                         
                         model_output = np.zeros((len(outlier_channels), 2))
+                        bias_old = np.zeros(len(outlier_channels))
                         
                         for k in range(0, len(outlier_channels)):
-                            bias_old = copy.deepcopy(model.features[layers[j]].bias[outlier_channels[k]])
+                            bias_old[k] = copy.deepcopy(model.features[layers[j]].bias[outlier_channels[k]])
                             model.features[layers[j]].bias[outlier_channels[k]] = torch.tensor(-np.inf)
                             model_output[k] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
-                            model.features[layers[j]].bias[outlier_channels[k]] = copy.deepcopy(bias_old)
-                            
+                                                        
                         vars()[ablation_real_variable_name][i]['model_output_after_ablation'] = model_output
+                        
+                        for k in range(0, len(outlier_channels)):
+                            model.features[layers[j]].bias[outlier_channels[k]] = copy.deepcopy(bias_old[k])
                         
                         # Absolute mean values
                         ablation_abs_variable_name = 'ablation_results_abs_Conv2d_' + str(j + 1)
@@ -1203,20 +1207,24 @@ def main():
                         diff = np.sqrt((vars()[abs_mean_variable_name][i, :] - median) ** 2)
                         median_abs_deviation = np.median(diff)
                         modified_z_score = 0.6745 * diff / median_abs_deviation
-                        outlier_channels = np.argwhere(modified_z_score > thresh_mad)
+                        # outlier_channels = np.argwhere(modified_z_score > thresh_mad)
+                        outlier_channels = modified_z_score.argsort()[-10:][::-1]
                         
                         vars()[ablation_abs_variable_name][i]['outlier_channels'] = outlier_channels + 1
                         vars()[ablation_abs_variable_name][i]['model_output_before_ablation'] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
                         
                         model_output = np.zeros((len(outlier_channels), 2))
+                        bias_old = np.zeros(len(outlier_channels))
                         
                         for k in range(0, len(outlier_channels)):
-                            bias_old = copy.deepcopy(model.features[layers[j]].bias[outlier_channels[k]])
+                            bias_old[k] = copy.deepcopy(model.features[layers[j]].bias[outlier_channels[k]])
                             model.features[layers[j]].bias[outlier_channels[k]] = torch.tensor(-np.inf)
                             model_output[k] = model(x_sample, x_baseline).squeeze().detach().cpu().clone().numpy()
-                            model.features[layers[j]].bias[outlier_channels[k]] = copy.deepcopy(bias_old)
                             
                         vars()[ablation_abs_variable_name][i]['model_output_after_ablation'] = model_output
+                        
+                        for k in range(0, len(outlier_channels)):
+                            model.features[layers[j]].bias[outlier_channels[k]] = copy.deepcopy(bias_old[k])
                                         
                 scipy.io.savemat(saving_folder + '/ablation_results_real_Conv2d_1.mat', mdict = {'ablation_results_real_Conv2d_1': ablation_results_real_Conv2d_1})
                 scipy.io.savemat(saving_folder + '/ablation_results_real_Conv2d_2.mat', mdict = {'ablation_results_real_Conv2d_2': ablation_results_real_Conv2d_2})
