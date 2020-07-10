@@ -1055,8 +1055,7 @@ def main():
                     all_channel_conductance_Conv2d_3[i] = conductance_layer_conv_3.attribute(x_sample, baselines = x_baseline).detach().cpu().clone().numpy()
                     all_channel_conductance_Conv2d_4[i] = conductance_layer_conv_4.attribute(x_sample, baselines = x_baseline).detach().cpu().clone().numpy()
                     all_channel_conductance_Conv2d_5[i] = conductance_layer_conv_5.attribute(x_sample, baselines = x_baseline).detach().cpu().clone().numpy()
-                    
-                    
+                                        
                 scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})
                 
                 scipy.io.savemat(saving_folder + '/all_channel_conductance_Conv2d_1.mat', mdict = {'all_channel_conductance_Conv2d_1': all_channel_conductance_Conv2d_1})
@@ -1168,8 +1167,7 @@ def main():
                     ablation_results_abs_Conv2d_4.append({'sample' : i + 1})
                     ablation_results_abs_Conv2d_5.append({'sample' : i + 1})
                     
-                    for j in range(0, 5):
-                                              
+                    for j in range(0, 5):                                              
                         # Real mean values
                         ablation_real_variable_name = 'ablation_results_real_Conv2d_' + str(j + 1)                                               
                         mean_variable_name = 'mean_channel_conductance_Conv2d_' + str(j + 1)                                                
