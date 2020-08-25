@@ -914,11 +914,11 @@ def main():
                         all_unit_activity_all_channels_analysis_layer_4[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_4[indices, :], axis = 0)
                         all_unit_activity_all_channels_analysis_layer_5[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_5[indices, :], axis = 0)
                 
-                all_simulation_unit_activity_all_channels_layer_1[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_1.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer) + 1, 64)
-                all_simulation_unit_activity_all_channels_layer_2[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_2.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer) + 1, 192)
-                all_simulation_unit_activity_all_channels_layer_3[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_3.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer) + 1, 384)
-                all_simulation_unit_activity_all_channels_layer_4[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_4.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer) + 1, 256)
-                all_simulation_unit_activity_all_channels_layer_5[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_5.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer) + 1, 256)
+                all_simulation_unit_activity_all_channels_layer_1[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_1.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer), 64)
+                all_simulation_unit_activity_all_channels_layer_2[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_2.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer), 192)
+                all_simulation_unit_activity_all_channels_layer_3[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_3.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer), 384)
+                all_simulation_unit_activity_all_channels_layer_4[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_4.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer), 256)
+                all_simulation_unit_activity_all_channels_layer_5[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_5.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer), 256)
     
     # Dimensionality reduction with PCA   
     resp_dict = {}
