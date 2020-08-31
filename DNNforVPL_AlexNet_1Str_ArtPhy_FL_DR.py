@@ -24,6 +24,7 @@ import torch.optim
 import torchvision.transforms as transforms
 from torchvision.utils import make_grid
 
+from scipy.spatial import distance
 from sklearn.decomposition import PCA
 from matplotlib.colors import ListedColormap
 
@@ -82,6 +83,12 @@ def main():
     all_simulation_unit_activity_all_channels_layer_3 = np.zeros((1, 4, 6, 20, 384), dtype = np.float32)
     all_simulation_unit_activity_all_channels_layer_4 = np.zeros((1, 4, 6, 20, 256), dtype = np.float32)
     all_simulation_unit_activity_all_channels_layer_5 = np.zeros((1, 4, 6, 20, 256), dtype = np.float32)
+    
+    all_simulation_layer_rotation_weight_layer_1 = np.zeros((1, 4, 6, 180), dtype = np.float32)
+    all_simulation_layer_rotation_weight_layer_2 = np.zeros((1, 4, 6, 180), dtype = np.float32)
+    all_simulation_layer_rotation_weight_layer_3 = np.zeros((1, 4, 6, 180), dtype = np.float32)
+    all_simulation_layer_rotation_weight_layer_4 = np.zeros((1, 4, 6, 180), dtype = np.float32)
+    all_simulation_layer_rotation_weight_layer_5 = np.zeros((1, 4, 6, 180), dtype = np.float32)
     
     for num_simulation in range(0, 1):
         print('Simulation:   ', num_simulation + 1)
@@ -673,7 +680,13 @@ def main():
                         weight_change_2[epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
                         weight_change_3[epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
                         weight_change_4[epoch] = (torch.pow(torch.sum(torch.pow(model.features[8].weight - Conv2d_4_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[8].weight, 2)), 0.5)).item()
-                        weight_change_5[epoch] = (torch.pow(torch.sum(torch.pow(model.features[10].weight - Conv2d_5_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[10].weight, 2)), 0.5)).item()       
+                        weight_change_5[epoch] = (torch.pow(torch.sum(torch.pow(model.features[10].weight - Conv2d_5_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[10].weight, 2)), 0.5)).item()
+                        
+                        all_simulation_layer_rotation_weight_layer_1[num_simulation, group_counter, layer_freeze_counter, epoch] = distance.cosine(torch.flatten(model.features[0].weight).detach().cpu().clone().numpy(), torch.flatten(Conv2d_1_0).detach().cpu().clone().numpy())
+                        all_simulation_layer_rotation_weight_layer_2[num_simulation, group_counter, layer_freeze_counter, epoch] = distance.cosine(torch.flatten(model.features[3].weight).detach().cpu().clone().numpy(), torch.flatten(Conv2d_2_0).detach().cpu().clone().numpy())
+                        all_simulation_layer_rotation_weight_layer_3[num_simulation, group_counter, layer_freeze_counter, epoch] = distance.cosine(torch.flatten(model.features[6].weight).detach().cpu().clone().numpy(), torch.flatten(Conv2d_3_0).detach().cpu().clone().numpy())
+                        all_simulation_layer_rotation_weight_layer_4[num_simulation, group_counter, layer_freeze_counter, epoch] = distance.cosine(torch.flatten(model.features[8].weight).detach().cpu().clone().numpy(), torch.flatten(Conv2d_4_0).detach().cpu().clone().numpy())
+                        all_simulation_layer_rotation_weight_layer_5[num_simulation, group_counter, layer_freeze_counter, epoch] = distance.cosine(torch.flatten(model.features[10].weight).detach().cpu().clone().numpy(), torch.flatten(Conv2d_5_0).detach().cpu().clone().numpy())
                            
                 os.mkdir('New_Results_AlexNet_1Str_ArtPhy_FL_DR/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training_' + str(layer_freeze))
                 saving_folder = 'New_Results_AlexNet_1Str_ArtPhy_FL_DR/Simulation_' + str(num_simulation + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
@@ -702,7 +715,7 @@ def main():
                 plt.plot(range(0, epochs), weight_change_3, "-r", label = "Conv Layer 3")
                 plt.plot(range(0, epochs), weight_change_4, "-c", label = "Conv Layer 4")
                 plt.plot(range(0, epochs), weight_change_5, "-m", label = "Conv Layer 5")
-                plt.legend(loc="upper left")
+                plt.legend(loc = "upper left")
                 plt.ylim((0, 0.0012))
                 plt.xticks(np.arange(-1, epochs + 1, 1.0))
                 plt.show()
@@ -920,7 +933,34 @@ def main():
                 all_simulation_unit_activity_all_channels_layer_4[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_4.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer), 256)
                 all_simulation_unit_activity_all_channels_layer_5[num_simulation, group_counter, layer_freeze_counter, :, :] = all_unit_activity_all_channels_analysis_layer_5.mean(axis = (2, 3)).reshape(len(SF_transfer) * len(Ori_transfer), 256)
     
-    # Dimensionality reduction with PCA   
+    ### Layer rotation: a surprisingly powerful indicator of generalization in deep networks?
+        
+    fig, axs = plt.subplots(4, 6, figsize = (4 * 4, 6 * 3.5))
+    fig.suptitle('Layer rotation: a surprisingly powerful indicator of generalization in deep networks?')
+    
+    for i in range(4):
+        for j in range(6):
+            ax = axs[i, j]
+            
+            if i == 0:
+                ax.set_title('Freezed Layer = ' + str(j))
+            if i == 3:
+                ax.set_xlabel("epoch")
+            if j == 0:
+                ax.set_ylabel("layer rotation")
+                        
+            ax.plot(range(0, 180), all_simulation_layer_rotation_weight_layer_1.mean(0)[i, j], "-b", label = "Conv Layer 1")
+            ax.plot(range(0, 180), all_simulation_layer_rotation_weight_layer_2.mean(0)[i, j], "-g", label = "Conv Layer 2")
+            ax.plot(range(0, 180), all_simulation_layer_rotation_weight_layer_3.mean(0)[i, j], "-r", label = "Conv Layer 3")
+            ax.plot(range(0, 180), all_simulation_layer_rotation_weight_layer_4.mean(0)[i, j], "-c", label = "Conv Layer 4")
+            ax.plot(range(0, 180), all_simulation_layer_rotation_weight_layer_5.mean(0)[i, j], "-m", label = "Conv Layer 5")
+            ax.legend(loc = "upper left", fontsize = "x-small")
+            
+            ax.set_ylim((-5 * 10 ** (-7), 10 ** (-6)))
+            ax.set_xticks(np.arange(0, 180, 30.0))
+     
+    ### Dimensionality reduction with PCA   
+    
     resp_dict = {}
     
     for i in range(6):
