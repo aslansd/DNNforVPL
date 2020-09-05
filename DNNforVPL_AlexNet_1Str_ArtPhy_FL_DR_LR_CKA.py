@@ -1029,9 +1029,9 @@ def main():
                                   all_simulation_transfer_accuracy.std(axis = (0, 3))[2, i],
                                   all_simulation_transfer_accuracy.std(axis = (0, 3))[3, i]])
         
-        bar_list[0].set_color('r')
+        bar_list[0].set_color('b')
         bar_list[1].set_color('g')
-        bar_list[2].set_color('b')
+        bar_list[2].set_color('r')
         bar_list[3].set_color('c')
         
         ax.set_ylim((0, 105))
@@ -1063,9 +1063,9 @@ def main():
                                   all_simulation_specificity_index.std(0)[2, i],
                                   all_simulation_specificity_index.std(0)[3, i]])
         
-        bar_list[0].set_color('r')
+        bar_list[0].set_color('b')
         bar_list[1].set_color('g')
-        bar_list[2].set_color('b')
+        bar_list[2].set_color('r')
         bar_list[3].set_color('c')
         
         ax.set_ylim((-0.2, 1.2))
@@ -1272,7 +1272,7 @@ def plot_resp_lowd(resp_dict, layer_freeze, num_group, num_layer, parent_folder)
         point_label[0:10] = 0
         point_label[10:20] = 1
         classes = ['CW', 'CCW']
-        colours = ListedColormap(['r','g'])
+        colours = ListedColormap(['b','g'])
         
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
