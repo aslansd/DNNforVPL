@@ -31,7 +31,7 @@ from cka import feature_space_linear_cka
 # The DNN model for VPL
 class DNNforVPL(nn.Module):
     
-    def __init__(self, num_classes = 1):
+    def __init__(self, num_classes = 2):
         
         super(DNNforVPL, self).__init__()
         
@@ -50,22 +50,13 @@ class DNNforVPL(nn.Module):
              nn.Linear(16 * 3 * 3, num_classes)
         )
     
-    def forward(self, x1, x2):
-        x1 = self.features(x1)
-        x1 = self.avgpool(x1)
-        x1 = torch.flatten(x1, 1)
-        x1 = self.classifier(x1)
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
         
-        x2 = self.features(x2)
-        x2 = self.avgpool(x2)
-        x2 = torch.flatten(x2, 1)
-        x2 = self.classifier(x2)
-        
-        SoftMax = nn.Softmax(dim = -1)
-        input = torch.cat((x1, x2), -1)
-        output = SoftMax(input)
-        
-        return output
+        return x
 
 def main():
     
@@ -85,7 +76,7 @@ def main():
     number_group = 4
     number_layer = 2
     number_layer_freeze = 3
-    number_transfer_stimuli = 21
+    number_transfer_stimuli = 20
     
     all_simulation_training_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 360), dtype = np.float32)
     all_simulation_transfer_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 10), dtype = np.float32)
@@ -105,7 +96,7 @@ def main():
     # Cosine distance definition
     CosSim = nn.CosineSimilarity(dim = 0, eps = 1e-10)
        
-    parent_folder = 'New_Results_Light_2Str_ArtPhy_FL_DR_LR_PWCCA_CKA'
+    parent_folder = 'New_Results_Light_1Str_ArtPhy_FL_DR_LR_PWCCA_CKA'
         
     os.mkdir(parent_folder)
     
@@ -451,43 +442,6 @@ def main():
                 
                 print('Freezed Layer:   ', layer_freeze)
                 
-                # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
-                
-                # Define the main reference variables
-                x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
-                x_tensor_ref = []
-                
-                # Load image
-                img = Image.open(file_name_path_ref[0]).convert('RGB')
-                
-                # Resize image
-                width, height = img.size
-                new_width = width * 256 // min(img.size)
-                new_height = height * 256 // min(img.size)
-                img = img.resize((new_width, new_height), Image.BILINEAR)
-                
-                # Center crop image
-                width, height = img.size
-                startx = width // 2 - (112 // 2)
-                starty = height // 2 - (112 // 2)
-                img = np.asarray(img).reshape(height, width, 3)
-                img = img[starty:starty + 112, startx:startx + 112]
-                assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
-                
-                # Save image
-                x_val_ref[:, :, :] = img[:, :, :]
-                
-                # Convert image to tensor and normalize and copy
-                x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
-                normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                
-                for i in range(40):
-                    x_tensor_ref.append(normalize(x_temp))
-                    
-                x_tensor_ref = torch.stack(x_tensor_ref)
-                print(x_tensor_ref.shape)
-                
                 # Select GPU
                 global device
                 gpu = 0
@@ -590,29 +544,9 @@ def main():
                     #         plt.show()
                     #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
                     #         plt.close()
-                    
-                    # The reference stimulus              
-                    all_unit_activity_ref_Conv2d_1 = np.zeros((1, 6, 28, 28), dtype = np.float32)
-                    all_unit_activity_ref_Conv2d_2 = np.zeros((1, 16, 13, 13), dtype = np.float32)
-                    
-                    x_sample = torch.index_select(x_tensor_ref, 0, torch.tensor(0))
-                    x_sample = x_sample.cuda(gpu)
-                    
-                    unit_activity_layer_0 = model.features[0](x_sample)
-                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                    
-                    all_unit_activity_ref_Conv2d_1[0, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                    all_unit_activity_ref_Conv2d_2[0, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                    
-                    # scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_1.mat', mdict = {'all_unit_activity_ref_Conv2d_1': all_unit_activity_ref_Conv2d_1})
-                    # scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_2.mat', mdict = {'all_unit_activity_ref_Conv2d_2': all_unit_activity_ref_Conv2d_2})
                 
                 # Define the main learning parameters
-                lr = 0.0001
+                lr = 0.001
                 momentum = 0.9
                 weight_decay = 0.0001
                 
@@ -666,12 +600,11 @@ def main():
                             with torch.set_grad_enabled(True):
                                 end = time.time()
                         
-                                x_ref = x_tensor_ref.cuda(gpu)
                                 x_train = x_train.cuda(gpu)
                                 y_train = y_train.cuda(gpu)
                         
                                 # Compute output
-                                output = model(x_train, x_ref)
+                                output = model(x_train)
                                 loss = criterion(output, y_train)
                         
                                 # Measure accuracy and record loss
@@ -711,43 +644,6 @@ def main():
                     'best_acc1': best_acc1,
                     'optimizer' : optimizer.state_dict(),
                 }, is_best, group_training, 'DNNforVPL_' + group_training + '.pth.tar')
-                
-                # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
-                        
-                # Define the main reference variables
-                x_val_ref = np.zeros((112, 112, 3), dtype = np.float32)
-                x_tensor_ref = []
-                
-                # Load image
-                img = Image.open(file_name_path_ref[0]).convert('RGB')
-                
-                # Resize image
-                width, height = img.size
-                new_width = width * 256 // min(img.size)
-                new_height = height * 256 // min(img.size)
-                img = img.resize((new_width, new_height), Image.BILINEAR)
-                
-                # Center crop image
-                width, height = img.size
-                startx = width // 2 - (112 // 2)
-                starty = height // 2 - (112 // 2)
-                img = np.asarray(img).reshape(height, width, 3)
-                img = img[starty:starty + 112, startx:startx + 112]
-                assert img.shape[0] == 112 and img.shape[1] == 112, (img.shape, height, width)
-                
-                # Save image
-                x_val_ref[:, :, :] = img[:, :, :]
-                
-                # Convert image to tensor and normalize and copy
-                x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
-                normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                
-                for i in range(len(SF_transfer) * len(Ori_transfer)):
-                    x_tensor_ref.append(normalize(x_temp))
-                    
-                x_tensor_ref = torch.stack(x_tensor_ref)
-                print(x_tensor_ref.shape)
                 
                 # Select GPU
                 gpu = 0
@@ -796,12 +692,11 @@ def main():
                     with torch.no_grad():
                         end = time.time()
                         
-                        x_ref = x_tensor_ref.cuda(gpu)
                         x_valid = x_valid.cuda(gpu)
                         y_valid = y_valid.cuda(gpu)
             
                         # Compute output
-                        output = model(x_valid, x_ref)
+                        output = model(x_valid)
                         loss = criterion(output, y_valid)
             
                         # Measure accuracy and record loss
@@ -893,26 +788,6 @@ def main():
                 #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
                 #         plt.close()
                 
-                # The reference stimulus            
-                all_unit_activity_ref_Conv2d_1 = np.zeros((1, 6, 28, 28), dtype = np.float32)
-                all_unit_activity_ref_Conv2d_2 = np.zeros((1, 16, 13, 13), dtype = np.float32)
-                
-                x_sample = torch.index_select(x_tensor_ref, 0, torch.tensor(0))
-                x_sample = x_sample.cuda(gpu)
-                
-                unit_activity_layer_0 = model.features[0](x_sample)
-                unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                
-                all_unit_activity_ref_Conv2d_1[0, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                all_unit_activity_ref_Conv2d_2[0, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                
-                # scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_1.mat', mdict = {'all_unit_activity_ref_Conv2d_1': all_unit_activity_ref_Conv2d_1})
-                # scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_2.mat', mdict = {'all_unit_activity_ref_Conv2d_2': all_unit_activity_ref_Conv2d_2})
-                
                 ### Saving all units activity for all transfer stimuli 
                 
                 all_unit_activity_analysis_layer_1 = np.zeros((number_transfer_stimuli, 6, 28, 28), dtype = np.float32)
@@ -925,9 +800,6 @@ def main():
                         all_unit_activity_analysis_layer_1[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_1[indices, :], axis = 0)
                         all_unit_activity_analysis_layer_2[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_2[indices, :], axis = 0)
                 
-                all_unit_activity_analysis_layer_1[len(SF_transfer) * len(Ori_transfer), :] = all_unit_activity_ref_Conv2d_1[0, :]
-                all_unit_activity_analysis_layer_2[len(SF_transfer) * len(Ori_transfer), :] = all_unit_activity_ref_Conv2d_2[0, :]
-                
                 all_simulation_unit_activity_layer_1[simulation_counter, group_counter, layer_freeze_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 6)
                 all_simulation_unit_activity_layer_2[simulation_counter, group_counter, layer_freeze_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 16)
     
@@ -935,39 +807,39 @@ def main():
     
     all_simulation_specificity_index = (all_simulation_training_accuracy[:, : , :, 359] - all_simulation_transfer_accuracy.mean(3)) / (all_simulation_training_accuracy[:, : , :, 359] - all_simulation_training_accuracy[:, : , :, 0])
         
-    ### PWCCA & CKA
+    # ### PWCCA & CKA
     
-    counter = -1
+    # counter = -1
         
-    for i in range(number_simulation):
-        for j in range(i + 1, number_simulation):
-            counter = counter + 1
+    # for i in range(number_simulation):
+    #     for j in range(i + 1, number_simulation):
+    #         counter = counter + 1
             
-            group_counter = -1
+    #         group_counter = -1
             
-            for group_training in ['group1', 'group2', 'group3', 'group4']:
-                group_counter = group_counter + 1
+    #         for group_training in ['group1', 'group2', 'group3', 'group4']:
+    #             group_counter = group_counter + 1
                 
-                layer_freeze_counter = -1
+    #             layer_freeze_counter = -1
                 
-                for layer_freeze in [None, 0, 3]: 
-                    layer_freeze_counter = layer_freeze_counter + 1
+    #             for layer_freeze in [None, 0, 3]: 
+    #                 layer_freeze_counter = layer_freeze_counter + 1
                     
-                    loading_folder_i = parent_folder + '/Simulation_' + str(i + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
+    #                 loading_folder_i = parent_folder + '/Simulation_' + str(i + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
                     
-                    all_unit_activity_layer_i_1 = np.transpose(scipy.io.loadmat(loading_folder_i + '/all_unit_activity_Conv2d_1.mat')['all_unit_activity_Conv2d_1'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 28 * 28, 6)
-                    all_unit_activity_layer_i_2 = np.transpose(scipy.io.loadmat(loading_folder_i + '/all_unit_activity_Conv2d_2.mat')['all_unit_activity_Conv2d_2'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 13 * 13, 16)
+    #                 all_unit_activity_layer_i_1 = np.transpose(scipy.io.loadmat(loading_folder_i + '/all_unit_activity_Conv2d_1.mat')['all_unit_activity_Conv2d_1'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 28 * 28, 6)
+    #                 all_unit_activity_layer_i_2 = np.transpose(scipy.io.loadmat(loading_folder_i + '/all_unit_activity_Conv2d_2.mat')['all_unit_activity_Conv2d_2'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 13 * 13, 16)
 
-                    loading_folder_j = parent_folder + '/Simulation_' + str(j + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
+    #                 loading_folder_j = parent_folder + '/Simulation_' + str(j + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
                     
-                    all_unit_activity_layer_j_1 = np.transpose(scipy.io.loadmat(loading_folder_j + '/all_unit_activity_Conv2d_1.mat')['all_unit_activity_Conv2d_1'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 28 * 28, 6)
-                    all_unit_activity_layer_j_2 = np.transpose(scipy.io.loadmat(loading_folder_j + '/all_unit_activity_Conv2d_2.mat')['all_unit_activity_Conv2d_2'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 13 * 13, 16)    
+    #                 all_unit_activity_layer_j_1 = np.transpose(scipy.io.loadmat(loading_folder_j + '/all_unit_activity_Conv2d_1.mat')['all_unit_activity_Conv2d_1'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 28 * 28, 6)
+    #                 all_unit_activity_layer_j_2 = np.transpose(scipy.io.loadmat(loading_folder_j + '/all_unit_activity_Conv2d_2.mat')['all_unit_activity_Conv2d_2'], axes = (0, 2, 3, 1)).reshape(num_sample_artiphysiology * 13 * 13, 16)    
                     
-                    all_simulation_all_PWCCA[counter, group_counter, 0, layer_freeze_counter] = 1 - compute_pwcca(all_unit_activity_layer_i_1.T, all_unit_activity_layer_j_1.T, epsilon = 1e-10)[0]
-                    all_simulation_all_PWCCA[counter, group_counter, 1, layer_freeze_counter] = 1 - compute_pwcca(all_unit_activity_layer_i_2.T, all_unit_activity_layer_j_2.T, epsilon = 1e-10)[0]
+    #                 all_simulation_all_PWCCA[counter, group_counter, 0, layer_freeze_counter] = 1 - compute_pwcca(all_unit_activity_layer_i_1.T, all_unit_activity_layer_j_1.T, epsilon = 1e-10)[0]
+    #                 all_simulation_all_PWCCA[counter, group_counter, 1, layer_freeze_counter] = 1 - compute_pwcca(all_unit_activity_layer_i_2.T, all_unit_activity_layer_j_2.T, epsilon = 1e-10)[0]
                     
-                    all_simulation_all_CKA[counter, group_counter, 0, layer_freeze_counter] = 1 - feature_space_linear_cka(all_unit_activity_layer_i_1, all_unit_activity_layer_j_1, debiased = True)
-                    all_simulation_all_CKA[counter, group_counter, 1, layer_freeze_counter] = 1 - feature_space_linear_cka(all_unit_activity_layer_i_2, all_unit_activity_layer_j_2, debiased = True)
+    #                 all_simulation_all_CKA[counter, group_counter, 0, layer_freeze_counter] = 1 - feature_space_linear_cka(all_unit_activity_layer_i_1, all_unit_activity_layer_j_1, debiased = True)
+    #                 all_simulation_all_CKA[counter, group_counter, 1, layer_freeze_counter] = 1 - feature_space_linear_cka(all_unit_activity_layer_i_2, all_unit_activity_layer_j_2, debiased = True)
                              
     ### Saving the main variables
    
@@ -1078,65 +950,65 @@ def main():
                 
     fig.savefig(parent_folder + '/Specificity Index.tif')
     
-    ### PWCCA: Insights on representational similarity in neural networks with canonical correlation
+    # ### PWCCA: Insights on representational similarity in neural networks with canonical correlation
     
-    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
-    fig.suptitle('Projection Weighted Canonical Correlation Analysis', fontsize = 20)
+    # fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
+    # fig.suptitle('Projection Weighted Canonical Correlation Analysis', fontsize = 20)
     
-    for i in range(number_layer_freeze):
-        ax = axs[i]
+    # for i in range(number_layer_freeze):
+    #     ax = axs[i]
                 
-        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
-        ax.set_ylabel('PWCCA distance')
+    #     ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+    #     ax.set_ylabel('PWCCA distance')
         
-        ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[0, :, i], "-b", label = "Group 1")
-        ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[0, :, i] - all_simulation_all_PWCCA.std(0)[0, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[0, :, i] + all_simulation_all_PWCCA.std(0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+    #     ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[0, :, i], "-b", label = "Group 1")
+    #     ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[0, :, i] - all_simulation_all_PWCCA.std(0)[0, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[0, :, i] + all_simulation_all_PWCCA.std(0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[1, :, i], "-g", label = "Group 2")
-        ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[1, :, i] - all_simulation_all_PWCCA.std(0)[1, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[1, :, i] + all_simulation_all_PWCCA.std(0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+    #     ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[1, :, i], "-g", label = "Group 2")
+    #     ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[1, :, i] - all_simulation_all_PWCCA.std(0)[1, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[1, :, i] + all_simulation_all_PWCCA.std(0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[2, :, i], "-r", label = "Group 3")
-        ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[2, :, i] - all_simulation_all_PWCCA.std(0)[2, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[2, :, i] + all_simulation_all_PWCCA.std(0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+    #     ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[2, :, i], "-r", label = "Group 3")
+    #     ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[2, :, i] - all_simulation_all_PWCCA.std(0)[2, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[2, :, i] + all_simulation_all_PWCCA.std(0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
         
-        ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[3, :, i], "-c", label = "Group 4")
-        ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[3, :, i] - all_simulation_all_PWCCA.std(0)[3, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[3, :, i] + all_simulation_all_PWCCA.std(0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+    #     ax.plot(range(0, 2), all_simulation_all_PWCCA.mean(0)[3, :, i], "-c", label = "Group 4")
+    #     ax.fill_between(range(0, 2), all_simulation_all_PWCCA.mean(0)[3, :, i] - all_simulation_all_PWCCA.std(0)[3, :, i] / number_simulation ** 0.5, all_simulation_all_PWCCA.mean(0)[3, :, i] + all_simulation_all_PWCCA.std(0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
-        ax.legend(loc = 'upper left', fontsize = 'medium')
-        ax.set_ylim((0, 0.3))
-        ax.set_xticks(range(0, 2))
-        ax.set_xticklabels(['Layer 1', 'Layer 2'])
+    #     ax.legend(loc = 'upper left', fontsize = 'medium')
+    #     ax.set_ylim((0, 0.3))
+    #     ax.set_xticks(range(0, 2))
+    #     ax.set_xticklabels(['Layer 1', 'Layer 2'])
                 
-    fig.savefig(parent_folder + '/PWCCA Distance.tif')
+    # fig.savefig(parent_folder + '/PWCCA Distance.tif')
        
-    ### CKA: Similarity of Neural Network Representations Revisited
+    # ### CKA: Similarity of Neural Network Representations Revisited
     
-    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
-    fig.suptitle('Centered Kernel Alignment', fontsize = 20)
+    # fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
+    # fig.suptitle('Centered Kernel Alignment', fontsize = 20)
     
-    for i in range(number_layer_freeze):
-        ax = axs[i]
+    # for i in range(number_layer_freeze):
+    #     ax = axs[i]
                 
-        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
-        ax.set_ylabel('CKA distance')
+    #     ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+    #     ax.set_ylabel('CKA distance')
         
-        ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[0, :, i], "-b", label = "Group 1")
-        ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[0, :, i] - all_simulation_all_CKA.std(0)[0, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[0, :, i] + all_simulation_all_CKA.std(0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+    #     ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[0, :, i], "-b", label = "Group 1")
+    #     ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[0, :, i] - all_simulation_all_CKA.std(0)[0, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[0, :, i] + all_simulation_all_CKA.std(0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[1, :, i], "-g", label = "Group 2")
-        ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[1, :, i] - all_simulation_all_CKA.std(0)[1, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[1, :, i] + all_simulation_all_CKA.std(0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+    #     ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[1, :, i], "-g", label = "Group 2")
+    #     ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[1, :, i] - all_simulation_all_CKA.std(0)[1, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[1, :, i] + all_simulation_all_CKA.std(0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[2, :, i], "-r", label = "Group 3")
-        ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[2, :, i] - all_simulation_all_CKA.std(0)[2, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[2, :, i] + all_simulation_all_CKA.std(0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+    #     ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[2, :, i], "-r", label = "Group 3")
+    #     ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[2, :, i] - all_simulation_all_CKA.std(0)[2, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[2, :, i] + all_simulation_all_CKA.std(0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
         
-        ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[3, :, i], "-c", label = "Group 4")
-        ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[3, :, i] - all_simulation_all_CKA.std(0)[3, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[3, :, i] + all_simulation_all_CKA.std(0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+    #     ax.plot(range(0, 2), all_simulation_all_CKA.mean(0)[3, :, i], "-c", label = "Group 4")
+    #     ax.fill_between(range(0, 2), all_simulation_all_CKA.mean(0)[3, :, i] - all_simulation_all_CKA.std(0)[3, :, i] / number_simulation ** 0.5, all_simulation_all_CKA.mean(0)[3, :, i] + all_simulation_all_CKA.std(0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
-        ax.legend(loc = 'upper left', fontsize = 'medium')
-        ax.set_ylim((0, 1))
-        ax.set_xticks(range(0, 2))
-        ax.set_xticklabels(['Layer 1', 'Layer 2'])
+    #     ax.legend(loc = 'upper left', fontsize = 'medium')
+    #     ax.set_ylim((0, 1))
+    #     ax.set_xticks(range(0, 2))
+    #     ax.set_xticklabels(['Layer 1', 'Layer 2'])
                 
-    fig.savefig(parent_folder + '/CKA Distance.tif')
+    # fig.savefig(parent_folder + '/CKA Distance.tif')
     
     ### Weight Change
     
@@ -1275,9 +1147,8 @@ def plot_resp_lowd(resp_dict, layer_freeze, num_group, num_layer, parent_folder)
         point_label = np.zeros(len(x))
         point_label[0:10] = 0
         point_label[10:20] = 1
-        point_label[20] = 2
-        classes = ['CW', 'CCW', 'Ref']
-        colours = ListedColormap(['b','g','r'])
+        classes = ['CW', 'CCW']
+        colours = ListedColormap(['b','g'])
         
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
