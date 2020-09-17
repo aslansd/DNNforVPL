@@ -1153,67 +1153,61 @@ def main():
     
     ### PWCCA: Insights on representational similarity in neural networks with canonical correlation
     
-    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
     fig.suptitle('Projection Weighted Canonical Correlation Analysis', fontsize = 20)
     
     for i in range(number_layer_freeze):
-        if i <= 2:
-            ax = axs[0, i]
-        elif i > 2:
-            ax = axs[1, i - 3]
+        ax = axs[i]
         
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_ylabel('PWCCA distance')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[0, :, i], "-b", label = "Group 1")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[0, :, i], "-b", label = "Group 1")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[1, :, i], "-g", label = "Group 2")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[1, :, i], "-g", label = "Group 2")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[2, :, i], "-r", label = "Group 3")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[2, :, i], "-r", label = "Group 3")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i], "-c", label = "Group 4")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i], "-c", label = "Group 4")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper left', fontsize = 'medium')
-        ax.set_ylim((0, 0.005))
-        ax.set_xticks(range(0, 5))
-        ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+        ax.set_ylim((0, 0.5))
+        ax.set_xticks(range(0, 2))
+        ax.set_xticklabels(['Layer 1', 'Layer 2'])
                 
     fig.savefig(parent_folder + '/PWCCA Distance.tif')
        
     ### CKA: Similarity of Neural Network Representations Revisited
     
-    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
     fig.suptitle('Centered Kernel Alignment', fontsize = 20)
     
     for i in range(number_layer_freeze):
-        if i <= 2:
-            ax = axs[0, i]
-        elif i > 2:
-            ax = axs[1, i - 3]
+        ax = axs[i]
         
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_ylabel('CKA distance')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[0, :, i], "-b", label = "Group 1")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[0, :, i], "-b", label = "Group 1")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[1, :, i], "-g", label = "Group 2")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[1, :, i], "-g", label = "Group 2")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[2, :, i], "-r", label = "Group 3")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[2, :, i], "-r", label = "Group 3")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
         
-        ax.plot(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[3, :, i], "-c", label = "Group 4")
-        ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_CKA, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[3, :, i], "-c", label = "Group 4")
+        ax.fill_between(range(0, 2), np.nanmean(all_simulation_all_CKA, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_CKA, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_CKA, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_CKA, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper left', fontsize = 'medium')
-        ax.set_ylim((0, 0.005))
-        ax.set_xticks(range(0, 5))
-        ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+        ax.set_ylim((0, 1))
+        ax.set_xticks(range(0, 2))
+        ax.set_xticklabels(['Layer 1', 'Layer 2'])
                 
     fig.savefig(parent_folder + '/CKA Distance.tif')
     

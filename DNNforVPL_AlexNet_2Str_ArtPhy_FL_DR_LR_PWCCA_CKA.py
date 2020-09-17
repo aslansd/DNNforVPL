@@ -1370,7 +1370,7 @@ def main():
         ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_PWCCA, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_PWCCA, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_PWCCA, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper left', fontsize = 'medium')
-        ax.set_ylim((0, 0.005))
+        ax.set_ylim((0, 0.03))
         ax.set_xticks(range(0, 5))
         ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
                 
