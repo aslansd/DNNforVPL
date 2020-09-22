@@ -1133,8 +1133,9 @@ def main():
             ax.plot(range(0, n_pca_component), PCA_explained_variance.mean(0)[3, j], "-c", label = "Group 4")
             ax.fill_between(range(0, n_pca_component), PCA_explained_variance.mean(0)[3, j] - PCA_explained_variance.std(0)[3, j] / number_simulation ** 0.5, PCA_explained_variance.mean(0)[3, j] + PCA_explained_variance.std(0)[3, j] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                                                 
-            ax.legend(loc = 'lower right', fontsize = 'x-small')
+            ax.legend(loc = 'upper right', fontsize = 'x-small')
             ax.set_ylim((0, 1))
+            ax.set_xlim((0, 5))
             
     fig.savefig(parent_folder + '/Variance Explained by PCA.tif')
     
@@ -1239,7 +1240,7 @@ def main():
         ax.fill_between(range(0, 5), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper right', fontsize = 'medium')
-        ax.set_ylim((0, 100))
+        ax.set_ylim((2, 4))
         ax.set_xticks(range(0, 5))
         ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
                 
