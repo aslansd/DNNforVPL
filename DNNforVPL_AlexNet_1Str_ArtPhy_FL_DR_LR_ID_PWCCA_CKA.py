@@ -39,7 +39,7 @@ pretrained_dict = load_state_dict_from_url(model_urls['alexnet'])
 # The DNN model for VPL
 class DNNforVPL(nn.Module):
     
-    def __init__(self, num_classes = 1):
+    def __init__(self, num_classes = 2):
         
         super(DNNforVPL, self).__init__()
         
@@ -65,22 +65,13 @@ class DNNforVPL(nn.Module):
              nn.Linear(256 * 6 * 6, num_classes)
         )
     
-    def forward(self, x1, x2):
-        x1 = self.features(x1)
-        x1 = self.avgpool(x1)
-        x1 = torch.flatten(x1, 1)
-        x1 = self.classifier(x1)
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
         
-        x2 = self.features(x2)
-        x2 = self.avgpool(x2)
-        x2 = torch.flatten(x2, 1)
-        x2 = self.classifier(x2)
-        
-        SoftMax = nn.Softmax(dim = -1)
-        input = torch.cat((x1, x2), -1)
-        output = SoftMax(input)
-        
-        return output
+        return x
     
 def main():
     
@@ -136,7 +127,7 @@ def main():
     # Cosine distance definition
     CosSim = nn.CosineSimilarity(dim = 0, eps = 1e-10)
        
-    parent_folder = 'New_Results_AlexNet_2Str_ArtPhy_FL_DR_LR_ID_PWCCA_CKA'
+    parent_folder = 'New_Results_AlexNet_1Str_ArtPhy_FL_DR_LR_ID_PWCCA_CKA'
         
     os.mkdir(parent_folder)
     
@@ -144,7 +135,7 @@ def main():
         print('Simulation:   ', simulation_counter + 1)
         
         os.mkdir(parent_folder + '/Simulation_' + str(simulation_counter + 1))
-            
+                    
         group_counter = -1
         
         for group_training in ['group1', 'group2', 'group3', 'group4']:
@@ -311,7 +302,7 @@ def main():
             
             counter = -1
             
-            for i in range(len(file_names)):                 
+            for i in range(len(file_names)):                
                 # Construct the main descriptive variables
                 name_digits = file_names[i].split('_')
                 
@@ -335,7 +326,7 @@ def main():
                                     
                                 z_val_transfer[j][k][((Phase + 1) // 2) - 1] = counter
                 
-                if flag_image_name:                      
+                if flag_image_name:                     
                     # Load image
                     img = Image.open(file_name_paths[i]).convert('RGB')
                     
@@ -403,7 +394,7 @@ def main():
             
             counter = -1
             
-            for p in range(10):
+            for p in range(0, 10):
                 # Reading all images
                 if group_training == 'group1' or group_training == 'group2':
                     file_name_paths = glob.glob('VPL Stimuli/6 x 40 x 360 Stimuli (32)/group1&2/p' + str(p + 1) + '/*.TIFF')
@@ -474,43 +465,6 @@ def main():
                 layer_freeze_counter = layer_freeze_counter + 1
                 
                 print('Freezed Layer:   ', layer_freeze)
-                
-                # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
-                
-                # Define the main reference variables
-                x_val_ref = np.zeros((224, 224, 3), dtype = np.float32)
-                x_tensor_ref = []
-                
-                # Load image
-                img = Image.open(file_name_path_ref[0]).convert('RGB')
-                
-                # Resize image
-                width, height = img.size
-                new_width = width * 256 // min(img.size)
-                new_height = height * 256 // min(img.size)
-                img = img.resize((new_width, new_height), Image.BILINEAR)
-                
-                # Center crop image
-                width, height = img.size
-                startx = width // 2 - (224 // 2)
-                starty = height // 2 - (224 // 2)
-                img = np.asarray(img).reshape(height, width, 3)
-                img = img[starty:starty + 224, startx:startx + 224]
-                assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
-                
-                # Save image
-                x_val_ref[:, :, :] = img[:, :, :]
-                
-                # Convert image to tensor and normalize and copy
-                x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
-                normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                
-                for i in range(len(SF_training) * len(Ori_training)):
-                    x_tensor_ref.append(normalize(x_temp))
-                    
-                x_tensor_ref = torch.stack(x_tensor_ref)
-                print(x_tensor_ref.shape)
                 
                 # Select GPU
                 global device
@@ -657,45 +611,9 @@ def main():
                     #         plt.show()
                     #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
                     #         plt.close()
-                    
-                    # The reference stimulus              
-                    all_unit_activity_ref_Conv2d_1 = np.zeros((1, 64, 55, 55), dtype = np.float32)
-                    all_unit_activity_ref_Conv2d_2 = np.zeros((1, 192, 27, 27), dtype = np.float32)
-                    all_unit_activity_ref_Conv2d_3 = np.zeros((1, 384, 13, 13), dtype = np.float32)
-                    all_unit_activity_ref_Conv2d_4 = np.zeros((1, 256, 13, 13), dtype = np.float32)
-                    all_unit_activity_ref_Conv2d_5 = np.zeros((1, 256, 13, 13), dtype = np.float32)
-                    
-                    x_sample = torch.index_select(x_tensor_ref, 0, torch.tensor(0))
-                    x_sample = x_sample.cuda(gpu)
-                    
-                    unit_activity_layer_0 = model.features[0](x_sample)
-                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                    unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
-                    unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
-                    unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
-                    unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
-                    unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
-                    unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
-                    unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
-                    
-                    all_unit_activity_ref_Conv2d_1[0, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                    all_unit_activity_ref_Conv2d_2[0, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                    all_unit_activity_ref_Conv2d_3[0, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
-                    all_unit_activity_ref_Conv2d_4[0, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
-                    all_unit_activity_ref_Conv2d_5[0, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
-                    
-                    scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_1.mat', mdict = {'all_unit_activity_ref_Conv2d_1': all_unit_activity_ref_Conv2d_1})
-                    scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_2.mat', mdict = {'all_unit_activity_ref_Conv2d_2': all_unit_activity_ref_Conv2d_2})
-                    scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_3.mat', mdict = {'all_unit_activity_ref_Conv2d_3': all_unit_activity_ref_Conv2d_3})
-                    scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_4.mat', mdict = {'all_unit_activity_ref_Conv2d_4': all_unit_activity_ref_Conv2d_4})
-                    scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_5.mat', mdict = {'all_unit_activity_ref_Conv2d_5': all_unit_activity_ref_Conv2d_5})
                 
                 # Define the main learning parameters
-                lr = 0.00001
+                lr = 0.0001
                 momentum = 0.9
                 weight_decay = 0.0001
                 
@@ -720,14 +638,14 @@ def main():
                     for j in range(len(Ori_training)):
                         random.shuffle(z_val_shuffle[i, j, :])
                     
-                for session in range(start_session, sessions):                   
+                for session in range(start_session, sessions):                    
                     # Adjust the learning rate
                     adjust_learning_rate(optimizer, session, lr)
                     
                     # Train on a training set        
                     epochs = 180
-                    
-                    for epoch in range(epochs):                       
+                            
+                    for epoch in range(epochs):                        
                         z_val_shuffle_1D = np.unique(z_val_shuffle[:, :, epoch])
                         indices = torch.tensor(z_val_shuffle_1D, dtype = torch.long)
                         x_train = torch.index_select(x_tensor_training, 0, indices)
@@ -745,12 +663,11 @@ def main():
                         with torch.set_grad_enabled(True):
                             end = time.time()
                     
-                            x_ref = x_tensor_ref.cuda(gpu)
                             x_train = x_train.cuda(gpu)
                             y_train = y_train.cuda(gpu)
                     
                             # Compute output
-                            output = model(x_train, x_ref)
+                            output = model(x_train)
                             loss = criterion(output, y_train)
                     
                             # Measure accuracy and record loss
@@ -795,43 +712,6 @@ def main():
                     'optimizer' : optimizer.state_dict(),
                 }, is_best, group_training, 'DNNforVPL_' + group_training + '.pth.tar')
                 
-                # Reading the reference image
-                file_name_path_ref = glob.glob('VPL Stimuli/Learning & Transfer_SF (32)/ReferenceStimulus.TIFF')
-                        
-                # Define the main reference variables
-                x_val_ref = np.zeros((224, 224, 3), dtype = np.float32)
-                x_tensor_ref = []
-                
-                # Load image
-                img = Image.open(file_name_path_ref[0]).convert('RGB')
-                
-                # Resize image
-                width, height = img.size
-                new_width = width * 256 // min(img.size)
-                new_height = height * 256 // min(img.size)
-                img = img.resize((new_width, new_height), Image.BILINEAR)
-                
-                # Center crop image
-                width, height = img.size
-                startx = width // 2 - (224 // 2)
-                starty = height // 2 - (224 // 2)
-                img = np.asarray(img).reshape(height, width, 3)
-                img = img[starty:starty + 224, startx:startx + 224]
-                assert img.shape[0] == 224 and img.shape[1] == 224, (img.shape, height, width)
-                
-                # Save image
-                x_val_ref[:, :, :] = img[:, :, :]
-                
-                # Convert image to tensor and normalize and copy
-                x_temp = torch.from_numpy(np.transpose(x_val_ref[:, :, :], (2, 0, 1)))
-                normalize = transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
-                
-                for i in range(len(SF_transfer) * len(Ori_transfer)):
-                    x_tensor_ref.append(normalize(x_temp))
-                    
-                x_tensor_ref = torch.stack(x_tensor_ref)
-                print(x_tensor_ref.shape)
-                
                 # Select GPU
                 gpu = 0
                 os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
@@ -854,7 +734,7 @@ def main():
                 start_session = 0
                 sessions = 10
                     
-                for session in range(start_session, sessions):                   
+                for session in range(start_session, sessions):                    
                     z_val_shuffle = copy.deepcopy(z_val_transfer)
                     
                     for j in range(len(SF_transfer)):
@@ -867,7 +747,7 @@ def main():
                     x_valid = torch.index_select(x_tensor_transfer, 0, indices)
                     y_valid = torch.index_select(y_tensor_transfer, 0, indices)
                     y_valid = y_valid.squeeze(1)
-                           
+                                               
                     batch_time = AverageMeter('Time', ':6.3f')
                     losses = AverageMeter('Loss', ':.4e')
                     top1 = AverageMeter('Accuracy', ':6.2f')
@@ -879,12 +759,11 @@ def main():
                     with torch.no_grad():
                         end = time.time()
                         
-                        x_ref = x_tensor_ref.cuda(gpu)
                         x_valid = x_valid.cuda(gpu)
                         y_valid = y_valid.cuda(gpu)
             
                         # Compute output
-                        output = model(x_valid, x_ref)
+                        output = model(x_valid)
                         loss = criterion(output, y_valid)
             
                         # Measure accuracy and record loss
@@ -903,7 +782,7 @@ def main():
                     # Remember the best accuracy and save checkpoint
                     is_best = all_simulation_transfer_accuracy[simulation_counter, group_counter, layer_freeze_counter, session - start_session] >= best_acc1
                     best_acc1 = max(all_simulation_transfer_accuracy[simulation_counter, group_counter, layer_freeze_counter, session - start_session], best_acc1)
-                                                                  
+                                              
                 ### ’Artiphysiology’ reveals V4-like shape tuning in a deep network trained for image classification
                 
                 # The convolutional layers: (0, 3, 6, 8, 10)
@@ -1010,42 +889,6 @@ def main():
                 #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
                 #         plt.close()
                 
-                # The reference stimulus            
-                all_unit_activity_ref_Conv2d_1 = np.zeros((1, 64, 55, 55), dtype = np.float32)
-                all_unit_activity_ref_Conv2d_2 = np.zeros((1, 192, 27, 27), dtype = np.float32)
-                all_unit_activity_ref_Conv2d_3 = np.zeros((1, 384, 13, 13), dtype = np.float32)
-                all_unit_activity_ref_Conv2d_4 = np.zeros((1, 256, 13, 13), dtype = np.float32)
-                all_unit_activity_ref_Conv2d_5 = np.zeros((1, 256, 13, 13), dtype = np.float32)
-                
-                x_sample = torch.index_select(x_tensor_ref, 0, torch.tensor(0))
-                x_sample = x_sample.cuda(gpu)
-                
-                unit_activity_layer_0 = model.features[0](x_sample)
-                unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
-                unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
-                unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
-                unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
-                unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
-                unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
-                unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
-                
-                all_unit_activity_ref_Conv2d_1[0, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                all_unit_activity_ref_Conv2d_2[0, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                all_unit_activity_ref_Conv2d_3[0, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
-                all_unit_activity_ref_Conv2d_4[0, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
-                all_unit_activity_ref_Conv2d_5[0, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
-                
-                scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_1.mat', mdict = {'all_unit_activity_ref_Conv2d_1': all_unit_activity_ref_Conv2d_1})
-                scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_2.mat', mdict = {'all_unit_activity_ref_Conv2d_2': all_unit_activity_ref_Conv2d_2})
-                scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_3.mat', mdict = {'all_unit_activity_ref_Conv2d_3': all_unit_activity_ref_Conv2d_3})
-                scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_4.mat', mdict = {'all_unit_activity_ref_Conv2d_4': all_unit_activity_ref_Conv2d_4})
-                scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_5.mat', mdict = {'all_unit_activity_ref_Conv2d_5': all_unit_activity_ref_Conv2d_5})
-                
                 ### Saving all units activity for all transfer stimuli 
                 
                 all_unit_activity_analysis_layer_1 = np.zeros((number_transfer_stimuli, 64, 55, 55), dtype = np.float32)
@@ -1063,12 +906,6 @@ def main():
                         all_unit_activity_analysis_layer_3[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_3[indices, :], axis = 0)
                         all_unit_activity_analysis_layer_4[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_4[indices, :], axis = 0)
                         all_unit_activity_analysis_layer_5[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_5[indices, :], axis = 0)
-                
-                all_unit_activity_analysis_layer_1[len(SF_transfer) * len(Ori_transfer), :] = all_unit_activity_ref_Conv2d_1[0, :]
-                all_unit_activity_analysis_layer_2[len(SF_transfer) * len(Ori_transfer), :] = all_unit_activity_ref_Conv2d_2[0, :]
-                all_unit_activity_analysis_layer_3[len(SF_transfer) * len(Ori_transfer), :] = all_unit_activity_ref_Conv2d_3[0, :]
-                all_unit_activity_analysis_layer_4[len(SF_transfer) * len(Ori_transfer), :] = all_unit_activity_ref_Conv2d_4[0, :]
-                all_unit_activity_analysis_layer_5[len(SF_transfer) * len(Ori_transfer), :] = all_unit_activity_ref_Conv2d_5[0, :]
                 
                 all_simulation_unit_activity_layer_1[simulation_counter, group_counter, layer_freeze_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
                 all_simulation_unit_activity_layer_2[simulation_counter, group_counter, layer_freeze_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
@@ -1096,12 +933,12 @@ def main():
                 all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'))[2]
                 all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'))[2]
                 all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'))[2]
-                all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'))[2]                
+                all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'))[2]
     
     ### Specificity Index
     
     all_simulation_specificity_index = (all_simulation_training_accuracy[:, : , :, 179] - all_simulation_transfer_accuracy.mean(3)) / (all_simulation_training_accuracy[:, : , :, 179] - all_simulation_training_accuracy[:, : , :, 0])
-    
+        
     ### Saving the main variables
    
     scipy.io.savemat(parent_folder + '/all_simulation_training_accuracy.mat', mdict = {'all_simulation_training_accuracy': all_simulation_training_accuracy})
@@ -1132,7 +969,7 @@ def main():
     scipy.io.savemat(parent_folder + '/all_simulation_layer_rotation_layer_3.mat', mdict = {'all_simulation_layer_rotation_layer_3': all_simulation_layer_rotation_layer_3})
     scipy.io.savemat(parent_folder + '/all_simulation_layer_rotation_layer_4.mat', mdict = {'all_simulation_layer_rotation_layer_4': all_simulation_layer_rotation_layer_4})
     scipy.io.savemat(parent_folder + '/all_simulation_layer_rotation_layer_5.mat', mdict = {'all_simulation_layer_rotation_layer_5': all_simulation_layer_rotation_layer_5})
-       
+    
     ### Training Accuracy
     
     fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
@@ -1256,7 +1093,7 @@ def main():
             resp_dict[label] = all_simulation_unit_activity_layer_5.mean(0)[j, i, :, :]
     
         plot_resp_lowd(resp_dict, i, number_group, 5, parent_folder)
-        
+    
     ### Variance Explained by PCA
     
     fig, axs = plt.subplots(number_layer, number_layer_freeze, figsize = (number_layer * 4, number_layer_freeze * 3.5))
@@ -1459,7 +1296,7 @@ def main():
                     
     scipy.io.savemat(parent_folder + '/all_simulation_all_PWCCA.mat', mdict = {'all_simulation_all_PWCCA': all_simulation_all_PWCCA})
     scipy.io.savemat(parent_folder + '/all_simulation_all_CKA.mat', mdict = {'all_simulation_all_CKA': all_simulation_all_CKA})
-                             
+    
     ### PWCCA: Insights on representational similarity in neural networks with canonical correlation
     
     fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
@@ -1525,7 +1362,7 @@ def main():
         ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
                 
     fig.savefig(parent_folder + '/CKA Distance.tif')
-       
+    
 def imshow(x_sample, title):
     """Imshow for Tensor"""
     
@@ -1593,9 +1430,8 @@ def plot_resp_lowd(resp_dict, layer_freeze, num_group, num_layer, parent_folder)
         point_label = np.zeros(len(x))
         point_label[0:10] = 0
         point_label[10:20] = 1
-        point_label[20] = 2
-        classes = ['CW', 'CCW', 'Ref']
-        colours = ListedColormap(['b','g','r'])
+        classes = ['CW', 'CCW']
+        colours = ListedColormap(['b','g'])
         
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
