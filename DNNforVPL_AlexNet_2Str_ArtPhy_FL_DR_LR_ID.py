@@ -95,7 +95,7 @@ def main():
     
     best_acc1 = 0
     
-    number_simulation = 2
+    number_simulation = 1
     number_group = 4
     number_layer = 5
     number_layer_freeze = 6
@@ -106,9 +106,10 @@ def main():
     all_simulation_transfer_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 10), dtype = np.float32)
     all_simulation_specificity_index = np.zeros((number_simulation, number_group, number_layer_freeze), dtype = np.float32)
     all_simulation_all_ID = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze, 19), dtype = np.float32)
+    all_x_sample_ID = np.zeros((number_simulation), dtype = np.float32)
     
-    all_simulation_training_accuracy_permuted = np.zeros((number_simulation, number_group, 180), dtype = np.float32)
-    all_simulation_all_ID_permuted = np.zeros((number_simulation, number_group, number_layer, 19), dtype = np.float32)
+    all_simulation_training_accuracy_permuted = np.zeros((number_simulation, number_group, number_layer_freeze, 180), dtype = np.float32)
+    all_simulation_all_ID_permuted = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze, 19), dtype = np.float32)
     
     all_simulation_unit_activity_layer_1 = np.zeros((number_simulation, number_group, number_layer_freeze, number_transfer_stimuli, 64), dtype = np.float32)
     all_simulation_unit_activity_layer_2 = np.zeros((number_simulation, number_group, number_layer_freeze, number_transfer_stimuli, 192), dtype = np.float32)
@@ -566,6 +567,8 @@ def main():
                     
                     feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
                     
+                    all_x_sample = np.zeros((num_sample_artiphysiology, 3, 224, 224), dtype = np.float32)
+                    
                     all_unit_activity_Conv2d_1 = np.zeros((num_sample_artiphysiology, 64, 55, 55), dtype = np.float32)
                     all_unit_activity_Conv2d_2 = np.zeros((num_sample_artiphysiology, 192, 27, 27), dtype = np.float32)
                     all_unit_activity_Conv2d_3 = np.zeros((num_sample_artiphysiology, 384, 13, 13), dtype = np.float32)
@@ -592,6 +595,8 @@ def main():
                         unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
                         unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
                         unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
+                        
+                        all_x_sample[i, :] = x_sample.detach().cpu().clone().numpy()
                         
                         all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
                         all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
@@ -696,6 +701,8 @@ def main():
                     # scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_5.mat', mdict = {'all_unit_activity_ref_Conv2d_5': all_unit_activity_ref_Conv2d_5})
                     
                     ### Calculating the intrinsic dimension
+                    
+                    all_x_sample_ID[simulation_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                 
                     all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
@@ -703,11 +710,11 @@ def main():
                     all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, 0] = all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0]
                 
                 # Define the main learning parameters
                 lr = 0.00001
@@ -803,7 +810,7 @@ def main():
                         all_simulation_layer_rotation_layer_4[simulation_counter, group_counter, layer_freeze_counter, epoch] = 1 - CosSim(torch.flatten(model.features[8].weight), torch.flatten(Conv2d_4_0)).item()
                         all_simulation_layer_rotation_layer_5[simulation_counter, group_counter, layer_freeze_counter, epoch] = 1 - CosSim(torch.flatten(model.features[10].weight), torch.flatten(Conv2d_5_0)).item()
                         
-                        if epoch % 10 == 0:
+                        if (layer_freeze == None or layer_freeze == 0 or layer_freeze == 10) and epoch % 10 == 0:
                             ID_counter = ID_counter + 1
                             
                             for i in range(num_sample_artiphysiology):
@@ -1059,7 +1066,7 @@ def main():
                 
                 ### Training with Permuted Labels
                 
-                if layer_freeze == None:
+                if layer_freeze == None or layer_freeze == 0 or layer_freeze == 10:
                     print('Training with Permuted Labels')
                     
                     # Load the PyTorch model
@@ -1197,11 +1204,11 @@ def main():
                                 
                                 ### Calculating the intrinsic dimension
                             
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
     
     ### Specificity Index
     
@@ -1213,6 +1220,7 @@ def main():
     scipy.io.savemat(parent_folder + '/all_simulation_transfer_accuracy.mat', mdict = {'all_simulation_transfer_accuracy': all_simulation_transfer_accuracy})
     scipy.io.savemat(parent_folder + '/all_simulation_specificity_index.mat', mdict = {'all_simulation_specificity_index': all_simulation_specificity_index})
     scipy.io.savemat(parent_folder + '/all_simulation_all_ID.mat', mdict = {'all_simulation_all_ID': all_simulation_all_ID})
+    scipy.io.savemat(parent_folder + '/all_x_sample_ID.mat', mdict = {'all_x_sample_ID': all_x_sample_ID})
     
     scipy.io.savemat(parent_folder + '/all_simulation_training_accuracy_permuted.mat', mdict = {'all_simulation_training_accuracy_permuted': all_simulation_training_accuracy_permuted})
     scipy.io.savemat(parent_folder + '/all_simulation_all_ID_permuted.mat', mdict = {'all_simulation_all_ID_permuted': all_simulation_all_ID_permuted})
@@ -1241,10 +1249,10 @@ def main():
     scipy.io.savemat(parent_folder + '/all_simulation_layer_rotation_layer_4.mat', mdict = {'all_simulation_layer_rotation_layer_4': all_simulation_layer_rotation_layer_4})
     scipy.io.savemat(parent_folder + '/all_simulation_layer_rotation_layer_5.mat', mdict = {'all_simulation_layer_rotation_layer_5': all_simulation_layer_rotation_layer_5})
        
-    ### Training Accuracy
+    ### Training Accuracy with Correct Labels
     
     fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
-    fig.suptitle('Training Accuracy', fontsize = 20)
+    fig.suptitle('Training Accuracy with Correct Labels', fontsize = 20)
     
     for i in range(number_layer_freeze):
         if i <= 2:
@@ -1272,32 +1280,38 @@ def main():
         ax.set_ylim((0, 105))
         ax.set_xticks(np.arange(0, 180, 30.0))
         
-    fig.savefig(parent_folder + '/Training Accuracy.png')
+    fig.savefig(parent_folder + '/Training Accuracy with Correct Labels.png')
     
     ### Training Accuracy with Permuted Labels
     
-    fig, axs = plt.subplots(1, 1, figsize = (1 * 8, 1 * 6))
+    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
     fig.suptitle('Training Accuracy with Permuted Labels', fontsize = 20)
+    
+    for i in range(number_layer_freeze):
+        if i <= 2:
+            ax = axs[0, i]
+        elif i > 2:
+            ax = axs[1, i - 3]
         
-    axs.set_title('Freezed Layer = None', fontsize = 12)
-    axs.set_xlabel('Epoch')
-    axs.set_ylabel('% Accuracy')
-                
-    axs.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[0], "-b", label = "Group 1")
-    axs.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[0] - all_simulation_training_accuracy_permuted.std(0)[0] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[0] + all_simulation_training_accuracy_permuted.std(0)[0] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
-    
-    axs.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[1], "-g", label = "Group 2")
-    axs.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[1] - all_simulation_training_accuracy_permuted.std(0)[1] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[1] + all_simulation_training_accuracy_permuted.std(0)[1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
-    
-    axs.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[2], "-r", label = "Group 3")
-    axs.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[2] - all_simulation_training_accuracy_permuted.std(0)[2] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[2] + all_simulation_training_accuracy_permuted.std(0)[2] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
-    
-    axs.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[3], "-c", label = "Group 4")
-    axs.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[3] - all_simulation_training_accuracy_permuted.std(0)[3] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[3] + all_simulation_training_accuracy_permuted.std(0)[3] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
-               
-    axs.legend(loc = 'lower right', fontsize = 'medium')
-    axs.set_ylim((0, 105))
-    axs.set_xticks(np.arange(0, 180, 30.0))
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('% Accuracy')
+                    
+        ax.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[0, i], "-b", label = "Group 1")
+        ax.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[0, i] - all_simulation_training_accuracy_permuted.std(0)[0, i] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[0, i] + all_simulation_training_accuracy_permuted.std(0)[0, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        
+        ax.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[1, i], "-g", label = "Group 2")
+        ax.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[1, i] - all_simulation_training_accuracy_permuted.std(0)[1, i] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[1, i] + all_simulation_training_accuracy_permuted.std(0)[1, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        
+        ax.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[2, i], "-r", label = "Group 3")
+        ax.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[2, i] - all_simulation_training_accuracy_permuted.std(0)[2, i] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[2, i] + all_simulation_training_accuracy_permuted.std(0)[2, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        
+        ax.plot(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[3, i], "-c", label = "Group 4")
+        ax.fill_between(range(0, 180), all_simulation_training_accuracy_permuted.mean(0)[3, i] - all_simulation_training_accuracy_permuted.std(0)[3, i] / number_simulation ** 0.5, all_simulation_training_accuracy_permuted.mean(0)[3, i] + all_simulation_training_accuracy_permuted.std(0)[3, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+                   
+        ax.legend(loc = 'lower right', fontsize = 'medium')
+        ax.set_ylim((0, 105))
+        ax.set_xticks(np.arange(0, 180, 30.0))
         
     fig.savefig(parent_folder + '/Training Accuracy with Permuted Labels.png')
     
@@ -1540,28 +1554,34 @@ def main():
     
     # ID across layers and groups for permuted labels
     
-    fig, axs = plt.subplots(1, 1, figsize = (1 * 8, 1 * 6))
+    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
     fig.suptitle('Intrinsic Dimension with Permuted Labels', fontsize = 20)
-            
-    axs.set_title('Freezed Layer = None', fontsize = 12)
-    axs.set_ylabel('ID')
     
-    axs.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, -1], "-b", label = "Group 1")
-    axs.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
-    
-    axs.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, -1], "-g", label = "Group 2")
-    axs.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
-    
-    axs.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, -1], "-r", label = "Group 3")
-    axs.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
-    
-    axs.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, -1], "-c", label = "Group 4")
-    axs.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
-            
-    axs.legend(loc = 'upper right', fontsize = 'medium')
-    axs.set_ylim((2, 4))
-    axs.set_xticks(range(0, number_layer))
-    axs.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+    for i in range(number_layer_freeze):
+        if i <= 2:
+            ax = axs[0, i]
+        elif i > 2:
+            ax = axs[1, i - 3]
+        
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_ylabel('ID')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1], "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1], "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1], "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1], "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+                
+        ax.legend(loc = 'upper right', fontsize = 'medium')
+        ax.set_ylim((2, 4))
+        ax.set_xticks(range(0, number_layer))
+        ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
                 
     fig.savefig(parent_folder + '/Intrinsic Dimension with Permuted Labels.png')
     
@@ -1590,7 +1610,7 @@ def main():
             point_label[j * number_simulation:(j + 1) * number_simulation] = j
         
         classes = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
-        colours = ListedColormap(['b','g','r', 'c'])
+        colours = ListedColormap(['b', 'g', 'r', 'c'])
         
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
@@ -1625,7 +1645,7 @@ def main():
             point_label[j * number_simulation:(j + 1) * number_simulation] = j
         
         classes = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
-        colours = ListedColormap(['b','g','r', 'c'])
+        colours = ListedColormap(['b', 'g', 'r', 'c'])
         
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
@@ -1664,12 +1684,14 @@ def main():
         for j in range(n_lines):
             x = np.arange(0, number_layer)
             y = np.nanmean(all_simulation_all_ID, axis = 0)[i, :, 0, j]
-            lc = ax.plot(x, y, color = s_m.to_rgba(j))
+            ax.plot(x, y, color = s_m.to_rgba(j))
         
     fig.subplots_adjust(right = 0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
     cbar = fig.colorbar(s_m, cax = cbar_ax)
-    cbar.set_label('# of epochs divided by 10')
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
     fig.savefig(parent_folder + '/ID versus Layers across Epochs for Correct Labels.png')
     
@@ -1686,12 +1708,12 @@ def main():
         
         ax.set_title('Group = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('ID')
-        ax.set_ylim((2.9, 3.5))
+        ax.set_ylim((2.7, 3.5))
         
         ax.set_xticks(range(0, number_layer))
         ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
         
-        n_lines = 19        
+        n_lines = 19
         parameters = np.arange(0, n_lines)
         norm = matplotlib.colors.Normalize(vmin = np.min(parameters), vmax = np.max(parameters))
         
@@ -1701,14 +1723,16 @@ def main():
         
         for j in range(n_lines):
             x = np.arange(0, number_layer)
-            y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, :, j]
-            lc = ax.plot(x, y, color = s_m.to_rgba(j))
+            y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, :, 0, j]
+            ax.plot(x, y, color = s_m.to_rgba(j))
         
     fig.subplots_adjust(right = 0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
     cbar = fig.colorbar(s_m, cax = cbar_ax)
-    cbar.set_label('# of epochs divided by 10')
-
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
+    
     fig.savefig(parent_folder + '/ID versus Layers across Epochs for Permuted Labels.png')
             
     # ID in the first layer versus training accuracy across epochs for correct labels
@@ -1745,9 +1769,9 @@ def main():
     fig.subplots_adjust(right = 0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
     cbar = fig.colorbar(points, cax = cbar_ax)
-    cbar.set_label('# of epochs divided by 10')
-    cbar.set_ticks([0, 1 / 9, 2 / 9, 3 / 9, 4 / 9, 5 / 9, 6 / 9, 7 / 9, 8 / 9, 1])
-    cbar.set_ticklabels(['0', '2', '4', '6', '8', '10', '12', '14', '16', '18'])
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
     fig.savefig(parent_folder + '/ID in the First Layer versus Training Accuracy across Epochs for Correct Labels.png')
     
@@ -1785,9 +1809,9 @@ def main():
     fig.subplots_adjust(right = 0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
     cbar = fig.colorbar(points, cax = cbar_ax)
-    cbar.set_label('# of epochs divided by 10')
-    cbar.set_ticks([0, 1 / 9, 2 / 9, 3 / 9, 4 / 9, 5 / 9, 6 / 9, 7 / 9, 8 / 9, 1])
-    cbar.set_ticklabels(['0', '2', '4', '6', '8', '10', '12', '14', '16', '18'])
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
     fig.savefig(parent_folder + '/ID in the Last Layer versus Training Accuracy across Epochs for Correct Labels.png')
     
@@ -1803,31 +1827,31 @@ def main():
             ax = axs[1, i - 2]
         
         ax.set_title('Group = ' + str(i + 1), fontsize = 12)
-
+        
         ax.set_xlabel('% Error')
-        ax.set_xlim((25, 75))
+        ax.set_xlim((-5, 55))
         
         ax.set_ylabel('ID')
-        ax.set_ylim((3.25, 3.5))
+        ax.set_ylim((3.1, 3.5))
         
         n_points = 18
         
         x = np.zeros(n_points)
         for j in range(n_points):
-            x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 10 * j]
-        y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, 0, 1:]
+            x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 0, 10 * j]
+        y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, 0, 0, 1:]
         
         color_idx = np.linspace(0, 1, n_points)
         
         cmap = sns.cubehelix_palette(as_cmap = True)
         points = ax.scatter(x, y, c = color_idx, cmap = cmap)
-        
+    
     fig.subplots_adjust(right = 0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
     cbar = fig.colorbar(points, cax = cbar_ax)
-    cbar.set_label('# of epochs divided by 10')
-    cbar.set_ticks([0, 1 / 9, 2 / 9, 3 / 9, 4 / 9, 5 / 9, 6 / 9, 7 / 9, 8 / 9, 1])
-    cbar.set_ticklabels(['0', '2', '4', '6', '8', '10', '12', '14', '16', '18'])
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
     fig.savefig(parent_folder + '/ID in the First Layer versus Training Accuracy across Epochs for Permuted Labels.png')
     
@@ -1843,19 +1867,19 @@ def main():
             ax = axs[1, i - 2]
         
         ax.set_title('Group = ' + str(i + 1), fontsize = 12)
-
+        
         ax.set_xlabel('% Error')
-        ax.set_xlim((25, 75))
+        ax.set_xlim((-5, 55))
         
         ax.set_ylabel('ID')
-        ax.set_ylim((2.9, 3.25))
+        ax.set_ylim((2.7, 3.2))
         
         n_points = 18
         
         x = np.zeros(n_points)
         for j in range(n_points):
-            x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 10 * j]
-        y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, -1, 1:]
+            x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 0, 10 * j]
+        y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, -1, 0, 1:]
         
         color_idx = np.linspace(0, 1, n_points)
         
@@ -1865,9 +1889,9 @@ def main():
     fig.subplots_adjust(right = 0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
     cbar = fig.colorbar(points, cax = cbar_ax)
-    cbar.set_label('# of epochs divided by 10')
-    cbar.set_ticks([0, 1 / 9, 2 / 9, 3 / 9, 4 / 9, 5 / 9, 6 / 9, 7 / 9, 8 / 9, 1])
-    cbar.set_ticklabels(['0', '2', '4', '6', '8', '10', '12', '14', '16', '18'])
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
     fig.savefig(parent_folder + '/ID in the Last Layer versus Training Accuracy across Epochs for Permuted Labels.png')
        
