@@ -94,7 +94,7 @@ def main():
     all_simulation_transfer_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 10), dtype = np.float32)
     all_simulation_specificity_index = np.zeros((number_simulation, number_group, number_layer_freeze), dtype = np.float32)
     all_simulation_all_ID = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze, 37), dtype = np.float32)
-    all_x_sample_ID = np.zeros((number_simulation), dtype = np.float32)
+    all_x_sample_ID = np.zeros((number_simulation, number_group), dtype = np.float32)
     
     all_simulation_training_accuracy_permuted = np.zeros((number_simulation, number_group, number_layer_freeze, 360), dtype = np.float32)
     all_simulation_all_ID_permuted = np.zeros((number_simulation, number_group, number_layer_freeze, number_layer, 37), dtype = np.float32)
@@ -624,7 +624,7 @@ def main():
                     
                     ### Calculating the intrinsic dimension
                     
-                    all_x_sample_ID[simulation_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_x_sample_ID[simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                 
                     all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
@@ -1022,7 +1022,7 @@ def main():
                             optimizer.step()
                     
                             # Save the validation accuracy for plotting
-                            all_simulation_training_accuracy_permuted[simulation_counter, group_counter, epoch] = acc1[0].item()
+                            all_simulation_training_accuracy_permuted[simulation_counter, group_counter, layer_freeze_counter, epoch] = acc1[0].item()
                             
                             # Measure elapsed time
                             batch_time.update(time.time() - end)
@@ -1030,8 +1030,8 @@ def main():
                             progress.display(epoch)
                             
                         # Remember the best accuracy
-                        is_best = all_simulation_training_accuracy_permuted[simulation_counter, group_counter, epoch] >= best_acc1
-                        best_acc1 = max(all_simulation_training_accuracy_permuted[simulation_counter, group_counter, epoch], best_acc1)
+                        is_best = all_simulation_training_accuracy_permuted[simulation_counter, group_counter, layer_freeze_counter, epoch] >= best_acc1
+                        best_acc1 = max(all_simulation_training_accuracy_permuted[simulation_counter, group_counter, layer_freeze_counter, epoch], best_acc1)
                         
                         if epoch % 10 == 0:
                             ID_counter = ID_counter + 1
