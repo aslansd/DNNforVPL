@@ -83,7 +83,7 @@ def main():
     
     best_acc1 = 0
     
-    number_simulation = 1
+    number_simulation = 10
     number_group = 4
     number_layer = 2
     number_layer_freeze = 3
@@ -1754,7 +1754,7 @@ def plot_resp_lowd(resp_dict, layer_freeze, num_group, num_layer, parent_folder)
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
     
-    fig.savefig(parent_folder + '/DL with PCA_FL = ' + str(layer_freeze) + '.tif')
+    fig.savefig(parent_folder + '/DL with PCA_FL = ' + str(layer_freeze) + '.png')
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""

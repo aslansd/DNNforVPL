@@ -95,7 +95,7 @@ def main():
     
     best_acc1 = 0
     
-    number_simulation = 1
+    number_simulation = 10
     number_group = 4
     number_layer = 5
     number_layer_freeze = 6
@@ -1284,14 +1284,16 @@ def main():
     
     ### Training Accuracy with Permuted Labels
     
-    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
     fig.suptitle('Training Accuracy with Permuted Labels', fontsize = 20)
     
-    for i in range(number_layer_freeze):
-        if i <= 2:
-            ax = axs[0, i]
-        elif i > 2:
-            ax = axs[1, i - 3]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_xlabel('Epoch')
@@ -1521,14 +1523,16 @@ def main():
     
     # ID across layers and groups for correct labels
     
-    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
     fig.suptitle('Intrinsic Dimension with Correct Labels', fontsize = 20)
     
-    for i in range(number_layer_freeze):
-        if i <= 2:
-            ax = axs[0, i]
-        elif i > 2:
-            ax = axs[1, i - 3]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_ylabel('ID')
@@ -1554,14 +1558,16 @@ def main():
     
     # ID across layers and groups for permuted labels
     
-    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
     fig.suptitle('Intrinsic Dimension with Permuted Labels', fontsize = 20)
     
-    for i in range(number_layer_freeze):
-        if i <= 2:
-            ax = axs[0, i]
-        elif i > 2:
-            ax = axs[1, i - 3]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_ylabel('ID')
@@ -1587,14 +1593,16 @@ def main():
     
     # Scatter plot of ID in the first layer versus transfer accuracy
     
-    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
     fig.suptitle('ID in the First Layer versus Transfer Accuracy', fontsize = 20)
     
-    for i in range(number_layer_freeze):
-        if i <= 2:
-            ax = axs[0, i]
-        elif i > 2:
-            ax = axs[1, i - 3]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_xlabel('% Transfer Accuracy')
@@ -1616,20 +1624,22 @@ def main():
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
         
         ax.set_xlim((45, 105))
-        ax.set_ylim((3, 3.6))
+        ax.set_ylim((3, 3.75))
     
     fig.savefig(parent_folder + '/ID in the First Layer versus Transfer Accuracy.png')
     
     # Scatter plot of ID in the last layer versus transfer accuracy
     
-    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
     fig.suptitle('ID in the Last Layer versus Transfer Accuracy', fontsize = 20)
     
-    for i in range(number_layer_freeze):
-        if i <= 2:
-            ax = axs[0, i]
-        elif i > 2:
-            ax = axs[1, i - 3]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_xlabel('% Transfer Accuracy')
@@ -1651,7 +1661,7 @@ def main():
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
         
         ax.set_xlim((45, 105))
-        ax.set_ylim((2.6, 3.2))
+        ax.set_ylim((3, 3.75))
     
     fig.savefig(parent_folder + '/ID in the Last Layer versus Transfer Accuracy.png')
     
@@ -1668,7 +1678,7 @@ def main():
         
         ax.set_title('Group = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('ID')
-        ax.set_ylim((2.7, 3.5))
+        ax.set_ylim((3, 3.75))
         
         ax.set_xticks(range(0, number_layer))
         ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
@@ -1708,7 +1718,7 @@ def main():
         
         ax.set_title('Group = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('ID')
-        ax.set_ylim((2.7, 3.5))
+        ax.set_ylim((2.8, 3.75))
         
         ax.set_xticks(range(0, number_layer))
         ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
@@ -1752,7 +1762,7 @@ def main():
         ax.set_xlim((-5, 55))
         
         ax.set_ylabel('ID')
-        ax.set_ylim((3.1, 3.5))
+        ax.set_ylim((3, 3.75))
         
         n_points = 18
         
@@ -1792,7 +1802,7 @@ def main():
         ax.set_xlim((-5, 55))
         
         ax.set_ylabel('ID')
-        ax.set_ylim((2.7, 3.2))
+        ax.set_ylim((3, 3.75))
         
         n_points = 18
         
@@ -1832,7 +1842,7 @@ def main():
         ax.set_xlim((-5, 55))
         
         ax.set_ylabel('ID')
-        ax.set_ylim((3.1, 3.5))
+        ax.set_ylim((2.8, 3.75))
         
         n_points = 18
         
@@ -1872,7 +1882,7 @@ def main():
         ax.set_xlim((-5, 55))
         
         ax.set_ylabel('ID')
-        ax.set_ylim((2.7, 3.2))
+        ax.set_ylim((2.8, 3.75))
         
         n_points = 18
         
@@ -1969,7 +1979,7 @@ def plot_resp_lowd(resp_dict, layer_freeze, num_group, num_layer, parent_folder)
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
     
-    fig.savefig(parent_folder + '/DL with PCA_FL = ' + str(layer_freeze) + '.tif')
+    fig.savefig(parent_folder + '/DL with PCA_FL = ' + str(layer_freeze) + '.png')
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
