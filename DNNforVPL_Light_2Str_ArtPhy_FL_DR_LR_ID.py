@@ -12,10 +12,13 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import numpy as np
+import pandas as pd
+import pingouin as pg
 from PIL import Image
 import random
 import scipy.io
 import seaborn as sns
+from scipy import stats
 from sklearn.decomposition import PCA
 import shutil
 import time
@@ -1173,6 +1176,24 @@ def main():
         ax.set_ylim((0, 105))
         ax.set_xticks(range(0, number_group))
         ax.set_xticklabels(['Group 1', 'Group 2', 'Group 3', 'Group 4'])
+        
+        if i == 0:
+            t_stat_1, p_value_1 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 0, 0, :].flatten(), all_simulation_transfer_accuracy[:, 1, 0, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_2, p_value_2 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 2, 0, :].flatten(), all_simulation_transfer_accuracy[:, 3, 0, :].flatten(), equal_var = True, nan_policy = 'omit')
+            
+            ax.text(bar_list[1].get_x() + bar_list[1].get_width() * 0.5, 1.15 * bar_list[1].get_height(), 'p = {:.4e}'.format(p_value_1), ha = 'center', va = 'bottom', color = 'g')
+            ax.text(bar_list[3].get_x() + bar_list[3].get_width() * 0.5, 1.15 * bar_list[3].get_height(), 'p = {:.4e}'.format(p_value_2), ha = 'center', va = 'bottom', color = 'c')
+            
+        elif i != 0:
+            t_stat_1, p_value_1 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 0, 0, :].flatten(), all_simulation_transfer_accuracy[:, 0, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_2, p_value_2 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 1, 0, :].flatten(), all_simulation_transfer_accuracy[:, 1, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_3, p_value_3 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 2, 0, :].flatten(), all_simulation_transfer_accuracy[:, 2, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_4, p_value_4 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 3, 0, :].flatten(), all_simulation_transfer_accuracy[:, 3, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            
+            ax.text(bar_list[0].get_x() + bar_list[0].get_width() * 0.5, 1.15 * bar_list[0].get_height(), 'p = {:.4e}'.format(p_value_1), ha = 'center', va = 'bottom', color = 'b')
+            ax.text(bar_list[1].get_x() + bar_list[1].get_width() * 0.5, 1.15 * bar_list[1].get_height(), 'p = {:.4e}'.format(p_value_2), ha = 'center', va = 'bottom', color = 'g')
+            ax.text(bar_list[2].get_x() + bar_list[2].get_width() * 0.5, 1.15 * bar_list[2].get_height(), 'p = {:.4e}'.format(p_value_3), ha = 'center', va = 'bottom', color = 'r')
+            ax.text(bar_list[3].get_x() + bar_list[3].get_width() * 0.5, 1.15 * bar_list[3].get_height(), 'p = {:.4e}'.format(p_value_4), ha = 'center', va = 'bottom', color = 'c')
                 
     fig.savefig(parent_folder + '/Transfer Accuracy.png')
     
@@ -1204,6 +1225,24 @@ def main():
         ax.set_ylim((-0.2, 1.2))
         ax.set_xticks(range(0, number_group))
         ax.set_xticklabels(['Group 1', 'Group 2', 'Group 3', 'Group 4'])
+        
+        if i == 0:
+            t_stat_1, p_value_1 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 0, 0, :].flatten(), all_simulation_transfer_accuracy[:, 1, 0, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_2, p_value_2 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 2, 0, :].flatten(), all_simulation_transfer_accuracy[:, 3, 0, :].flatten(), equal_var = True, nan_policy = 'omit')
+            
+            ax.text(bar_list[1].get_x() + bar_list[1].get_width() * 0.5, 1.25 * bar_list[1].get_height(), 'p = {:.4e}'.format(p_value_1), ha = 'center', va = 'bottom', color = 'g')
+            ax.text(bar_list[3].get_x() + bar_list[3].get_width() * 0.5, 1.25 * bar_list[3].get_height(), 'p = {:.4e}'.format(p_value_2), ha = 'center', va = 'bottom', color = 'c')
+            
+        elif i != 0:
+            t_stat_1, p_value_1 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 0, 0, :].flatten(), all_simulation_transfer_accuracy[:, 0, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_2, p_value_2 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 1, 0, :].flatten(), all_simulation_transfer_accuracy[:, 1, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_3, p_value_3 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 2, 0, :].flatten(), all_simulation_transfer_accuracy[:, 2, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            t_stat_4, p_value_4 = stats.ttest_ind(all_simulation_transfer_accuracy[:, 3, 0, :].flatten(), all_simulation_transfer_accuracy[:, 3, i, :].flatten(), equal_var = True, nan_policy = 'omit')
+            
+            ax.text(bar_list[0].get_x() + bar_list[0].get_width() * 0.5, 1.25 * bar_list[0].get_height(), 'p = {:.4e}'.format(p_value_1), ha = 'center', va = 'bottom', color = 'b')
+            ax.text(bar_list[1].get_x() + bar_list[1].get_width() * 0.5, 1.25 * bar_list[1].get_height(), 'p = {:.4e}'.format(p_value_2), ha = 'center', va = 'bottom', color = 'g')
+            ax.text(bar_list[2].get_x() + bar_list[2].get_width() * 0.5, 1.25 * bar_list[2].get_height(), 'p = {:.4e}'.format(p_value_3), ha = 'center', va = 'bottom', color = 'r')
+            ax.text(bar_list[3].get_x() + bar_list[3].get_width() * 0.5, 1.25 * bar_list[3].get_height(), 'p = {:.4e}'.format(p_value_4), ha = 'center', va = 'bottom', color = 'c')
                 
     fig.savefig(parent_folder + '/Specificity Index.png')
     
@@ -1343,6 +1382,41 @@ def main():
         ax.set_ylim((2, 4))
         ax.set_xticks(range(0, number_layer))
         ax.set_xticklabels(['Layer 1', 'Layer 2'])
+        
+        if i == 0:
+            t_stat_lp = np.zeros(number_layer)
+            t_stat_hp = np.zeros(number_layer)
+            
+            p_value_lp = np.zeros(number_layer)
+            p_value_hp = np.zeros(number_layer)
+            
+            for j in range(0, number_layer):
+                t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_ID[:, 0, j, 0, -1], all_simulation_all_ID[:, 1, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1])):
+                label = 'p = {:.4e}'.format(p_value_lp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1])):
+                label = 'p = {:.4e}'.format(p_value_hp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
+                
+            all_simulation_group_layer15_ID = np.concatenate((all_simulation_all_ID[:, 0, 0, 0, -1].flatten(), all_simulation_all_ID[:, 0, 1, 0, -1].flatten(),
+                                                              all_simulation_all_ID[:, 1, 0, 0, -1].flatten(), all_simulation_all_ID[:, 1, 1, 0, -1].flatten(),
+                                                              all_simulation_all_ID[:, 2, 0, 0, -1].flatten(), all_simulation_all_ID[:, 2, 1, 0, -1].flatten(),
+                                                              all_simulation_all_ID[:, 3, 0, 0, -1].flatten(), all_simulation_all_ID[:, 3, 1, 0, -1].flatten()))
+
+            df = pd.DataFrame({'ID': all_simulation_group_layer15_ID,
+                               'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
+                               'Layer': np.tile(np.repeat(['Layer 1', 'Layer 2'], number_simulation), number_group),
+                               'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
+            
+            aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(aov)
+            
+            posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Intrinsic Dimension with Correct Labels.png')
     
@@ -1373,6 +1447,55 @@ def main():
         ax.set_ylim((2, 4))
         ax.set_xticks(range(0, number_layer))
         ax.set_xticklabels(['Layer 1', 'Layer 2'])
+        
+        if i == 0:
+            t_stat_1 = np.zeros(number_layer)
+            t_stat_2 = np.zeros(number_layer)
+            t_stat_3 = np.zeros(number_layer)
+            t_stat_4 = np.zeros(number_layer)
+            
+            p_value_1 = np.zeros(number_layer)
+            p_value_2 = np.zeros(number_layer)
+            p_value_3 = np.zeros(number_layer)
+            p_value_4 = np.zeros(number_layer)
+            
+            for j in range(0, number_layer):
+                t_stat_1[j], p_value_1[j] = stats.ttest_ind(all_simulation_all_ID[:, 0, j, 0, -1], all_simulation_all_ID_permuted[:, 0, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_2[j], p_value_2[j] = stats.ttest_ind(all_simulation_all_ID[:, 1, j, 0, -1], all_simulation_all_ID_permuted[:, 1, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_3[j], p_value_3[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID_permuted[:, 2, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_4[j], p_value_4[j] = stats.ttest_ind(all_simulation_all_ID[:, 3, j, 0, -1], all_simulation_all_ID_permuted[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
+            
+            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 0, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_1[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 1, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_2[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 2, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_3[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'r')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 3, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_4[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
+                
+            all_simulation_group_layer15_ID = np.concatenate((all_simulation_all_ID_permuted[:, 0, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 0, 1, 0, -1].flatten(),
+                                                              all_simulation_all_ID_permuted[:, 1, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 1, 1, 0, -1].flatten(),
+                                                              all_simulation_all_ID_permuted[:, 2, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 2, 1, 0, -1].flatten(),
+                                                              all_simulation_all_ID_permuted[:, 3, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 3, 1, 0, -1].flatten()))
+
+            df = pd.DataFrame({'ID': all_simulation_group_layer15_ID,
+                               'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
+                               'Layer': np.tile(np.repeat(['Layer 1', 'Layer 2'], number_simulation), number_group),
+                               'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
+            
+            aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(aov)
+            
+            posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Intrinsic Dimension with Permuted Labels.png')
     
@@ -1402,6 +1525,20 @@ def main():
         
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
+        
+        slope_12, intercept_12, r_value_12, p_value_12, std_err_12 = stats.linregress(x[0:2 * number_simulation], y[0:2 * number_simulation])
+        slope_34, intercept_34, r_value_34, p_value_34, std_err_34 = stats.linregress(x[2 * number_simulation:4 * number_simulation], y[2 * number_simulation:4 * number_simulation])
+        
+        ax.plot(x[0:2 * number_simulation], intercept_12 + slope_12 * x[0:2 * number_simulation], color = 'g')
+        ax.plot(x[2 * number_simulation:4 * number_simulation], intercept_34 + slope_34 * x[2 * number_simulation:4 * number_simulation], color = 'c')
+        
+        ax.annotate('Group 1&2: Correlation = {:.4e}'.format(r_value_12) + ', p-value = {:.4e}'.format(p_value_12),
+                    (x[number_simulation], intercept_12 + slope_12 * x[number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+        
+        ax.annotate('Group 3&4: Correlation = {:.4e}'.format(r_value_34) + ', p-value = {:.4e}'.format(p_value_34),
+                    (x[3 * number_simulation], intercept_34 + slope_34 * x[3 * number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
         
         ax.set_xlim((45, 105))
         ax.set_ylim((3, 3.6))
@@ -1434,6 +1571,20 @@ def main():
         
         scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
+        
+        slope_12, intercept_12, r_value_12, p_value_12, std_err_12 = stats.linregress(x[0:2 * number_simulation], y[0:2 * number_simulation])
+        slope_34, intercept_34, r_value_34, p_value_34, std_err_34 = stats.linregress(x[2 * number_simulation:4 * number_simulation], y[2 * number_simulation:4 * number_simulation])
+        
+        ax.plot(x[0:2 * number_simulation], intercept_12 + slope_12 * x[0:2 * number_simulation], color = 'g')
+        ax.plot(x[2 * number_simulation:4 * number_simulation], intercept_34 + slope_34 * x[2 * number_simulation:4 * number_simulation], color = 'c')
+        
+        ax.annotate('Group 1&2: Correlation = {:.4e}'.format(r_value_12) + ', p-value = {:.4e}'.format(p_value_12),
+                    (x[number_simulation], intercept_12 + slope_12 * x[number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+        
+        ax.annotate('Group 3&4: Correlation = {:.4e}'.format(r_value_34) + ', p-value = {:.4e}'.format(p_value_34),
+                    (x[3 * number_simulation], intercept_34 + slope_34 * x[3 * number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
         
         ax.set_xlim((45, 105))
         ax.set_ylim((2.6, 3.2))
