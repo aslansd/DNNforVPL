@@ -32,6 +32,7 @@ import torchvision.transforms as transforms
 from torchvision.utils import make_grid
 
 from intrinsic_dimension import estimate
+from mutual_info import mutual_information
 from scipy.spatial.distance import pdist, squareform
 
 # Initialize the weights of the convolutional layers of AlexNet
@@ -98,7 +99,7 @@ def main():
     
     best_acc1 = 0
     
-    number_simulation = 10
+    number_simulation = 1
     number_group = 4
     number_layer = 5
     number_layer_freeze = 6
@@ -108,6 +109,7 @@ def main():
     all_simulation_training_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 180), dtype = np.float32)
     all_simulation_transfer_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 10), dtype = np.float32)
     all_simulation_specificity_index = np.zeros((number_simulation, number_group, number_layer_freeze), dtype = np.float32)
+    all_simulation_all_MI = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze), dtype = np.float32)
     all_simulation_all_ID = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze, 19), dtype = np.float32)
     all_x_sample_ID = np.zeros((number_simulation, number_group), dtype = np.float32)
     
@@ -472,7 +474,7 @@ def main():
             x_tensor_tuning = torch.stack(x_tensor_tuning)
             y_tensor_tuning = torch.stack(y_tensor_tuning)
             print(x_tensor_tuning.shape, y_tensor_tuning.shape)
-                
+            
             layer_freeze_counter = -1
             
             for layer_freeze in [None, 0, 3, 6, 8, 10]:
@@ -667,7 +669,7 @@ def main():
                     #         plt.savefig(saving_folder + '/' + feature + ' Boxplot Tuning Curve of the Convolutional Layer ' + str(conv_layer_num) + '.tif')
                     #         plt.close()
                     
-                    # The reference stimulus              
+                    # The reference stimulus
                     all_unit_activity_ref_Conv2d_1 = np.zeros((1, 64, 55, 55), dtype = np.float32)
                     all_unit_activity_ref_Conv2d_2 = np.zeros((1, 192, 27, 27), dtype = np.float32)
                     all_unit_activity_ref_Conv2d_3 = np.zeros((1, 384, 13, 13), dtype = np.float32)
@@ -703,21 +705,21 @@ def main():
                     # scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_4.mat', mdict = {'all_unit_activity_ref_Conv2d_4': all_unit_activity_ref_Conv2d_4})
                     # scipy.io.savemat(saving_folder + '/all_unit_activity_ref_Conv2d_5.mat', mdict = {'all_unit_activity_ref_Conv2d_5': all_unit_activity_ref_Conv2d_5})
                     
-                    ### Calculating the intrinsic dimension
+                    # ### Calculating the intrinsic dimension
                     
-                    all_x_sample_ID[simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    # all_x_sample_ID[simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                 
-                    all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    # all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    # all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    # all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    # all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    # all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0]
-                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0]
+                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0]
+                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0]
+                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0]
+                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0]
+                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0]
                 
                 # Define the main learning parameters
                 lr = 0.00001
@@ -813,43 +815,43 @@ def main():
                         all_simulation_layer_rotation_layer_4[simulation_counter, group_counter, layer_freeze_counter, epoch] = 1 - CosSim(torch.flatten(model.features[8].weight), torch.flatten(Conv2d_4_0)).item()
                         all_simulation_layer_rotation_layer_5[simulation_counter, group_counter, layer_freeze_counter, epoch] = 1 - CosSim(torch.flatten(model.features[10].weight), torch.flatten(Conv2d_5_0)).item()
                         
-                        if (layer_freeze == None or layer_freeze == 0 or layer_freeze == 10) and epoch % 10 == 0:
-                            ID_counter = ID_counter + 1
+                        # if (layer_freeze == None or layer_freeze == 0 or layer_freeze == 10) and epoch % 10 == 0:
+                        #     ID_counter = ID_counter + 1
                             
-                            for i in range(num_sample_artiphysiology):
-                                feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
+                        #     for i in range(num_sample_artiphysiology):
+                        #         feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
                                 
-                                index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
-                                x_sample = torch.index_select(x_tensor_transfer, 0, index)
-                                x_sample = x_sample.cuda(gpu)
+                        #         index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                        #         x_sample = torch.index_select(x_tensor_transfer, 0, index)
+                        #         x_sample = x_sample.cuda(gpu)
                                 
-                                unit_activity_layer_0 = model.features[0](x_sample)
-                                unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                                unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                                unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                                unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                                unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                                unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
-                                unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
-                                unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
-                                unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
-                                unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
-                                unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
-                                unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
+                        #         unit_activity_layer_0 = model.features[0](x_sample)
+                        #         unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                        #         unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                        #         unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                        #         unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                        #         unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                        #         unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
+                        #         unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
+                        #         unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
+                        #         unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
+                        #         unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
+                        #         unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
+                        #         unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
                                 
-                                all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                                all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                                all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
-                                all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
-                                all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
+                        #         all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                        #         all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                        #         all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
+                        #         all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
+                        #         all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                                 
-                            ### Calculating the intrinsic dimension
+                        #     ### Calculating the intrinsic dimension
                         
-                            all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                        
+                        #     all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                        #     all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                        #     all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                        #     all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                        #     all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                        
                         
                 # Save the checkpoint
                 save_checkpoint({
@@ -1067,6 +1069,69 @@ def main():
                 all_PCA_explained_variance_layer_4[simulation_counter, group_counter, layer_freeze_counter, :] = PCA_layer_4.explained_variance_ratio_
                 all_PCA_explained_variance_layer_5[simulation_counter, group_counter, layer_freeze_counter, :] = PCA_layer_5.explained_variance_ratio_
                 
+                ### Emergence of Invariance and Disentanglement in Deep Representations
+                
+                # The convolutional layers: (0, 3, 6, 8, 10)
+                # The size of consecutive convolutional layers: (55, 27, 13, 13, 13)
+                # The central units of consecutive convolutional layers: (27, 13, 6, 6, 6)
+                # The number of channels of consecutive convolutional layers: (64, 192, 384, 256, 256)
+                           
+                if group_training in ['group2', 'group4']:
+                    phase_count = 20                   
+                    counter = -1
+                    
+                    x_tensor_training_noise = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 3, 32, 32), dtype = np.float32)
+                    
+                    all_unit_activity_Conv2d_1 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 64, 55, 55), dtype = np.float32)
+                    all_unit_activity_Conv2d_2 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 192, 27, 27), dtype = np.float32)
+                    all_unit_activity_Conv2d_3 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 384, 13, 13), dtype = np.float32)
+                    all_unit_activity_Conv2d_4 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 256, 13, 13), dtype = np.float32)
+                    all_unit_activity_Conv2d_5 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 256, 13, 13), dtype = np.float32)
+                    
+                    for i in range(len(SF_training)):
+                        for j in range(len(Ori_training)):
+                            phase = np.random.permutation(180)[:phase_count]
+                            
+                            for k in range(phase_count):
+                                counter = counter + 1
+                                
+                                indices_training_1 = torch.tensor(z_val_training[i, j, phase[k]], dtype = torch.long)
+                                indices_training_2 = torch.tensor(z_val_training[1, j, phase[k]], dtype = torch.long)
+                                row_column = torch.tensor(np.arange(224 // 2 - 16, 224 // 2 + 16), dtype = torch.long)
+                                                          
+                                x_sample = torch.index_select(x_tensor_training, 0, indices_training_1) - torch.index_select(x_tensor_training, 0, indices_training_2)
+                                x_sample = x_sample.cuda(gpu)
+                            
+                                unit_activity_layer_0 = model.features[0](x_sample)
+                                unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                                unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                                unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                                unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                                unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                                unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
+                                unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
+                                unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
+                                unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
+                                unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
+                                unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
+                                unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
+                                
+                                x_tensor_training_noise[counter, :] = torch.index_select(torch.index_select(x_sample, 2, row_column.cuda(gpu)), 3, row_column.cuda(gpu))[0].detach().cpu().clone().numpy()
+                                
+                                all_unit_activity_Conv2d_1[counter, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_2[counter, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_3[counter, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_4[counter, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_5[counter, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
+                    
+                    ### Calculating the mutual information between the nuisance stimuli and layers activities
+                    
+                    all_simulation_all_MI[simulation_counter, group_counter, 0, layer_freeze_counter] = mutual_information((x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1)), k = 1)
+                    all_simulation_all_MI[simulation_counter, group_counter, 1, layer_freeze_counter] = mutual_information((x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1)), k = 1)
+                    all_simulation_all_MI[simulation_counter, group_counter, 2, layer_freeze_counter] = mutual_information((x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1)), k = 1)
+                    all_simulation_all_MI[simulation_counter, group_counter, 3, layer_freeze_counter] = mutual_information((x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1)), k = 1)
+                    all_simulation_all_MI[simulation_counter, group_counter, 4, layer_freeze_counter] = mutual_information((x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_5.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1)), k = 1)
+                
                 ### Training with Permuted Labels
                 
                 if layer_freeze == None or layer_freeze == 0 or layer_freeze == 10:
@@ -1175,43 +1240,43 @@ def main():
                             is_best = all_simulation_training_accuracy_permuted[simulation_counter, group_counter, layer_freeze_counter, epoch] >= best_acc1
                             best_acc1 = max(all_simulation_training_accuracy_permuted[simulation_counter, group_counter, layer_freeze_counter, epoch], best_acc1)
                             
-                            if epoch % 10 == 0:
-                                ID_counter = ID_counter + 1
+                            # if epoch % 10 == 0:
+                            #     ID_counter = ID_counter + 1
                                 
-                                for i in range(num_sample_artiphysiology):
-                                    feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
+                            #     for i in range(num_sample_artiphysiology):
+                            #         feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
                                     
-                                    index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
-                                    x_sample = torch.index_select(x_tensor_transfer, 0, index)
-                                    x_sample = x_sample.cuda(gpu)
+                            #         index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                            #         x_sample = torch.index_select(x_tensor_transfer, 0, index)
+                            #         x_sample = x_sample.cuda(gpu)
                                     
-                                    unit_activity_layer_0 = model.features[0](x_sample)
-                                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                                    unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
-                                    unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
-                                    unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
-                                    unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
-                                    unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
-                                    unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
-                                    unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
+                            #         unit_activity_layer_0 = model.features[0](x_sample)
+                            #         unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                            #         unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                            #         unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                            #         unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                            #         unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                            #         unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
+                            #         unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
+                            #         unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
+                            #         unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
+                            #         unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
+                            #         unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
+                            #         unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
                                     
-                                    all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                                    all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                                    all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
-                                    all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
-                                    all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
+                            #         all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                            #         all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                            #         all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
+                            #         all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
+                            #         all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                                 
-                                ### Calculating the intrinsic dimension
+                            #     ### Calculating the intrinsic dimension
                             
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
     
     ### Specificity Index
     
@@ -1222,6 +1287,7 @@ def main():
     scipy.io.savemat(parent_folder + '/all_simulation_training_accuracy.mat', mdict = {'all_simulation_training_accuracy': all_simulation_training_accuracy})
     scipy.io.savemat(parent_folder + '/all_simulation_transfer_accuracy.mat', mdict = {'all_simulation_transfer_accuracy': all_simulation_transfer_accuracy})
     scipy.io.savemat(parent_folder + '/all_simulation_specificity_index.mat', mdict = {'all_simulation_specificity_index': all_simulation_specificity_index})
+    scipy.io.savemat(parent_folder + '/all_simulation_all_MI.mat', mdict = {'all_simulation_all_MI': all_simulation_all_MI})
     scipy.io.savemat(parent_folder + '/all_simulation_all_ID.mat', mdict = {'all_simulation_all_ID': all_simulation_all_ID})
     scipy.io.savemat(parent_folder + '/all_x_sample_ID.mat', mdict = {'all_x_sample_ID': all_x_sample_ID})
     
@@ -1557,6 +1623,39 @@ def main():
             ax.set_xticks(np.arange(0, 180, 30.0))
             
     fig.savefig(parent_folder + '/Layer Rotation.png')
+    
+    ### Emergence of Invariance and Disentanglement in Deep Representations
+    
+    fig, axs = plt.subplots(2, 3, figsize = (2 * 8, 3 * 6))
+    fig.suptitle('Mutual Information between the Nuisance Stimuli and Layers Activities', fontsize = 20)
+    
+    for i in range(number_layer_freeze):
+        if i <= 2:
+            ax = axs[0, i]
+        elif i > 2:
+            ax = axs[1, i - 3]
+        
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_ylabel('MI')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[0, :, i], "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[1, :, i], "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[2, :, i], "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[3, :, i], "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+                
+        ax.legend(loc = 'upper right', fontsize = 'medium')
+        ax.set_ylim((0, 10))
+        ax.set_xticks(range(0, number_layer))
+        ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+                
+    fig.savefig(parent_folder + '/Mutual Information between the Nuisance Stimuli and Layers Activities.png')
     
     ### ID: Intrinsic dimension of data representations in deep neural networks
     
