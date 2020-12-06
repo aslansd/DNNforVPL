@@ -31,7 +31,7 @@ import torchvision.transforms as transforms
 from torchvision.utils import make_grid
 
 from intrinsic_dimension import estimate
-from mutual_info import mutual_information
+from mutual_info_EDGE import EDGE
 from scipy.spatial.distance import pdist, squareform
 
 # The DNN model for VPL
@@ -999,8 +999,10 @@ def main():
                     
                     ### Calculating the mutual information between the nuisance stimuli and layers activities
                     
-                    all_simulation_all_MI[simulation_counter, group_counter, 0, layer_freeze_counter] = mutual_information((x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1)), k = 1)
-                    all_simulation_all_MI[simulation_counter, group_counter, 1, layer_freeze_counter] = mutual_information((x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1)), k = 1)
+                    all_simulation_all_MI[simulation_counter, group_counter, 0, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                                                                                                             U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'fixed', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
+                    all_simulation_all_MI[simulation_counter, group_counter, 1, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                                                                                                             U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'fixed', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                     
                 ### Training with Permuted Labels
                 
