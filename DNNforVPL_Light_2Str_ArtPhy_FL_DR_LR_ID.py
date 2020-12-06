@@ -968,8 +968,8 @@ def main():
                     
                     x_tensor_training_noise = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 3, 32, 32), dtype = np.float32)
                     
-                    all_unit_activity_Conv2d_1 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 6, 28, 28), dtype = np.float32)
-                    all_unit_activity_Conv2d_2 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 16, 13, 13), dtype = np.float32)
+                    all_unit_activity_MI_Conv2d_1 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 6, 28, 28), dtype = np.float32)
+                    all_unit_activity_MI_Conv2d_2 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 16, 13, 13), dtype = np.float32)
                     
                     for i in range(len(SF_training)):
                         for j in range(len(Ori_training)):
@@ -994,14 +994,14 @@ def main():
                                 
                                 x_tensor_training_noise[counter, :] = x_tensor_training_noise[counter, :] = torch.index_select(torch.index_select(x_sample, 2, row_column.cuda(gpu)), 3, row_column.cuda(gpu))[0].detach().cpu().clone().numpy()
                                 
-                                all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                                all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                                all_unit_activity_MI_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                                all_unit_activity_MI_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
                     
                     ### Calculating the mutual information between the nuisance stimuli and layers activities
                     
-                    all_simulation_all_MI[simulation_counter, group_counter, 0, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI[simulation_counter, group_counter, 0, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                              U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'fixed', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI[simulation_counter, group_counter, 1, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI[simulation_counter, group_counter, 1, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                              U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'fixed', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                     
                 ### Training with Permuted Labels
