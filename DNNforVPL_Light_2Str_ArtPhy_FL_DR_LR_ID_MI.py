@@ -97,7 +97,8 @@ def main():
     all_simulation_training_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 360), dtype = np.float32)
     all_simulation_transfer_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 10), dtype = np.float32)
     all_simulation_specificity_index = np.zeros((number_simulation, number_group, number_layer_freeze), dtype = np.float32)
-    all_simulation_all_MI = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze), dtype = np.float32)
+    all_simulation_all_MI_original = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze), dtype = np.float32)
+    all_simulation_all_MI_noise = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze), dtype = np.float32)
     all_simulation_all_ID = np.zeros((number_simulation, number_group, number_layer, number_layer_freeze, 37), dtype = np.float32)
     all_x_sample_ID = np.zeros((number_simulation, number_group), dtype = np.float32)
     
@@ -962,48 +963,55 @@ def main():
                 # The central units of consecutive convolutional layers: (14, 6)
                 # The number of channels of consecutive convolutional layers: (6, 16)
                            
-                if group_training in ['group2', 'group4']:
-                    phase_count = 40                   
-                    counter = -1
-                    
-                    x_tensor_training_noise = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 3, 32, 32), dtype = np.float32)
-                    
-                    all_unit_activity_MI_Conv2d_1 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 6, 28, 28), dtype = np.float32)
-                    all_unit_activity_MI_Conv2d_2 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 16, 13, 13), dtype = np.float32)
-                    
-                    for i in range(len(SF_training)):
-                        for j in range(len(Ori_training)):
-                            phase = np.random.permutation(360)[:phase_count]
+                phase_count = 20                   
+                counter = -1
+                
+                x_tensor_training_original = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 3, 112, 112), dtype = np.float32)
+                x_tensor_training_noise = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 3, 112, 112), dtype = np.float32)
+                
+                all_unit_activity_MI_Conv2d_1 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 6, 28, 28), dtype = np.float32)
+                all_unit_activity_MI_Conv2d_2 = np.zeros((len(SF_training) * len(Ori_training) * phase_count, 16, 13, 13), dtype = np.float32)
+                
+                for i in range(len(SF_training)):
+                    for j in range(len(Ori_training)):
+                        phase = np.random.permutation(360)[:phase_count]
+                        
+                        for k in range(phase_count):
+                            counter = counter + 1
                             
-                            for k in range(phase_count):
-                                counter = counter + 1
-                                
-                                indices_training_1 = torch.tensor(z_val_training[i, j, phase[k]], dtype = torch.long)
-                                indices_training_2 = torch.tensor(z_val_training[1, j, phase[k]], dtype = torch.long)
-                                row_column = torch.tensor(np.arange(112 // 2 - 16, 112 // 2 + 16), dtype = torch.long)
-                                                          
-                                x_sample = torch.index_select(x_tensor_training, 0, indices_training_1) - torch.index_select(x_tensor_training, 0, indices_training_2)
-                                x_sample = x_sample.cuda(gpu)
+                            indices_training_1 = torch.tensor(z_val_training[i, j, phase[k]], dtype = torch.long)
+                            indices_training_2 = torch.tensor(z_val_training[int(len(SF_training) / 2 + 0.5) - 1, j, phase[k]], dtype = torch.long)
                             
-                                unit_activity_layer_0 = model.features[0](x_sample)
-                                unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                                unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                                unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                                unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                                unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                                
-                                x_tensor_training_noise[counter, :] = x_tensor_training_noise[counter, :] = torch.index_select(torch.index_select(x_sample, 2, row_column.cuda(gpu)), 3, row_column.cuda(gpu))[0].detach().cpu().clone().numpy()
-                                
-                                all_unit_activity_MI_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                                all_unit_activity_MI_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                    
-                    ### Calculating the mutual information between the nuisance stimuli and layers activities
-                    
-                    all_simulation_all_MI[simulation_counter, group_counter, 0, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
-                                                                                                             U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'fixed', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI[simulation_counter, group_counter, 1, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
-                                                                                                             U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'fixed', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    
+                            x_sample = torch.index_select(x_tensor_training, 0, indices_training_1)
+                            x_sample = x_sample.cuda(gpu)
+                            
+                            unit_activity_layer_0 = model.features[0](x_sample)
+                            unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                            unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                            unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                            unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                            unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                            
+                            x_tensor_training_original[counter, :] = torch.index_select(x_tensor_training, 0, indices_training_1).detach().cpu().clone().numpy()
+                            x_tensor_training_noise[counter, :] = (torch.index_select(x_tensor_training, 0, indices_training_1) - torch.index_select(x_tensor_training, 0, indices_training_2)).cuda(gpu)[0].detach().cpu().clone().numpy()
+                                                           
+                            all_unit_activity_MI_Conv2d_1[counter, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                            all_unit_activity_MI_Conv2d_2[counter, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                
+                ### Calculating the mutual information between the original stimuli and layers activities
+                
+                all_simulation_all_MI_original[simulation_counter, group_counter, 0, layer_freeze_counter] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                                                                                                                  U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
+                all_simulation_all_MI_original[simulation_counter, group_counter, 1, layer_freeze_counter] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                                                                                                                  U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
+                
+                ### Calculating the mutual information between the nuisance stimuli and layers activities
+                
+                all_simulation_all_MI_noise[simulation_counter, group_counter, 0, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                                                                                                               U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
+                all_simulation_all_MI_noise[simulation_counter, group_counter, 1, layer_freeze_counter] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                                                                                                               U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
+                
                 ### Training with Permuted Labels
                 
                 print('Training with Permuted Labels')
@@ -1139,7 +1147,8 @@ def main():
     scipy.io.savemat(parent_folder + '/all_simulation_training_accuracy.mat', mdict = {'all_simulation_training_accuracy': all_simulation_training_accuracy})
     scipy.io.savemat(parent_folder + '/all_simulation_transfer_accuracy.mat', mdict = {'all_simulation_transfer_accuracy': all_simulation_transfer_accuracy})
     scipy.io.savemat(parent_folder + '/all_simulation_specificity_index.mat', mdict = {'all_simulation_specificity_index': all_simulation_specificity_index})
-    scipy.io.savemat(parent_folder + '/all_simulation_all_MI.mat', mdict = {'all_simulation_all_MI': all_simulation_all_MI})
+    scipy.io.savemat(parent_folder + '/all_simulation_all_MI_original.mat', mdict = {'all_simulation_all_MI_original': all_simulation_all_MI_original})
+    scipy.io.savemat(parent_folder + '/all_simulation_all_MI_noise.mat', mdict = {'all_simulation_all_MI_noise': all_simulation_all_MI_noise})
     scipy.io.savemat(parent_folder + '/all_simulation_all_ID.mat', mdict = {'all_simulation_all_ID': all_simulation_all_ID})
     scipy.io.savemat(parent_folder + '/all_x_sample_ID.mat', mdict = {'all_x_sample_ID': all_x_sample_ID})
     
@@ -1425,8 +1434,10 @@ def main():
     
     ### Emergence of Invariance and Disentanglement in Deep Representations
     
+    # Mutual information between the original stimuli and layers activities
+    
     fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
-    fig.suptitle('Mutual Information between the Nuisance Stimuli and Layers Activities', fontsize = 20)
+    fig.suptitle('Mutual Information between the Original Stimuli and Layers Activities', fontsize = 20)
     
     for i in range(number_layer_freeze):
         ax = axs[i]
@@ -1434,18 +1445,48 @@ def main():
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_ylabel('MI')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[0, :, i], "-b", label = "Group 1")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[0, :, i], "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_MI_original, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_MI_original, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[1, :, i], "-g", label = "Group 2")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[1, :, i], "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_MI_original, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_MI_original, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[2, :, i], "-r", label = "Group 3")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[2, :, i], "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_MI_original, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_MI_original, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[3, :, i], "-c", label = "Group 4")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_MI, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_MI, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[3, :, i], "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_MI_original, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_MI_original, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
+        ax.legend(loc = 'upper right', fontsize = 'medium')
+        ax.set_ylim((0, 10))
+        ax.set_xticks(range(0, number_layer))
+        ax.set_xticklabels(['Layer 1', 'Layer 2'])
+                
+    fig.savefig(parent_folder + '/Mutual Information between the Original Stimuli and Layers Activities.png')
+    
+    # Mutual information between the nuisance stimuli and layers activities
+    
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
+    fig.suptitle('Mutual Information between the Nuisance Stimuli and Layers Activities', fontsize = 20)
+    
+    for i in range(number_layer_freeze):
+        ax = axs[i]
+        
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_ylabel('MI')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[0, :, i], "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[0, :, i] - np.nanstd(all_simulation_all_MI_noise, axis = 0)[0, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise, axis = 0)[0, :, i] + np.nanstd(all_simulation_all_MI_noise, axis = 0)[0, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[1, :, i], "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[1, :, i] - np.nanstd(all_simulation_all_MI_noise, axis = 0)[1, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise, axis = 0)[1, :, i] + np.nanstd(all_simulation_all_MI_noise, axis = 0)[1, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[2, :, i], "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[2, :, i] - np.nanstd(all_simulation_all_MI_noise, axis = 0)[2, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise, axis = 0)[2, :, i] + np.nanstd(all_simulation_all_MI_noise, axis = 0)[2, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        
+        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[3, :, i], "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[3, :, i] - np.nanstd(all_simulation_all_MI_noise, axis = 0)[3, :, i] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise, axis = 0)[3, :, i] + np.nanstd(all_simulation_all_MI_noise, axis = 0)[3, :, i] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+                 
         ax.legend(loc = 'upper right', fontsize = 'medium')
         ax.set_ylim((0, 10))
         ax.set_xticks(range(0, number_layer))
