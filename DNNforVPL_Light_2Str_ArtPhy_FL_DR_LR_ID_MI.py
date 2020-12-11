@@ -1461,6 +1461,41 @@ def main():
         ax.set_ylim((0, 10))
         ax.set_xticks(range(0, number_layer))
         ax.set_xticklabels(['Layer 1', 'Layer 2'])
+        
+        if i == 0:
+            t_stat_lp = np.zeros(number_layer)
+            t_stat_hp = np.zeros(number_layer)
+            
+            p_value_lp = np.zeros(number_layer)
+            p_value_hp = np.zeros(number_layer)
+            
+            for j in range(0, number_layer):
+                t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_MI_original[:, 0, j, 0], all_simulation_all_MI_original[:, 1, j, 0], equal_var = True, nan_policy = 'omit')
+                t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_MI_original[:, 2, j, 0], all_simulation_all_MI_original[:, 3, j, 0], equal_var = True, nan_policy = 'omit')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[1, :, 0])):
+                label = 'p = {:.4e}'.format(p_value_lp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_MI_original, axis = 0)[3, :, 0])):
+                label = 'p = {:.4e}'.format(p_value_hp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, -10), ha = 'center', color = 'c')
+                
+            all_simulation_group_layer12_MI = np.concatenate((all_simulation_all_MI_original[:, 0, 0, 0].flatten() - all_simulation_all_MI_original[:, 0, 1, 0].flatten(),
+                                                              all_simulation_all_MI_original[:, 1, 0, 0].flatten() - all_simulation_all_MI_original[:, 1, 1, 0].flatten(),
+                                                              all_simulation_all_MI_original[:, 2, 0, 0].flatten() - all_simulation_all_MI_original[:, 2, 1, 0].flatten(),
+                                                              all_simulation_all_MI_original[:, 3, 0, 0].flatten() - all_simulation_all_MI_original[:, 3, 1, 0].flatten()))
+            
+            df = pd.DataFrame({'MI': all_simulation_group_layer12_MI,
+                               'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 1), number_simulation + np.tile(np.arange(number_simulation), 1), 2 * number_simulation + np.tile(np.arange(number_simulation), 1), 3 * number_simulation + np.tile(np.arange(number_simulation), 1))),
+                               'Layer': np.tile(np.repeat(['Layer 12'], number_simulation), number_group),
+                               'Group': np.concatenate((np.tile(['Group 1'], 1 * number_simulation), np.tile(['Group 2'], 1 * number_simulation), np.tile(['Group 3'], 1 * number_simulation), np.tile(['Group 4'], 1 * number_simulation)))})
+            
+            aov = pg.mixed_anova(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(aov)
+            
+            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Original Stimuli and Layers Activities.png')
     
@@ -1491,6 +1526,41 @@ def main():
         ax.set_ylim((0, 10))
         ax.set_xticks(range(0, number_layer))
         ax.set_xticklabels(['Layer 1', 'Layer 2'])
+        
+        if i == 0:
+            t_stat_lp = np.zeros(number_layer)
+            t_stat_hp = np.zeros(number_layer)
+            
+            p_value_lp = np.zeros(number_layer)
+            p_value_hp = np.zeros(number_layer)
+            
+            for j in range(0, number_layer):
+                t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_MI_noise[:, 0, j, 0], all_simulation_all_MI_noise[:, 1, j, 0], equal_var = True, nan_policy = 'omit')
+                t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_MI_noise[:, 2, j, 0], all_simulation_all_MI_noise[:, 3, j, 0], equal_var = True, nan_policy = 'omit')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[1, :, 0])):
+                label = 'p = {:.4e}'.format(p_value_lp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+                
+            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_MI_noise, axis = 0)[3, :, 0])):
+                label = 'p = {:.4e}'.format(p_value_hp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, -10), ha = 'center', color = 'c')
+                
+            all_simulation_group_layer12_MI = np.concatenate((all_simulation_all_MI_noise[:, 0, 0, 0].flatten() - all_simulation_all_MI_noise[:, 0, 1, 0].flatten(),
+                                                              all_simulation_all_MI_noise[:, 1, 0, 0].flatten() - all_simulation_all_MI_noise[:, 1, 1, 0].flatten(),
+                                                              all_simulation_all_MI_noise[:, 2, 0, 0].flatten() - all_simulation_all_MI_noise[:, 2, 1, 0].flatten(),
+                                                              all_simulation_all_MI_noise[:, 3, 0, 0].flatten() - all_simulation_all_MI_noise[:, 3, 1, 0].flatten()))
+            
+            df = pd.DataFrame({'MI': all_simulation_group_layer12_MI,
+                               'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 1), number_simulation + np.tile(np.arange(number_simulation), 1), 2 * number_simulation + np.tile(np.arange(number_simulation), 1), 3 * number_simulation + np.tile(np.arange(number_simulation), 1))),
+                               'Layer': np.tile(np.repeat(['Layer 12'], number_simulation), number_group),
+                               'Group': np.concatenate((np.tile(['Group 1'], 1 * number_simulation), np.tile(['Group 2'], 1 * number_simulation), np.tile(['Group 3'], 1 * number_simulation), np.tile(['Group 4'], 1 * number_simulation)))})
+            
+            aov = pg.mixed_anova(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(aov)
+            
+            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Nuisance Stimuli and Layers Activities.png')
     

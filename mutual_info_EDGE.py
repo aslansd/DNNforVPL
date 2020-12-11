@@ -1,10 +1,4 @@
 """
-Created on Sun Dec  6 10:44:26 2020
-
-@author: Aslan
-"""
-
-"""
 # EDGE Estimator for Shannon Mutual Information
 #
 # Created by Morteza Noshad (noshad@umich.edu)
