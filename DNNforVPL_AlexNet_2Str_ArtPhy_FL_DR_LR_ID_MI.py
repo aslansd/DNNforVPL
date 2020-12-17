@@ -99,7 +99,7 @@ def main():
     
     best_acc1 = 0
     
-    number_simulation = 10
+    number_simulation = 20
     number_group = 4
     number_layer = 5
     number_layer_freeze = 6
@@ -708,19 +708,19 @@ def main():
                     
                     # ### Calculating the intrinsic dimension
                     
-                    # all_x_sample_ID[simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_x_sample_ID[simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                 
-                    # all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    # all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    # all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    # all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    # all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0]
-                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0]
-                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0]
-                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0]
-                    # all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, 0]
+                    all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, 0] = all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, 0]
                 
                 # Define the main learning parameters
                 lr = 0.00001
@@ -816,43 +816,43 @@ def main():
                         all_simulation_layer_rotation_layer_4[simulation_counter, group_counter, layer_freeze_counter, epoch] = 1 - CosSim(torch.flatten(model.features[8].weight), torch.flatten(Conv2d_4_0)).item()
                         all_simulation_layer_rotation_layer_5[simulation_counter, group_counter, layer_freeze_counter, epoch] = 1 - CosSim(torch.flatten(model.features[10].weight), torch.flatten(Conv2d_5_0)).item()
                         
-                        # if (layer_freeze == None or layer_freeze == 0 or layer_freeze == 10) and epoch % 10 == 0:
-                        #     ID_counter = ID_counter + 1
+                        if (layer_freeze == None or layer_freeze == 0 or layer_freeze == 10) and epoch % 10 == 0:
+                            ID_counter = ID_counter + 1
                             
-                        #     for i in range(num_sample_artiphysiology):
-                        #         feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
+                            for i in range(num_sample_artiphysiology):
+                                feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
                                 
-                        #         index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
-                        #         x_sample = torch.index_select(x_tensor_transfer, 0, index)
-                        #         x_sample = x_sample.cuda(gpu)
+                                index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                                x_sample = torch.index_select(x_tensor_transfer, 0, index)
+                                x_sample = x_sample.cuda(gpu)
                                 
-                        #         unit_activity_layer_0 = model.features[0](x_sample)
-                        #         unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                        #         unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                        #         unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                        #         unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                        #         unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                        #         unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
-                        #         unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
-                        #         unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
-                        #         unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
-                        #         unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
-                        #         unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
-                        #         unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
+                                unit_activity_layer_0 = model.features[0](x_sample)
+                                unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                                unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                                unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                                unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                                unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                                unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
+                                unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
+                                unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
+                                unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
+                                unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
+                                unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
+                                unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
                                 
-                        #         all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                        #         all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                        #         all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
-                        #         all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
-                        #         all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
+                                all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                                 
-                        #     ### Calculating the intrinsic dimension
+                            ### Calculating the intrinsic dimension
                         
-                        #     all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                        #     all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                        #     all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                        #     all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                        #     all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                        
+                            all_simulation_all_ID[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            all_simulation_all_ID[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            all_simulation_all_ID[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            all_simulation_all_ID[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                            all_simulation_all_ID[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                        
                         
                 # Save the checkpoint
                 save_checkpoint({
@@ -981,7 +981,42 @@ def main():
                 # The target stimuli
                 os.mkdir(parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/after_training_' + str(layer_freeze))
                 saving_folder = parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
+                            
+                feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
                 
+                all_unit_activity_Conv2d_1 = np.zeros((num_sample_artiphysiology, 64, 55, 55), dtype = np.float32)
+                all_unit_activity_Conv2d_2 = np.zeros((num_sample_artiphysiology, 192, 27, 27), dtype = np.float32)
+                all_unit_activity_Conv2d_3 = np.zeros((num_sample_artiphysiology, 384, 13, 13), dtype = np.float32)
+                all_unit_activity_Conv2d_4 = np.zeros((num_sample_artiphysiology, 256, 13, 13), dtype = np.float32)
+                all_unit_activity_Conv2d_5 = np.zeros((num_sample_artiphysiology, 256, 13, 13), dtype = np.float32)
+                        
+                for i in range(num_sample_artiphysiology):                    
+                    feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
+                    
+                    index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                    x_sample = torch.index_select(x_tensor_transfer, 0, index)
+                    x_sample = x_sample.cuda(gpu)
+                    
+                    unit_activity_layer_0 = model.features[0](x_sample)
+                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                    unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
+                    unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
+                    unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
+                    unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
+                    unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
+                    unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
+                    unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
+                    
+                    all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                    all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                    all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
+                    all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
+                    all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
+                    
                 scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})
                 
                 # scipy.io.savemat(saving_folder + '/all_unit_activity_Conv2d_1.mat', mdict = {'all_unit_activity_Conv2d_1': all_unit_activity_Conv2d_1})
@@ -1259,43 +1294,43 @@ def main():
                             is_best = all_simulation_training_accuracy_permuted[simulation_counter, group_counter, layer_freeze_counter, epoch] >= best_acc1
                             best_acc1 = max(all_simulation_training_accuracy_permuted[simulation_counter, group_counter, layer_freeze_counter, epoch], best_acc1)
                             
-                            # if epoch % 10 == 0:
-                            #     ID_counter = ID_counter + 1
+                            if epoch % 10 == 0:
+                                ID_counter = ID_counter + 1
                                 
-                            #     for i in range(num_sample_artiphysiology):
-                            #         feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
+                                for i in range(num_sample_artiphysiology):
+                                    feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
                                     
-                            #         index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
-                            #         x_sample = torch.index_select(x_tensor_transfer, 0, index)
-                            #         x_sample = x_sample.cuda(gpu)
+                                    index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                                    x_sample = torch.index_select(x_tensor_transfer, 0, index)
+                                    x_sample = x_sample.cuda(gpu)
                                     
-                            #         unit_activity_layer_0 = model.features[0](x_sample)
-                            #         unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
-                            #         unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
-                            #         unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
-                            #         unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
-                            #         unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
-                            #         unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
-                            #         unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
-                            #         unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
-                            #         unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
-                            #         unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
-                            #         unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
-                            #         unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
+                                    unit_activity_layer_0 = model.features[0](x_sample)
+                                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                                    unit_activity_layer_6 = model.features[6](unit_activity_layer_5)
+                                    unit_activity_layer_7 = model.features[7](unit_activity_layer_6)
+                                    unit_activity_layer_8 = model.features[8](unit_activity_layer_7)
+                                    unit_activity_layer_9 = model.features[9](unit_activity_layer_8)
+                                    unit_activity_layer_10 = model.features[10](unit_activity_layer_9)
+                                    unit_activity_layer_11 = model.features[11](unit_activity_layer_10)
+                                    unit_activity_layer_12 = model.features[12](unit_activity_layer_11)
                                     
-                            #         all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
-                            #         all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                            #         all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
-                            #         all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
-                            #         all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
+                                    all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                                    all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
+                                    all_unit_activity_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
+                                    all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
+                                    all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                                 
-                            #     ### Calculating the intrinsic dimension
+                                ### Calculating the intrinsic dimension
                             
-                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                            #     all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 0, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 1, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 2, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 3, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[simulation_counter, group_counter, 4, layer_freeze_counter, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
     
     ### Specificity Index
     
@@ -1605,6 +1640,12 @@ def main():
             ax.set_ylim((0, 0.0018))
             ax.set_xticks(np.arange(0, 180, 30.0))
             
+            if (i in [1, 3]) and j != 1:
+                t_stat, p_value = stats.ttest_ind(all_simulation_weight_change_layer_1[:, i, j].flatten(), all_simulation_weight_change_layer_1[:, i - 1, j].flatten(), equal_var = True, nan_policy = 'omit')
+                                
+                label = 'p = {:.4e}'.format(p_value)
+                ax.annotate(label, (179, all_simulation_weight_change_layer_1.mean(0)[i, j]), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
+            
     fig.savefig(parent_folder + '/Weight Change.png')
         
     ### Layer rotation: a surprisingly powerful indicator of generalization in deep networks?
@@ -1641,6 +1682,12 @@ def main():
             ax.legend(loc = 'upper left', fontsize = 'x-small')
             ax.set_ylim((-2.5 * 10 ** (-7), 10 * 10 ** (-7)))
             ax.set_xticks(np.arange(0, 180, 30.0))
+            
+            if (i in [1, 3]) and j != 1:
+                t_stat, p_value = stats.ttest_ind(all_simulation_layer_rotation_layer_1[:, i, j].flatten(), all_simulation_layer_rotation_layer_1[:, i - 1, j].flatten(), equal_var = True, nan_policy = 'omit')
+                                
+                label = 'p = {:.4e}'.format(p_value)
+                ax.annotate(label, (179, all_simulation_layer_rotation_layer_1.mean(0)[i, j]), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
             
     fig.savefig(parent_folder + '/Layer Rotation.png')
     
@@ -1706,10 +1753,10 @@ def main():
                                'Layer': np.tile(np.repeat(['Layer 12', 'Layer 23', 'Layer 34', 'Layer 45'], number_simulation), number_group),
                                'Group': np.concatenate((np.tile(['Group 1'], 4 * number_simulation), np.tile(['Group 2'], 4 * number_simulation), np.tile(['Group 3'], 4 * number_simulation), np.tile(['Group 4'], 4 * number_simulation)))})
             
-            aov = pg.mixed_anova(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            aov = pg.mixed_anova(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(aov)
             
-            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Original Stimuli and Layers Activities.png')
@@ -1774,511 +1821,511 @@ def main():
                                'Layer': np.tile(np.repeat(['Layer 12', 'Layer 23', 'Layer 34', 'Layer 45'], number_simulation), number_group),
                                'Group': np.concatenate((np.tile(['Group 1'], 4 * number_simulation), np.tile(['Group 2'], 4 * number_simulation), np.tile(['Group 3'], 4 * number_simulation), np.tile(['Group 4'], 4 * number_simulation)))})
             
-            aov = pg.mixed_anova(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            aov = pg.mixed_anova(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(aov)
             
-            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Nuisance Stimuli and Layers Activities.png')
     
-    # ### ID: Intrinsic dimension of data representations in deep neural networks
+    ### ID: Intrinsic dimension of data representations in deep neural networks
     
-    # # ID across layers and groups for correct labels
+    # ID across layers and groups for correct labels
     
-    # fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
-    # fig.suptitle('Intrinsic Dimension with Correct Labels', fontsize = 20)
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
+    fig.suptitle('Intrinsic Dimension with Correct Labels', fontsize = 20)
     
-    # for i in [0, 1, 5]:
-    #     if i == 0:
-    #         ax = axs[0]
-    #     elif i == 1:
-    #         ax = axs[1]
-    #     elif i == 5:
-    #         ax = axs[2]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
-    #     ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
-    #     ax.set_ylabel('ID')
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_ylabel('ID')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1], "-b", label = "Group 1")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1]) , "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1], "-g", label = "Group 2")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1]) , "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1], "-r", label = "Group 3")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1]) , "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1], "-c", label = "Group 4")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1]) , "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
-    #     ax.legend(loc = 'upper right', fontsize = 'medium')
-    #     ax.set_ylim((2, 4))
-    #     ax.set_xticks(range(0, number_layer))
-    #     ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+        ax.legend(loc = 'upper right', fontsize = 'medium')
+        ax.set_ylim((2, 4))
+        ax.set_xticks(range(0, number_layer + 1))
+        ax.set_xticklabels(['Layer 0', 'Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
         
-    #     if i == 0:
-    #         t_stat_lp = np.zeros(number_layer)
-    #         t_stat_hp = np.zeros(number_layer)
+        if i == 0:
+            t_stat_lp = np.zeros(number_layer)
+            t_stat_hp = np.zeros(number_layer)
             
-    #         p_value_lp = np.zeros(number_layer)
-    #         p_value_hp = np.zeros(number_layer)
+            p_value_lp = np.zeros(number_layer)
+            p_value_hp = np.zeros(number_layer)
             
-    #         for j in range(0, number_layer):
-    #             t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_ID[:, 0, j, 0, -1], all_simulation_all_ID[:, 1, j, 0, -1], equal_var = True, nan_policy = 'omit')
-    #             t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
+            for j in range(0, number_layer):
+                t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_ID[:, 0, j, 0, -1], all_simulation_all_ID[:, 1, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
                 
-    #         for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, 0, -1])):
-    #             label = 'p = {:.4e}'.format(p_value_lp[j])
-    #             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_lp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
                 
-    #         for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, 0, -1])):
-    #             label = 'p = {:.4e}'.format(p_value_hp[j])
-    #             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_hp[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
                 
-    #         all_simulation_group_layer15_ID = np.concatenate((all_simulation_all_ID[:, 0, 0, 0, -1].flatten(), all_simulation_all_ID[:, 0, 4, 0, -1].flatten(),
-    #                                                           all_simulation_all_ID[:, 1, 0, 0, -1].flatten(), all_simulation_all_ID[:, 1, 4, 0, -1].flatten(),
-    #                                                           all_simulation_all_ID[:, 2, 0, 0, -1].flatten(), all_simulation_all_ID[:, 2, 4, 0, -1].flatten(),
-    #                                                           all_simulation_all_ID[:, 3, 0, 0, -1].flatten(), all_simulation_all_ID[:, 3, 4, 0, -1].flatten()))
+            all_simulation_group_layer15_ID = np.concatenate((all_simulation_all_ID[:, 0, 0, 0, -1].flatten(), all_simulation_all_ID[:, 0, 4, 0, -1].flatten(),
+                                                              all_simulation_all_ID[:, 1, 0, 0, -1].flatten(), all_simulation_all_ID[:, 1, 4, 0, -1].flatten(),
+                                                              all_simulation_all_ID[:, 2, 0, 0, -1].flatten(), all_simulation_all_ID[:, 2, 4, 0, -1].flatten(),
+                                                              all_simulation_all_ID[:, 3, 0, 0, -1].flatten(), all_simulation_all_ID[:, 3, 4, 0, -1].flatten()))
 
-    #         df = pd.DataFrame({'ID': all_simulation_group_layer15_ID,
-    #                            'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
-    #                            'Layer': np.tile(np.repeat(['Layer 1', 'Layer 5'], number_simulation), number_group),
-    #                            'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
+            df = pd.DataFrame({'ID': all_simulation_group_layer15_ID,
+                                'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
+                                'Layer': np.tile(np.repeat(['Layer 1', 'Layer 5'], number_simulation), number_group),
+                                'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
             
-    #         aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-    #         pg.print_table(aov)
+            aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(aov)
             
-    #         posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-    #         pg.print_table(posthocs)
+            posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(posthocs)
                 
-    # fig.savefig(parent_folder + '/Intrinsic Dimension with Correct Labels.png')
+    fig.savefig(parent_folder + '/Intrinsic Dimension with Correct Labels.png')
     
-    # # ID across layers and groups for permuted labels
+    # ID across layers and groups for permuted labels
     
-    # fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
-    # fig.suptitle('Intrinsic Dimension with Permuted Labels', fontsize = 20)
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
+    fig.suptitle('Intrinsic Dimension with Permuted Labels', fontsize = 20)
     
-    # for i in [0, 1, 5]:
-    #     if i == 0:
-    #         ax = axs[0]
-    #     elif i == 1:
-    #         ax = axs[1]
-    #     elif i == 5:
-    #         ax = axs[2]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
-    #     ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
-    #     ax.set_ylabel('ID')
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_ylabel('ID')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1], "-b", label = "Group 1")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1]) , "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1], "-g", label = "Group 2")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1]) , "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1], "-r", label = "Group 3")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1]) , "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
         
-    #     ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1], "-c", label = "Group 4")
-    #     ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
-                
-    #     ax.legend(loc = 'upper right', fontsize = 'medium')
-    #     ax.set_ylim((2, 4))
-    #     ax.set_xticks(range(0, number_layer))
-    #     ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1]) , "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
         
-    #     if i == 0:
-    #         t_stat_1 = np.zeros(number_layer)
-    #         t_stat_2 = np.zeros(number_layer)
-    #         t_stat_3 = np.zeros(number_layer)
-    #         t_stat_4 = np.zeros(number_layer)
+        ax.legend(loc = 'upper right', fontsize = 'medium')
+        ax.set_ylim((2, 4))
+        ax.set_xticks(range(0, number_layer + 1))
+        ax.set_xticklabels(['Layer 0', 'Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+        
+        if i == 0:
+            t_stat_1 = np.zeros(number_layer)
+            t_stat_2 = np.zeros(number_layer)
+            t_stat_3 = np.zeros(number_layer)
+            t_stat_4 = np.zeros(number_layer)
             
-    #         p_value_1 = np.zeros(number_layer)
-    #         p_value_2 = np.zeros(number_layer)
-    #         p_value_3 = np.zeros(number_layer)
-    #         p_value_4 = np.zeros(number_layer)
+            p_value_1 = np.zeros(number_layer)
+            p_value_2 = np.zeros(number_layer)
+            p_value_3 = np.zeros(number_layer)
+            p_value_4 = np.zeros(number_layer)
             
-    #         for j in range(0, number_layer):
-    #             t_stat_1[j], p_value_1[j] = stats.ttest_ind(all_simulation_all_ID[:, 0, j, 0, -1], all_simulation_all_ID_permuted[:, 0, j, 0, -1], equal_var = True, nan_policy = 'omit')
-    #             t_stat_2[j], p_value_2[j] = stats.ttest_ind(all_simulation_all_ID[:, 1, j, 0, -1], all_simulation_all_ID_permuted[:, 1, j, 0, -1], equal_var = True, nan_policy = 'omit')
-    #             t_stat_3[j], p_value_3[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID_permuted[:, 2, j, 0, -1], equal_var = True, nan_policy = 'omit')
-    #             t_stat_4[j], p_value_4[j] = stats.ttest_ind(all_simulation_all_ID[:, 3, j, 0, -1], all_simulation_all_ID_permuted[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
+            for j in range(0, number_layer):
+                t_stat_1[j], p_value_1[j] = stats.ttest_ind(all_simulation_all_ID[:, 0, j, 0, -1], all_simulation_all_ID_permuted[:, 0, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_2[j], p_value_2[j] = stats.ttest_ind(all_simulation_all_ID[:, 1, j, 0, -1], all_simulation_all_ID_permuted[:, 1, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_3[j], p_value_3[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID_permuted[:, 2, j, 0, -1], equal_var = True, nan_policy = 'omit')
+                t_stat_4[j], p_value_4[j] = stats.ttest_ind(all_simulation_all_ID[:, 3, j, 0, -1], all_simulation_all_ID_permuted[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
             
-    #         for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 0, j, 0, -1])):
-    #             label = 'p = {:.4e}'.format(p_value_1[j])
-    #             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 0, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_1[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
                 
-    #         for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 1, j, 0, -1])):
-    #             label = 'p = {:.4e}'.format(p_value_2[j])
-    #             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 1, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_2[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
                 
-    #         for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 2, j, 0, -1])):
-    #             label = 'p = {:.4e}'.format(p_value_3[j])
-    #             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'r')
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 2, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_3[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'r')
                 
-    #         for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 3, j, 0, -1])):
-    #             label = 'p = {:.4e}'.format(p_value_4[j])
-    #             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 3, j, 0, -1])):
+                label = 'p = {:.4e}'.format(p_value_4[j])
+                ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
                 
-    #         all_simulation_group_layer15_ID = np.concatenate((all_simulation_all_ID_permuted[:, 0, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 0, 4, 0, -1].flatten(),
-    #                                                           all_simulation_all_ID_permuted[:, 1, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 1, 4, 0, -1].flatten(),
-    #                                                           all_simulation_all_ID_permuted[:, 2, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 2, 4, 0, -1].flatten(),
-    #                                                           all_simulation_all_ID_permuted[:, 3, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 3, 4, 0, -1].flatten()))
+            all_simulation_group_layer15_ID = np.concatenate((all_simulation_all_ID_permuted[:, 0, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 0, 4, 0, -1].flatten(),
+                                                              all_simulation_all_ID_permuted[:, 1, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 1, 4, 0, -1].flatten(),
+                                                              all_simulation_all_ID_permuted[:, 2, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 2, 4, 0, -1].flatten(),
+                                                              all_simulation_all_ID_permuted[:, 3, 0, 0, -1].flatten(), all_simulation_all_ID_permuted[:, 3, 4, 0, -1].flatten()))
 
-    #         df = pd.DataFrame({'ID': all_simulation_group_layer15_ID,
-    #                            'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
-    #                            'Layer': np.tile(np.repeat(['Layer 1', 'Layer 5'], number_simulation), number_group),
-    #                            'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
+            df = pd.DataFrame({'ID': all_simulation_group_layer15_ID,
+                                'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
+                                'Layer': np.tile(np.repeat(['Layer 1', 'Layer 5'], number_simulation), number_group),
+                                'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
             
-    #         aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-    #         pg.print_table(aov)
+            aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(aov)
             
-    #         posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-    #         pg.print_table(posthocs)
+            posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            pg.print_table(posthocs)
                 
-    # fig.savefig(parent_folder + '/Intrinsic Dimension with Permuted Labels.png')
+    fig.savefig(parent_folder + '/Intrinsic Dimension with Permuted Labels.png')
     
-    # # Scatter plot of ID in the first layer versus transfer accuracy
+    # Scatter plot of ID in the first layer versus transfer accuracy
     
-    # fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
-    # fig.suptitle('ID in the First Layer versus Transfer Accuracy', fontsize = 20)
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
+    fig.suptitle('ID in the First Layer versus Transfer Accuracy', fontsize = 20)
     
-    # for i in [0, 1, 5]:
-    #     if i == 0:
-    #         ax = axs[0]
-    #     elif i == 1:
-    #         ax = axs[1]
-    #     elif i == 5:
-    #         ax = axs[2]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
-    #     ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
-    #     ax.set_xlabel('% Transfer Accuracy')
-    #     ax.set_ylabel('ID')
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_xlabel('% Transfer Accuracy')
+        ax.set_ylabel('ID')
         
-    #     x = np.zeros(number_group * number_simulation)
-    #     y = np.zeros(number_group * number_simulation)
-    #     point_label = np.zeros(number_group * number_simulation)
+        x = np.zeros(number_group * number_simulation)
+        y = np.zeros(number_group * number_simulation)
+        point_label = np.zeros(number_group * number_simulation)
         
-    #     for j in range(number_group):
-    #         x[j * number_simulation:(j + 1) * number_simulation] = all_simulation_transfer_accuracy.mean(3)[:, j, i]
-    #         y[j * number_simulation:(j + 1) * number_simulation] = all_simulation_all_ID[:, j, 0, i, -1]
-    #         point_label[j * number_simulation:(j + 1) * number_simulation] = j
+        for j in range(number_group):
+            x[j * number_simulation:(j + 1) * number_simulation] = all_simulation_transfer_accuracy.mean(3)[:, j, i]
+            y[j * number_simulation:(j + 1) * number_simulation] = all_simulation_all_ID[:, j, 0, i, -1]
+            point_label[j * number_simulation:(j + 1) * number_simulation] = j
         
-    #     colours = ListedColormap(['b', 'g', 'r', 'c'])
-    #     scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
+        colours = ListedColormap(['b', 'g', 'r', 'c'])
+        scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         
-    #     classes = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
-    #     ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
+        classes = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
+        ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
         
-    #     slope_12, intercept_12, r_value_12, p_value_12, std_err_12 = stats.linregress(x[0:2 * number_simulation], y[0:2 * number_simulation])
-    #     slope_34, intercept_34, r_value_34, p_value_34, std_err_34 = stats.linregress(x[2 * number_simulation:4 * number_simulation], y[2 * number_simulation:4 * number_simulation])
+        slope_12, intercept_12, r_value_12, p_value_12, std_err_12 = stats.linregress(x[0:2 * number_simulation], y[0:2 * number_simulation])
+        slope_34, intercept_34, r_value_34, p_value_34, std_err_34 = stats.linregress(x[2 * number_simulation:4 * number_simulation], y[2 * number_simulation:4 * number_simulation])
         
-    #     ax.plot(x[0:2 * number_simulation], intercept_12 + slope_12 * x[0:2 * number_simulation], color = 'g')
-    #     ax.plot(x[2 * number_simulation:4 * number_simulation], intercept_34 + slope_34 * x[2 * number_simulation:4 * number_simulation], color = 'c')
+        ax.plot(x[0:2 * number_simulation], intercept_12 + slope_12 * x[0:2 * number_simulation], color = 'g')
+        ax.plot(x[2 * number_simulation:4 * number_simulation], intercept_34 + slope_34 * x[2 * number_simulation:4 * number_simulation], color = 'c')
         
-    #     ax.annotate('Group 1&2: Correlation = {:.4e}'.format(r_value_12) + ', p-value = {:.4e}'.format(p_value_12),
-    #                 (x[number_simulation], intercept_12 + slope_12 * x[number_simulation]),
-    #                 textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+        ax.annotate('Group 1&2: Correlation = {:.4e}'.format(r_value_12) + ', p-value = {:.4e}'.format(p_value_12),
+                    (x[number_simulation], intercept_12 + slope_12 * x[number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
         
-    #     ax.annotate('Group 3&4: Correlation = {:.4e}'.format(r_value_34) + ', p-value = {:.4e}'.format(p_value_34),
-    #                 (x[3 * number_simulation], intercept_34 + slope_34 * x[3 * number_simulation]),
-    #                 textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
+        ax.annotate('Group 3&4: Correlation = {:.4e}'.format(r_value_34) + ', p-value = {:.4e}'.format(p_value_34),
+                    (x[3 * number_simulation], intercept_34 + slope_34 * x[3 * number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
                
-    #     ax.set_xlim((45, 105))
-    #     ax.set_ylim((3, 3.75))
+        ax.set_xlim((45, 105))
+        ax.set_ylim((3, 3.75))
     
-    # fig.savefig(parent_folder + '/ID in the First Layer versus Transfer Accuracy.png')
+    fig.savefig(parent_folder + '/ID in the First Layer versus Transfer Accuracy.png')
     
-    # # Scatter plot of ID in the last layer versus transfer accuracy
+    # Scatter plot of ID in the last layer versus transfer accuracy
     
-    # fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
-    # fig.suptitle('ID in the Last Layer versus Transfer Accuracy', fontsize = 20)
+    fig, axs = plt.subplots(1, 3, figsize = (1 * 8, 3 * 6))
+    fig.suptitle('ID in the Last Layer versus Transfer Accuracy', fontsize = 20)
     
-    # for i in [0, 1, 5]:
-    #     if i == 0:
-    #         ax = axs[0]
-    #     elif i == 1:
-    #         ax = axs[1]
-    #     elif i == 5:
-    #         ax = axs[2]
+    for i in [0, 1, 5]:
+        if i == 0:
+            ax = axs[0]
+        elif i == 1:
+            ax = axs[1]
+        elif i == 5:
+            ax = axs[2]
         
-    #     ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
-    #     ax.set_xlabel('% Transfer Accuracy')
-    #     ax.set_ylabel('ID')
+        ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
+        ax.set_xlabel('% Transfer Accuracy')
+        ax.set_ylabel('ID')
         
-    #     x = np.zeros(number_group * number_simulation)
-    #     y = np.zeros(number_group * number_simulation)
-    #     point_label = np.zeros(number_group * number_simulation)
+        x = np.zeros(number_group * number_simulation)
+        y = np.zeros(number_group * number_simulation)
+        point_label = np.zeros(number_group * number_simulation)
         
-    #     for j in range(number_group):
-    #         x[j * number_simulation:(j + 1) * number_simulation] = all_simulation_transfer_accuracy.mean(3)[:, j, i]
-    #         y[j * number_simulation:(j + 1) * number_simulation] = all_simulation_all_ID[:, j, -1, i, -1]
-    #         point_label[j * number_simulation:(j + 1) * number_simulation] = j
+        for j in range(number_group):
+            x[j * number_simulation:(j + 1) * number_simulation] = all_simulation_transfer_accuracy.mean(3)[:, j, i]
+            y[j * number_simulation:(j + 1) * number_simulation] = all_simulation_all_ID[:, j, -1, i, -1]
+            point_label[j * number_simulation:(j + 1) * number_simulation] = j
               
-    #     colours = ListedColormap(['b', 'g', 'r', 'c'])
-    #     scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
+        colours = ListedColormap(['b', 'g', 'r', 'c'])
+        scatter_legend = ax.scatter(x, y, c = point_label, cmap = colours)
         
-    #     classes = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
-    #     ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
+        classes = ['Group 1', 'Group 2', 'Group 3', 'Group 4']
+        ax.legend(handles = scatter_legend.legend_elements()[0], labels = classes)
         
-    #     slope_12, intercept_12, r_value_12, p_value_12, std_err_12 = stats.linregress(x[0:2 * number_simulation], y[0:2 * number_simulation])
-    #     slope_34, intercept_34, r_value_34, p_value_34, std_err_34 = stats.linregress(x[2 * number_simulation:4 * number_simulation], y[2 * number_simulation:4 * number_simulation])
+        slope_12, intercept_12, r_value_12, p_value_12, std_err_12 = stats.linregress(x[0:2 * number_simulation], y[0:2 * number_simulation])
+        slope_34, intercept_34, r_value_34, p_value_34, std_err_34 = stats.linregress(x[2 * number_simulation:4 * number_simulation], y[2 * number_simulation:4 * number_simulation])
         
-    #     ax.plot(x[0:2 * number_simulation], intercept_12 + slope_12 * x[0:2 * number_simulation], color = 'g')
-    #     ax.plot(x[2 * number_simulation:4 * number_simulation], intercept_34 + slope_34 * x[2 * number_simulation:4 * number_simulation], color = 'c')
+        ax.plot(x[0:2 * number_simulation], intercept_12 + slope_12 * x[0:2 * number_simulation], color = 'g')
+        ax.plot(x[2 * number_simulation:4 * number_simulation], intercept_34 + slope_34 * x[2 * number_simulation:4 * number_simulation], color = 'c')
         
-    #     ax.annotate('Group 1&2: Correlation = {:.4e}'.format(r_value_12) + ', p-value = {:.4e}'.format(p_value_12),
-    #                 (x[number_simulation], intercept_12 + slope_12 * x[number_simulation]),
-    #                 textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
+        ax.annotate('Group 1&2: Correlation = {:.4e}'.format(r_value_12) + ', p-value = {:.4e}'.format(p_value_12),
+                    (x[number_simulation], intercept_12 + slope_12 * x[number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
         
-    #     ax.annotate('Group 3&4: Correlation = {:.4e}'.format(r_value_34) + ', p-value = {:.4e}'.format(p_value_34),
-    #                 (x[3 * number_simulation], intercept_34 + slope_34 * x[3 * number_simulation]),
-    #                 textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
+        ax.annotate('Group 3&4: Correlation = {:.4e}'.format(r_value_34) + ', p-value = {:.4e}'.format(p_value_34),
+                    (x[3 * number_simulation], intercept_34 + slope_34 * x[3 * number_simulation]),
+                    textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
         
-    #     ax.set_xlim((45, 105))
-    #     ax.set_ylim((3, 3.75))
+        ax.set_xlim((45, 105))
+        ax.set_ylim((3, 3.75))
     
-    # fig.savefig(parent_folder + '/ID in the Last Layer versus Transfer Accuracy.png')
+    fig.savefig(parent_folder + '/ID in the Last Layer versus Transfer Accuracy.png')
     
-    # # ID across layers and epochs for correct labels
+    # ID across layers and epochs for correct labels
     
-    # fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
-    # fig.suptitle('ID versus Layers across Epochs for Correct Labels', fontsize = 20)
+    fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
+    fig.suptitle('ID versus Layers across Epochs for Correct Labels', fontsize = 20)
     
-    # for i in range(number_group):
-    #     if i <= 1:
-    #         ax = axs[0, i]
-    #     elif i > 1:
-    #         ax = axs[1, i - 2]
+    for i in range(number_group):
+        if i <= 1:
+            ax = axs[0, i]
+        elif i > 1:
+            ax = axs[1, i - 2]
         
-    #     ax.set_title('Group = ' + str(i + 1), fontsize = 12)
-    #     ax.set_ylabel('ID')
-    #     ax.set_ylim((3, 3.75))
+        ax.set_title('Group = ' + str(i + 1), fontsize = 12)
+        ax.set_ylabel('ID')
+        ax.set_ylim((3, 3.75))
         
-    #     ax.set_xticks(range(0, number_layer))
-    #     ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+        ax.set_xticks(range(0, number_layer))
+        ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
         
-    #     n_lines = 19        
-    #     parameters = np.arange(0, n_lines)
-    #     norm = matplotlib.colors.Normalize(vmin = np.min(parameters), vmax = np.max(parameters))
+        n_lines = 19        
+        parameters = np.arange(0, n_lines)
+        norm = matplotlib.colors.Normalize(vmin = np.min(parameters), vmax = np.max(parameters))
         
-    #     c_m = matplotlib.cm.cool
-    #     s_m = matplotlib.cm.ScalarMappable(cmap = c_m, norm = norm)
-    #     s_m.set_array([])
+        c_m = matplotlib.cm.cool
+        s_m = matplotlib.cm.ScalarMappable(cmap = c_m, norm = norm)
+        s_m.set_array([])
         
-    #     for j in range(n_lines):
-    #         x = np.arange(0, number_layer)
-    #         y = np.nanmean(all_simulation_all_ID, axis = 0)[i, :, 0, j]
-    #         ax.plot(x, y, color = s_m.to_rgba(j))
+        for j in range(n_lines):
+            x = np.arange(0, number_layer)
+            y = np.nanmean(all_simulation_all_ID, axis = 0)[i, :, 0, j]
+            ax.plot(x, y, color = s_m.to_rgba(j))
         
-    # fig.subplots_adjust(right = 0.8)
-    # cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
-    # cbar = fig.colorbar(s_m, cax = cbar_ax)
-    # cbar.set_label('number of epochs')
-    # cbar.set_ticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
-    # cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
+    fig.subplots_adjust(right = 0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
+    cbar = fig.colorbar(s_m, cax = cbar_ax)
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
-    # fig.savefig(parent_folder + '/ID versus Layers across Epochs for Correct Labels.png')
+    fig.savefig(parent_folder + '/ID versus Layers across Epochs for Correct Labels.png')
     
-    # # ID across layers and epochs for permuted labels
+    # ID across layers and epochs for permuted labels
     
-    # fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
-    # fig.suptitle('ID versus Layers across Epochs for Permuted Labels', fontsize = 20)
+    fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
+    fig.suptitle('ID versus Layers across Epochs for Permuted Labels', fontsize = 20)
     
-    # for i in range(number_group):
-    #     if i <= 1:
-    #         ax = axs[0, i]
-    #     elif i > 1:
-    #         ax = axs[1, i - 2]
+    for i in range(number_group):
+        if i <= 1:
+            ax = axs[0, i]
+        elif i > 1:
+            ax = axs[1, i - 2]
         
-    #     ax.set_title('Group = ' + str(i + 1), fontsize = 12)
-    #     ax.set_ylabel('ID')
-    #     ax.set_ylim((2.8, 3.75))
+        ax.set_title('Group = ' + str(i + 1), fontsize = 12)
+        ax.set_ylabel('ID')
+        ax.set_ylim((2.8, 3.75))
         
-    #     ax.set_xticks(range(0, number_layer))
-    #     ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
+        ax.set_xticks(range(0, number_layer))
+        ax.set_xticklabels(['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5'])
         
-    #     n_lines = 19
-    #     parameters = np.arange(0, n_lines)
-    #     norm = matplotlib.colors.Normalize(vmin = np.min(parameters), vmax = np.max(parameters))
+        n_lines = 19
+        parameters = np.arange(0, n_lines)
+        norm = matplotlib.colors.Normalize(vmin = np.min(parameters), vmax = np.max(parameters))
         
-    #     c_m = matplotlib.cm.cool
-    #     s_m = matplotlib.cm.ScalarMappable(cmap = c_m, norm = norm)
-    #     s_m.set_array([])
+        c_m = matplotlib.cm.cool
+        s_m = matplotlib.cm.ScalarMappable(cmap = c_m, norm = norm)
+        s_m.set_array([])
         
-    #     for j in range(n_lines):
-    #         x = np.arange(0, number_layer)
-    #         y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, :, 0, j]
-    #         ax.plot(x, y, color = s_m.to_rgba(j))
+        for j in range(n_lines):
+            x = np.arange(0, number_layer)
+            y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, :, 0, j]
+            ax.plot(x, y, color = s_m.to_rgba(j))
         
-    # fig.subplots_adjust(right = 0.8)
-    # cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
-    # cbar = fig.colorbar(s_m, cax = cbar_ax)
-    # cbar.set_label('number of epochs')
-    # cbar.set_ticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
-    # cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
+    fig.subplots_adjust(right = 0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
+    cbar = fig.colorbar(s_m, cax = cbar_ax)
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
-    # fig.savefig(parent_folder + '/ID versus Layers across Epochs for Permuted Labels.png')
+    fig.savefig(parent_folder + '/ID versus Layers across Epochs for Permuted Labels.png')
             
-    # # ID in the first layer versus training accuracy across epochs for correct labels
+    # ID in the first layer versus training accuracy across epochs for correct labels
     
-    # fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
-    # fig.suptitle('ID in the First Layer versus Training Accuracy across Epochs for Correct Labels', fontsize = 20)
+    fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
+    fig.suptitle('ID in the First Layer versus Training Accuracy across Epochs for Correct Labels', fontsize = 20)
     
-    # for i in range(number_group):
-    #     if i <= 1:
-    #         ax = axs[0, i]
-    #     elif i > 1:
-    #         ax = axs[1, i - 2]
+    for i in range(number_group):
+        if i <= 1:
+            ax = axs[0, i]
+        elif i > 1:
+            ax = axs[1, i - 2]
         
-    #     ax.set_title('Group = ' + str(i + 1), fontsize = 12)
+        ax.set_title('Group = ' + str(i + 1), fontsize = 12)
         
-    #     ax.set_xlabel('% Error')
-    #     ax.set_xlim((-5, 55))
+        ax.set_xlabel('% Error')
+        ax.set_xlim((-5, 55))
         
-    #     ax.set_ylabel('ID')
-    #     ax.set_ylim((3, 3.75))
+        ax.set_ylabel('ID')
+        ax.set_ylim((3, 3.75))
         
-    #     n_points = 18
+        n_points = 18
         
-    #     x = np.zeros(n_points)
-    #     for j in range(n_points):
-    #         x[j] = 100 - all_simulation_training_accuracy.mean(0)[i, 0, 10 * j]
-    #     y = np.nanmean(all_simulation_all_ID, axis = 0)[i, 0, 0, 1:]
+        x = np.zeros(n_points)
+        for j in range(n_points):
+            x[j] = 100 - all_simulation_training_accuracy.mean(0)[i, 0, 10 * j]
+        y = np.nanmean(all_simulation_all_ID, axis = 0)[i, 0, 0, 1:]
         
-    #     color_idx = np.linspace(0, 1, n_points)
+        color_idx = np.linspace(0, 1, n_points)
         
-    #     cmap = sns.cubehelix_palette(as_cmap = True)
-    #     points = ax.scatter(x, y, c = color_idx, cmap = cmap)
+        cmap = sns.cubehelix_palette(as_cmap = True)
+        points = ax.scatter(x, y, c = color_idx, cmap = cmap)
     
-    # fig.subplots_adjust(right = 0.8)
-    # cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
-    # cbar = fig.colorbar(points, cax = cbar_ax)
-    # cbar.set_label('number of epochs')
-    # cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
-    # cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
+    fig.subplots_adjust(right = 0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
+    cbar = fig.colorbar(points, cax = cbar_ax)
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
-    # fig.savefig(parent_folder + '/ID in the First Layer versus Training Accuracy across Epochs for Correct Labels.png')
+    fig.savefig(parent_folder + '/ID in the First Layer versus Training Accuracy across Epochs for Correct Labels.png')
     
-    # # ID in the last layer versus training accuracy across epochs for correct labels
+    # ID in the last layer versus training accuracy across epochs for correct labels
     
-    # fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
-    # fig.suptitle('ID in the Last Layer versus Training Accuracy across Epochs for Correct Labels', fontsize = 20)
+    fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
+    fig.suptitle('ID in the Last Layer versus Training Accuracy across Epochs for Correct Labels', fontsize = 20)
     
-    # for i in range(number_group):
-    #     if i <= 1:
-    #         ax = axs[0, i]
-    #     elif i > 1:
-    #         ax = axs[1, i - 2]
+    for i in range(number_group):
+        if i <= 1:
+            ax = axs[0, i]
+        elif i > 1:
+            ax = axs[1, i - 2]
         
-    #     ax.set_title('Group = ' + str(i + 1), fontsize = 12)
+        ax.set_title('Group = ' + str(i + 1), fontsize = 12)
         
-    #     ax.set_xlabel('% Error')
-    #     ax.set_xlim((-5, 55))
+        ax.set_xlabel('% Error')
+        ax.set_xlim((-5, 55))
         
-    #     ax.set_ylabel('ID')
-    #     ax.set_ylim((3, 3.75))
+        ax.set_ylabel('ID')
+        ax.set_ylim((3, 3.75))
         
-    #     n_points = 18
+        n_points = 18
         
-    #     x = np.zeros(n_points)
-    #     for j in range(n_points):
-    #         x[j] = 100 - all_simulation_training_accuracy.mean(0)[i, 0, 10 * j]
-    #     y = np.nanmean(all_simulation_all_ID, axis = 0)[i, -1, 0, 1:]
+        x = np.zeros(n_points)
+        for j in range(n_points):
+            x[j] = 100 - all_simulation_training_accuracy.mean(0)[i, 0, 10 * j]
+        y = np.nanmean(all_simulation_all_ID, axis = 0)[i, -1, 0, 1:]
         
-    #     color_idx = np.linspace(0, 1, n_points)
+        color_idx = np.linspace(0, 1, n_points)
         
-    #     cmap = sns.cubehelix_palette(as_cmap = True)
-    #     points = ax.scatter(x, y, c = color_idx, cmap = cmap)
+        cmap = sns.cubehelix_palette(as_cmap = True)
+        points = ax.scatter(x, y, c = color_idx, cmap = cmap)
     
-    # fig.subplots_adjust(right = 0.8)
-    # cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
-    # cbar = fig.colorbar(points, cax = cbar_ax)
-    # cbar.set_label('number of epochs')
-    # cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
-    # cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
+    fig.subplots_adjust(right = 0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
+    cbar = fig.colorbar(points, cax = cbar_ax)
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
-    # fig.savefig(parent_folder + '/ID in the Last Layer versus Training Accuracy across Epochs for Correct Labels.png')
+    fig.savefig(parent_folder + '/ID in the Last Layer versus Training Accuracy across Epochs for Correct Labels.png')
     
-    # # ID in the first layer versus training accuracy across epochs for permuted labels
+    # ID in the first layer versus training accuracy across epochs for permuted labels
     
-    # fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
-    # fig.suptitle('ID in the First Layer versus Training Accuracy across Epochs for Permuted Labels', fontsize = 20)
+    fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
+    fig.suptitle('ID in the First Layer versus Training Accuracy across Epochs for Permuted Labels', fontsize = 20)
     
-    # for i in range(number_group):
-    #     if i <= 1:
-    #         ax = axs[0, i]
-    #     elif i > 1:
-    #         ax = axs[1, i - 2]
+    for i in range(number_group):
+        if i <= 1:
+            ax = axs[0, i]
+        elif i > 1:
+            ax = axs[1, i - 2]
         
-    #     ax.set_title('Group = ' + str(i + 1), fontsize = 12)
+        ax.set_title('Group = ' + str(i + 1), fontsize = 12)
         
-    #     ax.set_xlabel('% Error')
-    #     ax.set_xlim((-5, 55))
+        ax.set_xlabel('% Error')
+        ax.set_xlim((-5, 55))
         
-    #     ax.set_ylabel('ID')
-    #     ax.set_ylim((2.8, 3.75))
+        ax.set_ylabel('ID')
+        ax.set_ylim((2.8, 3.75))
         
-    #     n_points = 18
+        n_points = 18
         
-    #     x = np.zeros(n_points)
-    #     for j in range(n_points):
-    #         x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 0, 10 * j]
-    #     y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, 0, 0, 1:]
+        x = np.zeros(n_points)
+        for j in range(n_points):
+            x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 0, 10 * j]
+        y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, 0, 0, 1:]
         
-    #     color_idx = np.linspace(0, 1, n_points)
+        color_idx = np.linspace(0, 1, n_points)
         
-    #     cmap = sns.cubehelix_palette(as_cmap = True)
-    #     points = ax.scatter(x, y, c = color_idx, cmap = cmap)
+        cmap = sns.cubehelix_palette(as_cmap = True)
+        points = ax.scatter(x, y, c = color_idx, cmap = cmap)
     
-    # fig.subplots_adjust(right = 0.8)
-    # cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
-    # cbar = fig.colorbar(points, cax = cbar_ax)
-    # cbar.set_label('number of epochs')
-    # cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
-    # cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
+    fig.subplots_adjust(right = 0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
+    cbar = fig.colorbar(points, cax = cbar_ax)
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
-    # fig.savefig(parent_folder + '/ID in the First Layer versus Training Accuracy across Epochs for Permuted Labels.png')
+    fig.savefig(parent_folder + '/ID in the First Layer versus Training Accuracy across Epochs for Permuted Labels.png')
     
-    # # ID in the last layer versus training accuracy across epochs for permuted labels
+    # ID in the last layer versus training accuracy across epochs for permuted labels
     
-    # fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
-    # fig.suptitle('ID in the Last Layer versus Training Accuracy across Epochs for Permuted Labels', fontsize = 20)
+    fig, axs = plt.subplots(2, 2, figsize = (2 * 8, 2 * 6))
+    fig.suptitle('ID in the Last Layer versus Training Accuracy across Epochs for Permuted Labels', fontsize = 20)
     
-    # for i in range(number_group):
-    #     if i <= 1:
-    #         ax = axs[0, i]
-    #     elif i > 1:
-    #         ax = axs[1, i - 2]
+    for i in range(number_group):
+        if i <= 1:
+            ax = axs[0, i]
+        elif i > 1:
+            ax = axs[1, i - 2]
         
-    #     ax.set_title('Group = ' + str(i + 1), fontsize = 12)
+        ax.set_title('Group = ' + str(i + 1), fontsize = 12)
         
-    #     ax.set_xlabel('% Error')
-    #     ax.set_xlim((-5, 55))
+        ax.set_xlabel('% Error')
+        ax.set_xlim((-5, 55))
         
-    #     ax.set_ylabel('ID')
-    #     ax.set_ylim((2.8, 3.75))
+        ax.set_ylabel('ID')
+        ax.set_ylim((2.8, 3.75))
         
-    #     n_points = 18
+        n_points = 18
         
-    #     x = np.zeros(n_points)
-    #     for j in range(n_points):
-    #         x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 0, 10 * j]
-    #     y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, -1, 0, 1:]
+        x = np.zeros(n_points)
+        for j in range(n_points):
+            x[j] = 100 - all_simulation_training_accuracy_permuted.mean(0)[i, 0, 10 * j]
+        y = np.nanmean(all_simulation_all_ID_permuted, axis = 0)[i, -1, 0, 1:]
         
-    #     color_idx = np.linspace(0, 1, n_points)
+        color_idx = np.linspace(0, 1, n_points)
         
-    #     cmap = sns.cubehelix_palette(as_cmap = True)
-    #     points = ax.scatter(x, y, c = color_idx, cmap = cmap)
+        cmap = sns.cubehelix_palette(as_cmap = True)
+        points = ax.scatter(x, y, c = color_idx, cmap = cmap)
     
-    # fig.subplots_adjust(right = 0.8)
-    # cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
-    # cbar = fig.colorbar(points, cax = cbar_ax)
-    # cbar.set_label('number of epochs')
-    # cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
-    # cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
+    fig.subplots_adjust(right = 0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.025, 0.7])
+    cbar = fig.colorbar(points, cax = cbar_ax)
+    cbar.set_label('number of epochs')
+    cbar.set_ticks([0, 2 / 18, 4 / 18, 6 / 18, 8 / 18, 10 / 18, 12 / 18, 14 / 18, 16 / 18, 1])
+    cbar.set_ticklabels(['0', '20', '40', '60', '80', '100', '120', '140', '160', '180'])
     
-    # fig.savefig(parent_folder + '/ID in the Last Layer versus Training Accuracy across Epochs for Permuted Labels.png')
+    fig.savefig(parent_folder + '/ID in the Last Layer versus Training Accuracy across Epochs for Permuted Labels.png')
        
 def imshow(x_sample, title):
     """Imshow for Tensor"""

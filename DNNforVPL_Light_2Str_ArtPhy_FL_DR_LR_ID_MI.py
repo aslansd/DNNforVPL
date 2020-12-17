@@ -87,7 +87,7 @@ def main():
     
     best_acc1 = 0
     
-    number_simulation = 10
+    number_simulation = 20
     number_group = 4
     number_layer = 2
     number_layer_freeze = 3
@@ -458,24 +458,6 @@ def main():
             x_tensor_tuning = torch.stack(x_tensor_tuning)
             y_tensor_tuning = torch.stack(y_tensor_tuning)
             print(x_tensor_tuning.shape, y_tensor_tuning.shape)
-            
-            ### Emergence of Invariance and Disentanglement in Deep Representations
-            
-            if group_training in ['group2', 'group4']:
-                x_tensor_training_noise = torch.tensor((len(SF_training) * len(Ori_training) * 180, 224, 224, 3), dtype = torch.float64)
-                
-                for i in range(len(SF_training)):
-                    for j in range(len(Ori_training)):
-                        for k in range(180):
-                            x_tensor_training_noise[z_val_training[i, j, k]] = x_tensor_training[z_val_training[i, j, k]] - x_tensor_training[z_val_training[1, j, k]]           
-                            
-                # Get five sample tensors of training/validation images and show them
-                indices = torch.tensor(np.random.permutation(len(SF_training) * len(Ori_training) * 180), dtype = torch.long)
-                x_sample = torch.index_select(x_tensor_training_noise, 0, indices[:5])
-                y_sample = torch.index_select(y_tensor_training, 0, indices[:5])
-                x_sample = make_grid([x_sample[0], x_sample[1], x_sample[2], x_sample[3], x_sample[4]])
-                y_sample = [str(y_sample[0].item()), str(y_sample[1].item()), str(y_sample[2].item()), str(y_sample[3].item()), str(y_sample[4].item())]
-                imshow(x_sample, y_sample)
             
             layer_freeze_counter = -1
             
@@ -904,6 +886,26 @@ def main():
                 saving_folder = parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/after_training_' + str(layer_freeze)
                 
                 feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
+                
+                all_unit_activity_Conv2d_1 = np.zeros((num_sample_artiphysiology, 6, 28, 28), dtype = np.float32)
+                all_unit_activity_Conv2d_2 = np.zeros((num_sample_artiphysiology, 16, 13, 13), dtype = np.float32)
+                        
+                for i in range(num_sample_artiphysiology):                    
+                    feature_sample_artiphysiology[i, :] = [SF_transfer[x_sample_artiphysiology_index[i, 0]], Ori_transfer[x_sample_artiphysiology_index[i, 1]], x_sample_artiphysiology_index[i, 2]]
+                    
+                    index = torch.tensor(z_val_transfer[x_sample_artiphysiology_index[i, 0], x_sample_artiphysiology_index[i, 1], x_sample_artiphysiology_index[i, 2]], dtype = torch.long)
+                    x_sample = torch.index_select(x_tensor_transfer, 0, index)
+                    x_sample = x_sample.cuda(gpu)
+                    
+                    unit_activity_layer_0 = model.features[0](x_sample)
+                    unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
+                    unit_activity_layer_2 = model.features[2](unit_activity_layer_1)
+                    unit_activity_layer_3 = model.features[3](unit_activity_layer_2)
+                    unit_activity_layer_4 = model.features[4](unit_activity_layer_3)
+                    unit_activity_layer_5 = model.features[5](unit_activity_layer_4)
+                    
+                    all_unit_activity_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
+                    all_unit_activity_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
                     
                 scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})
                 
@@ -1402,6 +1404,12 @@ def main():
             ax.set_ylim((0, 0.0018))
             ax.set_xticks(np.arange(0, 360, 30.0))
             
+            if (i in [1, 3]) and j != 1:
+                t_stat, p_value = stats.ttest_ind(all_simulation_weight_change_layer_1[:, i, j].flatten(), all_simulation_weight_change_layer_1[:, i - 1, j].flatten(), equal_var = True, nan_policy = 'omit')
+                                
+                label = 'p = {:.4e}'.format(p_value)
+                ax.annotate(label, (179, all_simulation_weight_change_layer_1.mean(0)[i, j]), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
+            
     fig.savefig(parent_folder + '/Weight Change.png')
         
     ### Layer rotation: a surprisingly powerful indicator of generalization in deep networks?
@@ -1429,6 +1437,12 @@ def main():
             ax.legend(loc = 'upper left', fontsize = 'x-small')
             ax.set_ylim((-2.5 * 10 ** (-7), 10 * 10 ** (-7)))
             ax.set_xticks(np.arange(0, 360, 30.0))
+            
+            if (i in [1, 3]) and j != 1:
+                t_stat, p_value = stats.ttest_ind(all_simulation_layer_rotation_layer_1[:, i, j].flatten(), all_simulation_layer_rotation_layer_1[:, i - 1, j].flatten(), equal_var = True, nan_policy = 'omit')
+                                
+                label = 'p = {:.4e}'.format(p_value)
+                ax.annotate(label, (179, all_simulation_layer_rotation_layer_1.mean(0)[i, j]), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
             
     fig.savefig(parent_folder + '/Layer Rotation.png')
     
@@ -1491,10 +1505,10 @@ def main():
                                'Layer': np.tile(np.repeat(['Layer 12'], number_simulation), number_group),
                                'Group': np.concatenate((np.tile(['Group 1'], 1 * number_simulation), np.tile(['Group 2'], 1 * number_simulation), np.tile(['Group 3'], 1 * number_simulation), np.tile(['Group 4'], 1 * number_simulation)))})
             
-            aov = pg.mixed_anova(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            aov = pg.mixed_anova(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(aov)
             
-            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Original Stimuli and Layers Activities.png')
@@ -1556,10 +1570,10 @@ def main():
                                'Layer': np.tile(np.repeat(['Layer 12'], number_simulation), number_group),
                                'Group': np.concatenate((np.tile(['Group 1'], 1 * number_simulation), np.tile(['Group 2'], 1 * number_simulation), np.tile(['Group 3'], 1 * number_simulation), np.tile(['Group 4'], 1 * number_simulation)))})
             
-            aov = pg.mixed_anova(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            aov = pg.mixed_anova(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(aov)
             
-            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
+            posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
             pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Nuisance Stimuli and Layers Activities.png')
@@ -1577,22 +1591,22 @@ def main():
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_ylabel('ID')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1], "-b", label = "Group 1")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1]) , "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1], "-g", label = "Group 2")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1]) , "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1], "-r", label = "Group 3")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1]) , "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1], "-c", label = "Group 4")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
-                
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1]) , "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        
         ax.legend(loc = 'upper right', fontsize = 'medium')
         ax.set_ylim((2, 4))
-        ax.set_xticks(range(0, number_layer))
-        ax.set_xticklabels(['Layer 1', 'Layer 2'])
+        ax.set_xticks(range(0, number_layer + 1))
+        ax.set_xticklabels(['Layer 0', 'Layer 1', 'Layer 2'])
         
         if i == 0:
             t_stat_lp = np.zeros(number_layer)
@@ -1605,11 +1619,11 @@ def main():
                 t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_ID[:, 0, j, 0, -1], all_simulation_all_ID[:, 1, j, 0, -1], equal_var = True, nan_policy = 'omit')
                 t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
                 
-            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1])):
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), np.nanmean(all_simulation_all_ID, axis = 0)[1, :, i, -1])):
                 label = 'p = {:.4e}'.format(p_value_lp[j])
                 ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
                 
-            for j, (x, y) in enumerate(zip(range(0, number_layer), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1])):
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), np.nanmean(all_simulation_all_ID, axis = 0)[3, :, i, -1])):
                 label = 'p = {:.4e}'.format(p_value_hp[j])
                 ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
                 
@@ -1642,22 +1656,22 @@ def main():
         ax.set_title('Freezed Layer = ' + str(i), fontsize = 12)
         ax.set_ylabel('ID')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1], "-b", label = "Group 1")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1]) , "-b", label = "Group 1")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[0, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1], "-g", label = "Group 2")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1]) , "-g", label = "Group 2")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[1, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1], "-r", label = "Group 3")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1]) , "-r", label = "Group 3")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[2, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
         
-        ax.plot(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1], "-c", label = "Group 4")
-        ax.fill_between(range(0, number_layer), np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
-                
+        ax.plot(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1]) , "-c", label = "Group 4")
+        ax.fill_between(range(0, number_layer + 1), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] - np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID, axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] + np.nanstd(all_simulation_all_ID_permuted, axis = 0)[3, :, i, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        
         ax.legend(loc = 'upper right', fontsize = 'medium')
         ax.set_ylim((2, 4))
-        ax.set_xticks(range(0, number_layer))
-        ax.set_xticklabels(['Layer 1', 'Layer 2'])
+        ax.set_xticks(range(0, number_layer + 1))
+        ax.set_xticklabels(['Layer 0', 'Layer 1', 'Layer 2'])
         
         if i == 0:
             t_stat_1 = np.zeros(number_layer)
@@ -1676,19 +1690,19 @@ def main():
                 t_stat_3[j], p_value_3[j] = stats.ttest_ind(all_simulation_all_ID[:, 2, j, 0, -1], all_simulation_all_ID_permuted[:, 2, j, 0, -1], equal_var = True, nan_policy = 'omit')
                 t_stat_4[j], p_value_4[j] = stats.ttest_ind(all_simulation_all_ID[:, 3, j, 0, -1], all_simulation_all_ID_permuted[:, 3, j, 0, -1], equal_var = True, nan_policy = 'omit')
             
-            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 0, j, 0, -1])):
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 0, j, 0, -1])):
                 label = 'p = {:.4e}'.format(p_value_1[j])
                 ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
                 
-            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 1, j, 0, -1])):
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 1, j, 0, -1])):
                 label = 'p = {:.4e}'.format(p_value_2[j])
                 ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
                 
-            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 2, j, 0, -1])):
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 2, j, 0, -1])):
                 label = 'p = {:.4e}'.format(p_value_3[j])
                 ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'r')
                 
-            for j, (x, y) in enumerate(zip(range(0, number_layer), all_simulation_all_ID_permuted[:, 3, j, 0, -1])):
+            for j, (x, y) in enumerate(zip(range(1, number_layer + 1), all_simulation_all_ID_permuted[:, 3, j, 0, -1])):
                 label = 'p = {:.4e}'.format(p_value_4[j])
                 ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
                 
