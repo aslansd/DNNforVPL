@@ -839,23 +839,23 @@ def main():
                 if model_counter == 0:
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0]
                                                 
                 elif model_counter == 1:
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]               
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0]               
                 
                 elif model_counter == 2:
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                            
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]               
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0]               
                 
                 elif model_counter == 3:
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
@@ -863,10 +863,10 @@ def main():
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                             
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, 0]
                 
                 elif model_counter == 4:                        
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
@@ -875,11 +875,11 @@ def main():
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     all_simulation_all_ID[model_counter][simulation_counter, group_counter, 4, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0]
-                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 4, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 4, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 4, 0] = all_simulation_all_ID[model_counter][simulation_counter, group_counter, 4, 0]
                 
                 scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})                        
                 
