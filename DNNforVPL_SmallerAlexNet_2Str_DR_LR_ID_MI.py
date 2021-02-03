@@ -834,52 +834,52 @@ def main():
                         all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
                         all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                         
-                all_x_sample_ID[model_counter, simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                all_x_sample_ID[model_counter][simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                 
                 if model_counter == 0:
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
                                                 
                 elif model_counter == 1:
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]               
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]               
                 
                 elif model_counter == 2:
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                            
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]               
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]               
                 
                 elif model_counter == 3:
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                             
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0]
                 
                 elif model_counter == 4:                        
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                    all_simulation_all_ID[model_counter, simulation_counter, group_counter, 4, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_simulation_all_ID[model_counter][simulation_counter, group_counter, 4, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                     
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0]
-                    all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 4, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 4, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, 0]
+                    all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 4, 0] = all_simulation_all_ID[model_counter, simulation_counter, group_counter, 4, 0]
                 
                 scipy.io.savemat(saving_folder + '/feature_sample_artiphysiology.mat', mdict = {'feature_sample_artiphysiology': feature_sample_artiphysiology})                        
                 
@@ -969,7 +969,7 @@ def main():
                             optimizer.step()
                     
                             # Save the validation accuracy for plotting
-                            all_simulation_training_accuracy[model_counter, simulation_counter, group_counter, epoch] = acc1[0].item()
+                            all_simulation_training_accuracy[model_counter][simulation_counter, group_counter, epoch] = acc1[0].item()
                             
                             # Measure elapsed time
                             batch_time.update(time.time() - end)
@@ -977,53 +977,53 @@ def main():
                             progress.display(epoch)
                             
                         # Remember the best accuracy
-                        is_best = all_simulation_training_accuracy[model_counter, simulation_counter, group_counter, epoch] >= best_acc1
-                        best_acc1 = max(all_simulation_training_accuracy[model_counter, simulation_counter, group_counter, epoch], best_acc1)
+                        is_best = all_simulation_training_accuracy[model_counter][simulation_counter, group_counter, epoch] >= best_acc1
+                        best_acc1 = max(all_simulation_training_accuracy[model_counter][simulation_counter, group_counter, epoch], best_acc1)
                         
                         if model_counter == 0:                            
-                            all_simulation_weight_change_layer[model_counter, 0, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][0][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
                             
-                            all_simulation_layer_rotation_layer[model_counter, 0, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][0][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
                             
                         elif model_counter == 1:                            
-                            all_simulation_weight_change_layer[model_counter, 0, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 1, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][0][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][1][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
                             
-                            all_simulation_layer_rotation_layer[model_counter, 0, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 1, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][0][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][1][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
                             
                         elif model_counter == 2:                            
-                            all_simulation_weight_change_layer[model_counter, 0, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 1, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 2, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][0][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][1][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][2][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
                             
-                            all_simulation_layer_rotation_layer[model_counter, 0, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 1, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 2, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[6].weight), torch.flatten(Conv2d_3_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][0][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][1][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][2][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[6].weight), torch.flatten(Conv2d_3_0)).item()
                             
                         elif model_counter == 3:                            
-                            all_simulation_weight_change_layer[model_counter, 0, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 1, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 2, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 3, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[8].weight - Conv2d_4_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[8].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][0][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][1][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][2][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][3][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[8].weight - Conv2d_4_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[8].weight, 2)), 0.5)).item()
                             
-                            all_simulation_layer_rotation_layer[model_counter, 0, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 1, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 2, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[6].weight), torch.flatten(Conv2d_3_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 3, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[8].weight), torch.flatten(Conv2d_4_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][0][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][1][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][2][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[6].weight), torch.flatten(Conv2d_3_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][3][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[8].weight), torch.flatten(Conv2d_4_0)).item()
                             
                         elif model_counter == 4:                       
-                            all_simulation_weight_change_layer[model_counter, 0, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 1, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 2, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 3, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[8].weight - Conv2d_4_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[8].weight, 2)), 0.5)).item()
-                            all_simulation_weight_change_layer[model_counter, 4, simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[10].weight - Conv2d_5_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[10].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][0][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[0].weight - Conv2d_1_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[0].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][1][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[3].weight - Conv2d_2_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[3].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][2][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[6].weight - Conv2d_3_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[6].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][3][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[8].weight - Conv2d_4_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[8].weight, 2)), 0.5)).item()
+                            all_simulation_weight_change_layer[model_counter][4][simulation_counter, group_counter, epoch] = (torch.pow(torch.sum(torch.pow(model.features[10].weight - Conv2d_5_0, 2)), 0.5) / torch.pow(torch.sum(torch.pow(model.features[10].weight, 2)), 0.5)).item()
                             
-                            all_simulation_layer_rotation_layer[model_counter, 0, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 1, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 2, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[6].weight), torch.flatten(Conv2d_3_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 3, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[8].weight), torch.flatten(Conv2d_4_0)).item()
-                            all_simulation_layer_rotation_layer[model_counter, 4, simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[10].weight), torch.flatten(Conv2d_5_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][0][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[0].weight), torch.flatten(Conv2d_1_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][1][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[3].weight), torch.flatten(Conv2d_2_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][2][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[6].weight), torch.flatten(Conv2d_3_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][3][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[8].weight), torch.flatten(Conv2d_4_0)).item()
+                            all_simulation_layer_rotation_layer[model_counter][4][simulation_counter, group_counter, epoch] = 1 - CosSim(torch.flatten(model.features[10].weight), torch.flatten(Conv2d_5_0)).item()
                         
                         if (epoch + 1) % 10 == 0:
                             ID_counter = ID_counter + 1
@@ -1098,29 +1098,29 @@ def main():
                                     all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                                     
                             if model_counter == 0:
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                
                             elif model_counter == 1:
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                 
                             elif model_counter == 2:
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                 
                             elif model_counter == 3:
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                 
                             elif model_counter == 4:                                    
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID[model_counter, simulation_counter, group_counter, 4, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                      
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID[model_counter][simulation_counter, group_counter, 4, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                      
                         
                 # Save the checkpoint
                 save_checkpoint({
@@ -1228,7 +1228,7 @@ def main():
                         top1.update(acc1[0], x_valid.size(0))
                         
                         # Save the validation accuracy for plotting
-                        all_simulation_transfer_accuracy[model_counter, simulation_counter, group_counter, session - start_session] = acc1[0].item()
+                        all_simulation_transfer_accuracy[model_counter][simulation_counter, group_counter, session - start_session] = acc1[0].item()
             
                         # Measure elapsed time
                         batch_time.update(time.time() - end)
@@ -1236,8 +1236,8 @@ def main():
                         progress.display(1)
                         
                     # Remember the best accuracy and save checkpoint
-                    is_best = all_simulation_transfer_accuracy[model_counter, simulation_counter, group_counter, session - start_session] >= best_acc1
-                    best_acc1 = max(all_simulation_transfer_accuracy[model_counter, simulation_counter, group_counter, session - start_session], best_acc1)
+                    is_best = all_simulation_transfer_accuracy[model_counter][simulation_counter, group_counter, session - start_session] >= best_acc1
+                    best_acc1 = max(all_simulation_transfer_accuracy[model_counter][simulation_counter, group_counter, session - start_session], best_acc1)
                 
                 # The convolutional layers: (0, 3, 6, 8, 10)
                 # The size of consecutive convolutional layers: (55, 27, 13, 13, 13)
@@ -1353,11 +1353,11 @@ def main():
                               
                             all_unit_activity_analysis_layer_1[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_1[indices, :], axis = 0)
                                     
-                    all_simulation_unit_activity_layer[model_counter, 0, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
+                    all_simulation_unit_activity_layer[model_counter][0][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
                     
                     PCA_layer_1 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1))
                     
-                    all_PCA_explained_variance_layer[model_counter, 0, simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][0][simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
                 
                 elif model_counter == 1:
                     all_unit_activity_analysis_layer_1 = np.zeros((number_transfer_stimuli, 64, 55, 55), dtype = np.float32)
@@ -1370,14 +1370,14 @@ def main():
                             all_unit_activity_analysis_layer_1[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_1[indices, :], axis = 0)
                             all_unit_activity_analysis_layer_2[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_2[indices, :], axis = 0)
                                     
-                    all_simulation_unit_activity_layer[model_counter, 0, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
-                    all_simulation_unit_activity_layer[model_counter, 1, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
+                    all_simulation_unit_activity_layer[model_counter][0][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
+                    all_simulation_unit_activity_layer[model_counter][1][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
                     
                     PCA_layer_1 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_2 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1))
                     
-                    all_PCA_explained_variance_layer[model_counter, 0, simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 1, simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][0][simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][1][simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
                 
                 elif model_counter == 2:
                     all_unit_activity_analysis_layer_1 = np.zeros((number_transfer_stimuli, 64, 55, 55), dtype = np.float32)
@@ -1392,17 +1392,17 @@ def main():
                             all_unit_activity_analysis_layer_2[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_2[indices, :], axis = 0)
                             all_unit_activity_analysis_layer_3[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_3[indices, :], axis = 0)
                                     
-                    all_simulation_unit_activity_layer[model_counter, 0, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
-                    all_simulation_unit_activity_layer[model_counter, 1, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
-                    all_simulation_unit_activity_layer[model_counter, 2, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_3.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 384)
+                    all_simulation_unit_activity_layer[model_counter][0][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
+                    all_simulation_unit_activity_layer[model_counter][1][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
+                    all_simulation_unit_activity_layer[model_counter][2][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_3.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 384)
                     
                     PCA_layer_1 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_2 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_3 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1))
                     
-                    all_PCA_explained_variance_layer[model_counter, 0, simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 1, simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 2, simulation_counter, group_counter, :] = PCA_layer_3.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][0][simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][1][simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][2][simulation_counter, group_counter, :] = PCA_layer_3.explained_variance_ratio_
                 
                 elif model_counter == 3:   
                     all_unit_activity_analysis_layer_1 = np.zeros((number_transfer_stimuli, 64, 55, 55), dtype = np.float32)
@@ -1419,20 +1419,20 @@ def main():
                             all_unit_activity_analysis_layer_3[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_3[indices, :], axis = 0)
                             all_unit_activity_analysis_layer_4[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_4[indices, :], axis = 0)
                                     
-                    all_simulation_unit_activity_layer[model_counter, 0, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
-                    all_simulation_unit_activity_layer[model_counter, 1, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
-                    all_simulation_unit_activity_layer[model_counter, 2, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_3.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 384)
-                    all_simulation_unit_activity_layer[model_counter, 3, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_4.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 256)
+                    all_simulation_unit_activity_layer[model_counter][0][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
+                    all_simulation_unit_activity_layer[model_counter][1][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
+                    all_simulation_unit_activity_layer[model_counter][2][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_3.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 384)
+                    all_simulation_unit_activity_layer[model_counter][3][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_4.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 256)
                     
                     PCA_layer_1 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_2 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_3 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_4 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1))
                     
-                    all_PCA_explained_variance_layer[model_counter, 0, simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 1, simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 2, simulation_counter, group_counter, :] = PCA_layer_3.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 3, simulation_counter, group_counter, :] = PCA_layer_4.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][0][simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][1][simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][2][simulation_counter, group_counter, :] = PCA_layer_3.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][3][simulation_counter, group_counter, :] = PCA_layer_4.explained_variance_ratio_
                 
                 elif model_counter == 4:    
                     all_unit_activity_analysis_layer_1 = np.zeros((number_transfer_stimuli, 64, 55, 55), dtype = np.float32)
@@ -1451,11 +1451,11 @@ def main():
                             all_unit_activity_analysis_layer_4[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_4[indices, :], axis = 0)
                             all_unit_activity_analysis_layer_5[j * len(SF_transfer) + k, :] = np.mean(all_unit_activity_Conv2d_5[indices, :], axis = 0)
                                     
-                    all_simulation_unit_activity_layer[model_counter, 0, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
-                    all_simulation_unit_activity_layer[model_counter, 1, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
-                    all_simulation_unit_activity_layer[model_counter, 2, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_3.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 384)
-                    all_simulation_unit_activity_layer[model_counter, 3, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_4.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 256)
-                    all_simulation_unit_activity_layer[model_counter, 4, simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_5.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 256)
+                    all_simulation_unit_activity_layer[model_counter][0][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_1.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 64)
+                    all_simulation_unit_activity_layer[model_counter][1][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_2.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 192)
+                    all_simulation_unit_activity_layer[model_counter][2][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_3.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 384)
+                    all_simulation_unit_activity_layer[model_counter][3][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_4.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 256)
+                    all_simulation_unit_activity_layer[model_counter][4][simulation_counter, group_counter, :, :] = all_unit_activity_analysis_layer_5.mean(axis = (2, 3)).reshape(number_transfer_stimuli, 256)
                     
                     PCA_layer_1 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_2 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1))
@@ -1463,11 +1463,11 @@ def main():
                     PCA_layer_4 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1))
                     PCA_layer_5 = PCA(n_components = number_PCA_component).fit(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1))
                     
-                    all_PCA_explained_variance_layer[model_counter, 0, simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 1, simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 2, simulation_counter, group_counter, :] = PCA_layer_3.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 3, simulation_counter, group_counter, :] = PCA_layer_4.explained_variance_ratio_
-                    all_PCA_explained_variance_layer[model_counter, 4, simulation_counter, group_counter, :] = PCA_layer_5.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][0][simulation_counter, group_counter, :] = PCA_layer_1.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][1][simulation_counter, group_counter, :] = PCA_layer_2.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][2][simulation_counter, group_counter, :] = PCA_layer_3.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][3][simulation_counter, group_counter, :] = PCA_layer_4.explained_variance_ratio_
+                    all_PCA_explained_variance_layer[model_counter][4][simulation_counter, group_counter, :] = PCA_layer_5.explained_variance_ratio_
                     
                 ### Emergence of Invariance and Disentanglement in Deep Representations
                 
@@ -1569,80 +1569,80 @@ def main():
                                 all_unit_activity_MI_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                                 
                 if model_counter == 0:
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                                                     
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                     
                 elif model_counter == 1:
                         
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                     
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                         
                 elif model_counter == 2:
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 2] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 2] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                     
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 2] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 2] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                             
                 elif model_counter == 3: 
                                 
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 2] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 2] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 3] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 3] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                     
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 2] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 2] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 3] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 3] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                 elif model_counter == 4:
     
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 2] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 2] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 3] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 3] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_original[model_counter, simulation_counter, group_counter, 4] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_5.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_original[model_counter][simulation_counter, group_counter, 4] = EDGE(x_tensor_training_original.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_5.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                                U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
                                     
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 0] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_1.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), 
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 1] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_2.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 2] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 2] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_3.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 3] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 3] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_4.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
-                    all_simulation_all_MI_noise[model_counter, simulation_counter, group_counter, 4] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_5.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
+                    all_simulation_all_MI_noise[model_counter][simulation_counter, group_counter, 4] = EDGE(x_tensor_training_noise.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1), all_unit_activity_MI_Conv2d_5.mean(axis = 1).reshape(len(SF_training) * len(Ori_training) * phase_count, -1),
                                                                                                             U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
     
                 ### Training with Permuted Labels
@@ -1746,7 +1746,7 @@ def main():
                             optimizer.step()
                     
                             # Save the validation accuracy for plotting
-                            all_simulation_training_accuracy_permuted[model_counter, simulation_counter, group_counter, epoch] = acc1[0].item()
+                            all_simulation_training_accuracy_permuted[model_counter][simulation_counter, group_counter, epoch] = acc1[0].item()
                             
                             # Measure elapsed time
                             batch_time.update(time.time() - end)
@@ -1754,8 +1754,8 @@ def main():
                             progress.display(epoch)
                             
                         # Remember the best accuracy
-                        is_best = all_simulation_training_accuracy_permuted[model_counter, simulation_counter, group_counter, epoch] >= best_acc1
-                        best_acc1 = max(all_simulation_training_accuracy_permuted[model_counter, simulation_counter, group_counter, epoch], best_acc1)
+                        is_best = all_simulation_training_accuracy_permuted[model_counter][simulation_counter, group_counter, epoch] >= best_acc1
+                        best_acc1 = max(all_simulation_training_accuracy_permuted[model_counter][simulation_counter, group_counter, epoch], best_acc1)
                         
                         if (epoch + 1) % 10 == 0:
                             ID_counter = ID_counter + 1
@@ -1830,29 +1830,29 @@ def main():
                                     all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                                     
                             if model_counter == 0:
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                
                             elif model_counter == 1:
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                 
                             elif model_counter == 2:
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                 
                             elif model_counter == 3:
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                                 
                             elif model_counter == 4:                                    
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
-                                all_simulation_all_ID_permuted[model_counter, simulation_counter, group_counter, 4, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                      
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 0, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 1, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 2, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 3, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_4.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                                all_simulation_all_ID_permuted[model_counter][simulation_counter, group_counter, 4, ID_counter] = estimate(squareform(pdist(all_unit_activity_Conv2d_5.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]                      
                         
     ### Specificity Index
     
