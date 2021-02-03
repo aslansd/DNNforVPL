@@ -1531,7 +1531,7 @@ def main():
                                 
                                 all_unit_activity_MI_Conv2d_1[i, :] = unit_activity_layer_0[0].detach().cpu().clone().numpy()
                                 all_unit_activity_MI_Conv2d_2[i, :] = unit_activity_layer_3[0].detach().cpu().clone().numpy()
-                                all_unit_activity_MI_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()                                                                                       U = 10, gamma = [1, 1], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = False, ensemble_estimation = 'median', L_ensemble = 5, hashing = 'p-stable', stochastic = False)
+                                all_unit_activity_MI_Conv2d_3[i, :] = unit_activity_layer_6[0].detach().cpu().clone().numpy()
                              
                             elif model_counter == 3:   
                                 unit_activity_layer_0 = model.features[0](x_sample)

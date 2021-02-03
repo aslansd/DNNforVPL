@@ -625,8 +625,7 @@ def main():
                     x_sample = x_sample.cuda(gpu)
                     
                     # Calculating the intrinsic dimension of stimuli
-                    all_x_sample[i, :] = x_sample.detach().cpu().clone().numpy()
-                    all_x_sample_ID[model_counter, simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                    all_x_sample[i, :] = x_sample.detach().cpu().clone().numpy()                   
                                         
                     unit_activity_layer_0 = model.features[0](x_sample)
                     unit_activity_layer_1 = model.features[1](unit_activity_layer_0)
@@ -646,6 +645,8 @@ def main():
                     all_unit_activity_Conv2d_4[i, :] = unit_activity_layer_8[0].detach().cpu().clone().numpy()
                     all_unit_activity_Conv2d_5[i, :] = unit_activity_layer_10[0].detach().cpu().clone().numpy()
                     
+                all_x_sample_ID[model_counter, simulation_counter, group_counter] = estimate(squareform(pdist(all_x_sample.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
+                
                 all_simulation_all_ID[model_counter, simulation_counter, group_counter, 0, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_1.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                 all_simulation_all_ID[model_counter, simulation_counter, group_counter, 1, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_2.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
                 all_simulation_all_ID[model_counter, simulation_counter, group_counter, 2, 0] = estimate(squareform(pdist(all_unit_activity_Conv2d_3.reshape(num_sample_artiphysiology, -1)), 'euclidean'), fraction = 1.0)[2]
