@@ -548,36 +548,36 @@ def main():
                 model.load_state_dict(model_dict)
                 
                 if model_counter == 0:
-                    torch.nn.init.xavier_uniform(model.features[3].weight)
-                    torch.nn.init.xavier_uniform(model.features[6].weight)
-                    torch.nn.init.xavier_uniform(model.features[8].weight)
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[3].weight)
+                    torch.nn.init.xavier_uniform_(model.features[6].weight)
+                    torch.nn.init.xavier_uniform_(model.features[8].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
                     
-                    torch.nn.init.xavier_uniform_(model.features[3].bias)
-                    torch.nn.init.xavier_uniform_(model.features[6].bias)
-                    torch.nn.init.xavier_uniform_(model.features[8].bias)
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[3].bias)
+                    torch.nn.init.zeros_(model.features[6].bias)
+                    torch.nn.init.zeros_(model.features[8].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 1:
-                    torch.nn.init.xavier_uniform(model.features[6].weight)
-                    torch.nn.init.xavier_uniform(model.features[8].weight)
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[6].weight)
+                    torch.nn.init.xavier_uniform_(model.features[8].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
       
-                    torch.nn.init.xavier_uniform_(model.features[6].bias)
-                    torch.nn.init.xavier_uniform_(model.features[8].bias)
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[6].bias)
+                    torch.nn.init.zeros_(model.features[8].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 2:
-                    torch.nn.init.xavier_uniform(model.features[8].weight)
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[8].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
                     
-                    torch.nn.init.xavier_uniform_(model.features[8].bias)
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[8].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 3:   
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
                     
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 4:
                     pass
@@ -1079,36 +1079,36 @@ def main():
                 model.load_state_dict(model_dict)
                 
                 if model_counter == 0:
-                    torch.nn.init.xavier_uniform(model.features[3].weight)
-                    torch.nn.init.xavier_uniform(model.features[6].weight)
-                    torch.nn.init.xavier_uniform(model.features[8].weight)
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[3].weight)
+                    torch.nn.init.xavier_uniform_(model.features[6].weight)
+                    torch.nn.init.xavier_uniform_(model.features[8].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
                     
-                    torch.nn.init.xavier_uniform_(model.features[3].bias)
-                    torch.nn.init.xavier_uniform_(model.features[6].bias)
-                    torch.nn.init.xavier_uniform_(model.features[8].bias)
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[3].bias)
+                    torch.nn.init.zeros_(model.features[6].bias)
+                    torch.nn.init.zeros_(model.features[8].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 1:
-                    torch.nn.init.xavier_uniform(model.features[6].weight)
-                    torch.nn.init.xavier_uniform(model.features[8].weight)
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[6].weight)
+                    torch.nn.init.xavier_uniform_(model.features[8].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
       
-                    torch.nn.init.xavier_uniform_(model.features[6].bias)
-                    torch.nn.init.xavier_uniform_(model.features[8].bias)
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[6].bias)
+                    torch.nn.init.zeros_(model.features[8].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 2:
-                    torch.nn.init.xavier_uniform(model.features[8].weight)
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[8].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
                     
-                    torch.nn.init.xavier_uniform_(model.features[8].bias)
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[8].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 3:   
-                    torch.nn.init.xavier_uniform(model.features[10].weight)
+                    torch.nn.init.xavier_uniform_(model.features[10].weight)
                     
-                    torch.nn.init.xavier_uniform_(model.features[10].bias)
+                    torch.nn.init.zeros_(model.features[10].bias)
                     
                 elif model_counter == 4:
                     pass
