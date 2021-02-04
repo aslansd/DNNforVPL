@@ -296,7 +296,7 @@ def main():
         all_simulation_weight_change_layer_temp = []
         all_simulation_layer_rotation_layer_temp = []
         
-        for j in range(i):
+        for j in range(i + 1):
             all_simulation_unit_activity_layer_temp.append(np.zeros((number_simulation, number_group, number_transfer_stimuli, number_channel[j]), dtype = np.float32))
             all_PCA_explained_variance_layer_temp.append(np.zeros((number_simulation, number_group, number_PCA_component), dtype = np.float32))
             all_simulation_weight_change_layer_temp.append(np.zeros((number_simulation, number_group, 180), dtype = np.float32))
@@ -1245,8 +1245,8 @@ def main():
                 # The number of channels of consecutive convolutional layers: (64, 192, 384, 256, 256)
                                
                 # The target stimuli
-                os.mkdir(parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/after_training')
-                saving_folder = parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/after_training'
+                os.mkdir(parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/after_training_' + model_counter)
+                saving_folder = parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/after_training_' + model_counter
                             
                 feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
                                 
