@@ -604,8 +604,8 @@ def main():
                 # The number of channels of consecutive convolutional layers: (64, 192, 384, 256, 256)
                 
                 # The target stimuli
-                os.mkdir(parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/before_training')
-                saving_folder = parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/before_training'
+                os.mkdir(parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/before_training_' + str(model_counter))
+                saving_folder = parent_folder + '/Simulation_' + str(simulation_counter + 1) + '/' + group_training + '/before_training' + str(model_counter)
                 
                 feature_sample_artiphysiology = np.zeros((num_sample_artiphysiology, 3), dtype = np.int64)
                 
