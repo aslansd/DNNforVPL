@@ -278,7 +278,7 @@ def main():
     all_simulation_layer_rotation_layer = []
                 
     for i in range(number_model):
-        number_layer = i + 1
+        number_layer = number_model
             
         all_simulation_training_accuracy.append(np.zeros((number_simulation, number_group, 180), dtype = np.float32))
         all_simulation_transfer_accuracy.append(np.zeros((number_simulation, number_group, 10), dtype = np.float32))
@@ -296,7 +296,7 @@ def main():
         all_simulation_weight_change_layer_temp = []
         all_simulation_layer_rotation_layer_temp = []
         
-        for j in range(i + 1):
+        for j in range(number_model)
             all_simulation_unit_activity_layer_temp.append(np.zeros((number_simulation, number_group, number_transfer_stimuli, number_channel[j]), dtype = np.float32))
             all_PCA_explained_variance_layer_temp.append(np.zeros((number_simulation, number_group, number_PCA_component), dtype = np.float32))
             all_simulation_weight_change_layer_temp.append(np.zeros((number_simulation, number_group, 180), dtype = np.float32))
