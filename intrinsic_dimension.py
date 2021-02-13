@@ -84,7 +84,7 @@ def estimate(X, fraction = 0.9, verbose = False):
 
     # Regression
     regr = linear_model.LinearRegression(fit_intercept = False)
-    regr.fit(x[0:npoints,np.newaxis], y[0:npoints, np.newaxis]) 
+    regr.fit(x[0:npoints, np.newaxis], y[0:npoints, np.newaxis]) 
     r, pval = pearsonr(x[0:npoints], y[0:npoints])  
     
     return x, y, regr.coef_[0][0], r, pval                    

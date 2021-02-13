@@ -282,7 +282,6 @@ def main():
             
         all_simulation_training_accuracy.append(np.zeros((number_simulation, number_group, 180), dtype = np.float32))
         all_simulation_transfer_accuracy.append(np.zeros((number_simulation, number_group, 10), dtype = np.float32))
-        all_simulation_specificity_index.append(np.zeros((number_simulation, number_group), dtype = np.float32))
         all_simulation_all_MI_original.append(np.zeros((number_simulation, number_group, number_layer), dtype = np.float32))
         all_simulation_all_MI_noise.append(np.zeros((number_simulation, number_group, number_layer), dtype = np.float32))
         all_simulation_all_ID.append(np.zeros((number_simulation, number_group, number_layer, 19), dtype = np.float32))
@@ -1857,7 +1856,7 @@ def main():
     ### Specificity Index
     
     for i in range(number_model):
-        all_simulation_specificity_index = (all_simulation_training_accuracy[i][:, :, 179] - all_simulation_transfer_accuracy[i].mean(2)) / (all_simulation_training_accuracy[i][:, :, 179] - all_simulation_training_accuracy[i].mean(2))
+        all_simulation_specificity_index.append((all_simulation_training_accuracy[i][:, :, 179] - all_simulation_transfer_accuracy[i].mean(2)) / (all_simulation_training_accuracy[i][:, :, 179] - all_simulation_training_accuracy[i].mean(2)))
     
     ### Saving the main variables
    
@@ -1883,7 +1882,7 @@ def main():
     fig.suptitle('Training Accuracy with Correct Labels', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_xlabel('Epoch')
@@ -1913,7 +1912,7 @@ def main():
     fig.suptitle('Training Accuracy with Permuted Labels', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_xlabel('Epoch')
@@ -1943,7 +1942,7 @@ def main():
     fig.suptitle('Transfer Accuracy', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('% Accuracy')
@@ -1980,7 +1979,7 @@ def main():
     fig.suptitle('Specificity Index', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('Index')
@@ -2133,22 +2132,22 @@ def main():
     fig.suptitle('Mutual Information between the Original Stimuli and Layers Activities', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
        
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('MI')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[0, :], "-b", label = "Group 1")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[0, :] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[0, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[0, :] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[0, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[0, :i + 1], "-b", label = "Group 1")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[0, :i + 1] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[0, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[0, :i + 1] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[0, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :], "-g", label = "Group 2")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[1, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[1, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :i + 1], "-g", label = "Group 2")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :i + 1] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[1, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :i + 1] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[1, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[2, :], "-r", label = "Group 3")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[2, :] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[2, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[2, :] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[2, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[2, :i + 1], "-r", label = "Group 3")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[2, :i + 1] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[2, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[2, :i + 1] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[2, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :], "-c", label = "Group 4")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[3, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[3, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :i + 1], "-c", label = "Group 4")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :i + 1] - np.nanstd(all_simulation_all_MI_original[i], axis = 0)[3, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :i + 1] + np.nanstd(all_simulation_all_MI_original[i], axis = 0)[3, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper right', fontsize = 'medium')
         ax.set_ylim((0, 10))
@@ -2165,36 +2164,13 @@ def main():
             t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_MI_original[i, :, 0, j], all_simulation_all_MI_original[i, :, 1, j], equal_var = True, nan_policy = 'omit')
             t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_MI_original[i, :, 2, j], all_simulation_all_MI_original[i, :, 3, j], equal_var = True, nan_policy = 'omit')
             
-        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :])):
+        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[1, :i + 1])):
             label = 'p = {:.4e}'.format(p_value_lp[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
             
-        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :])):
+        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_original[i], axis = 0)[3, :i + 1])):
             label = 'p = {:.4e}'.format(p_value_hp[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, -10), ha = 'center', color = 'c')
-            
-        all_simulation_group_layer_MI = np.array([])
-        
-        for j in range(number_group):
-            all_simulation_group_layer_MI_temp = np.array([])
-            layer_map = []
-            
-            for k in range(i + 1):
-                all_simulation_group_layer_MI_temp = np.concatenate(all_simulation_group_layer_MI_temp, all_simulation_all_MI_original[i, :, j, k].flatten() - all_simulation_all_MI_original[i, :, j, k + 1].flatten())
-                layer_map.append('Layer ' + str(k + 1) + str(k + 2))
-            
-            all_simulation_group_layer_MI = np.concatenate(all_simulation_group_layer_MI, all_simulation_group_layer_MI_temp)
-        
-        df = pd.DataFrame({'MI': all_simulation_group_layer_MI,
-                           'Simulation': np.tile(np.arange(4 * number_simulation), 4),
-                           'Layer': np.tile(np.repeat(layer_map, number_simulation), number_group),
-                           'Group': np.concatenate((np.tile(['Group 1'], 4 * number_simulation), np.tile(['Group 2'], 4 * number_simulation), np.tile(['Group 3'], 4 * number_simulation), np.tile(['Group 4'], 4 * number_simulation)))})
-        
-        aov = pg.mixed_anova(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
-        pg.print_table(aov)
-        
-        posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
-        pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Original Stimuli and Layers Activities.png')
     
@@ -2204,22 +2180,22 @@ def main():
     fig.suptitle('Mutual Information between the Nuisance Stimuli and Layers Activities', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
        
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('MI')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[0, :], "-b", label = "Group 1")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[0, :] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[0, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[0, :] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[0, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[0, :i + 1], "-b", label = "Group 1")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[0, :i + 1] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[0, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[0, :i + 1] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[0, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :], "-g", label = "Group 2")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[1, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[1, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :i + 1], "-g", label = "Group 2")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :i + 1] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[1, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :i + 1] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[1, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[2, :], "-r", label = "Group 3")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[2, :] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[2, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[2, :] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[2, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[2, :i + 1], "-r", label = "Group 3")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[2, :i + 1] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[2, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[2, :i + 1] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[2, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'r', facecolor = 'r')
         
-        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :], "-c", label = "Group 4")
-        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[3, :] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[3, :] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :i + 1], "-c", label = "Group 4")
+        ax.fill_between(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :i + 1] - np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[3, :i + 1] / number_simulation ** 0.5, np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :i + 1] + np.nanstd(all_simulation_all_MI_noise[i], axis = 0)[3, :i + 1] / number_simulation ** 0.5, alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper right', fontsize = 'medium')
         ax.set_ylim((0, 10))
@@ -2236,36 +2212,13 @@ def main():
             t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_MI_noise[i, :, 0, j], all_simulation_all_MI_noise[i, :, 1, j], equal_var = True, nan_policy = 'omit')
             t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_MI_noise[i, :, 2, j], all_simulation_all_MI_noise[i, :, 3, j], equal_var = True, nan_policy = 'omit')
             
-        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :])):
+        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[1, :i + 1])):
             label = 'p = {:.4e}'.format(p_value_lp[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
             
-        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :])):
+        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_MI_noise[i], axis = 0)[3, :i + 1])):
             label = 'p = {:.4e}'.format(p_value_hp[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, -10), ha = 'center', color = 'c')
-            
-        all_simulation_group_layer_MI = np.array([])
-        
-        for j in range(number_group):
-            all_simulation_group_layer_MI_temp = np.array([])
-            layer_map = []
-            
-            for k in range(i + 1):
-                all_simulation_group_layer_MI_temp = np.concatenate(all_simulation_group_layer_MI_temp, all_simulation_all_MI_noise[i, :, j, k].flatten() - all_simulation_all_MI_noise[i, :, j, k + 1].flatten())
-                layer_map.append('Layer ' + str(k + 1) + str(k + 2))
-            
-            all_simulation_group_layer_MI = np.concatenate(all_simulation_group_layer_MI, all_simulation_group_layer_MI_temp)
-        
-        df = pd.DataFrame({'MI': all_simulation_group_layer_MI,
-                           'Simulation': np.tile(np.arange(4 * number_simulation), 4),
-                           'Layer': np.tile(np.repeat(layer_map, number_simulation), number_group),
-                           'Group': np.concatenate((np.tile(['Group 1'], 4 * number_simulation), np.tile(['Group 2'], 4 * number_simulation), np.tile(['Group 3'], 4 * number_simulation), np.tile(['Group 4'], 4 * number_simulation)))})
-        
-        aov = pg.mixed_anova(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
-        pg.print_table(aov)
-        
-        posthocs = pg.pairwise_ttests(dv = 'MI', within = 'Group', between = 'Layer', subject = 'Simulation', data = df)
-        pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Mutual Information between the Nuisance Stimuli and Layers Activities.png')
     
@@ -2277,22 +2230,22 @@ def main():
     fig.suptitle('Intrinsic Dimension with Correct Labels', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('ID')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID[i], axis = 0)[0, :, -1]) , "-b", label = "Group 1")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID[i], axis = 0)[0, :, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[0, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID[i], axis = 0)[0, :, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[0, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID[i], axis = 0)[0, :i + 1, -1]) , "-b", label = "Group 1")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID[i], axis = 0)[0, :i + 1, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[0, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID[i], axis = 0)[0, :i + 1, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[0, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :, -1]) , "-g", label = "Group 2")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[1, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[1, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :i + 1, -1]) , "-g", label = "Group 2")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :i + 1, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[1, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :i + 1, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[1, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID[i], axis = 0)[2, :, -1]) , "-r", label = "Group 3")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID[i], axis = 0)[2, :, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[2, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID[i], axis = 0)[2, :, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[2, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID[i], axis = 0)[2, :i + 1, -1]) , "-r", label = "Group 3")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID[i], axis = 0)[2, :i + 1, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[2, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID[i], axis = 0)[2, :i + 1, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[2, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :, -1]) , "-c", label = "Group 4")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[3, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[3, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :i + 1, -1]) , "-c", label = "Group 4")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :i + 1, -1] - np.nanstd(all_simulation_all_ID[i], axis = 0)[3, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :i + 1, -1] + np.nanstd(all_simulation_all_ID[i], axis = 0)[3, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper right', fontsize = 'medium')
         ax.set_ylim((2, 4))
@@ -2309,36 +2262,13 @@ def main():
             t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 0, j, -1], all_simulation_all_ID[i, :, 1, j, -1], equal_var = True, nan_policy = 'omit')
             t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 2, j, -1], all_simulation_all_ID[i, :, 3, j, -1], equal_var = True, nan_policy = 'omit')
             
-        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :, -1])):
+        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID[i], axis = 0)[1, :i + 1, -1])):
             label = 'p = {:.4e}'.format(p_value_lp[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
             
-        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :, -1])):
+        for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID[i], axis = 0)[3, :i + 1, -1])):
             label = 'p = {:.4e}'.format(p_value_hp[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
-            
-        all_simulation_group_layer_ID = np.array([])
-        
-        for j in range(number_group):
-            all_simulation_group_layer_ID_temp = np.array([])
-            layer_map = []
-            
-            for k in range(i + 1):
-                all_simulation_group_layer_ID_temp = np.concatenate(all_simulation_group_layer_ID_temp, all_simulation_all_ID[i, :, j, k, -1].flatten())
-                layer_map.append('Layer ' + str(k + 1))
-            
-            all_simulation_group_layer_ID = np.concatenate(all_simulation_group_layer_ID, all_simulation_group_layer_ID_temp)
-
-        df = pd.DataFrame({'ID': all_simulation_group_layer_ID,
-                           'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
-                           'Layer': np.tile(np.repeat(layer_map, number_simulation), number_group),
-                           'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
-        
-        aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-        pg.print_table(aov)
-        
-        posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-        pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Intrinsic Dimension with Correct Labels.png')
     
@@ -2348,22 +2278,22 @@ def main():
     fig.suptitle('Intrinsic Dimension with Permuted Labels', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_ylabel('ID')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[0, :, -1]) , "-b", label = "Group 1")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[0, :, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[0, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[0, :, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[0, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[0, :i + 1, -1]) , "-b", label = "Group 1")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[0, :i + 1, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[0, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[0], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[0, :i + 1, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[0, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'b', facecolor = 'b')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[1, :, -1]) , "-g", label = "Group 2")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[1, :, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[1, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[1, :, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[1, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[1, :i + 1, -1]) , "-g", label = "Group 2")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[1, :i + 1, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[1, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[1], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[1, :i + 1, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[1, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'g', facecolor = 'g')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[2, :, -1]) , "-r", label = "Group 3")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[2, :, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[2, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[2, :, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[2, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[2, :i + 1, -1]) , "-r", label = "Group 3")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[2, :i + 1, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[2, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[2], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[2, :i + 1, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[2, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'r')
         
-        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[3, :, -1]) , "-c", label = "Group 4")
-        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[3, :, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[3, :, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[3, :, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[3, :, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
+        ax.plot(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[3, :i + 1, -1]) , "-c", label = "Group 4")
+        ax.fill_between(range(0, i + 2), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[3, :i + 1, -1] - np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[3, :i + 1, -1] / number_simulation ** 0.5), np.append(np.nanmean(all_x_sample_ID[i], axis = 0)[3], np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[3, :i + 1, -1] + np.nanstd(all_simulation_all_ID_permuted[i], axis = 0)[3, :i + 1, -1] / number_simulation ** 0.5), alpha = 0.5, edgecolor = 'c', facecolor = 'c')
                 
         ax.legend(loc = 'upper right', fontsize = 'medium')
         ax.set_ylim((2, 4))
@@ -2381,49 +2311,26 @@ def main():
         p_value_4 = np.zeros(i + 1)
         
         for j in range(i + 1):
-            t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 0, j, -1], all_simulation_all_ID_permuted[i, :, 0, j, -1], equal_var = True, nan_policy = 'omit')
-            t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 1, j, -1], all_simulation_all_ID_permuted[i, :, 1, j, -1], equal_var = True, nan_policy = 'omit')
-            t_stat_lp[j], p_value_lp[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 2, j, -1], all_simulation_all_ID_permuted[i, :, 2, j, -1], equal_var = True, nan_policy = 'omit')
-            t_stat_hp[j], p_value_hp[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 3, j, -1], all_simulation_all_ID_permuted[i, :, 3, j, -1], equal_var = True, nan_policy = 'omit')
+            t_stat_1[j], p_value_1[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 0, j, -1], all_simulation_all_ID_permuted[i, :, 0, j, -1], equal_var = True, nan_policy = 'omit')
+            t_stat_2[j], p_value_2[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 1, j, -1], all_simulation_all_ID_permuted[i, :, 1, j, -1], equal_var = True, nan_policy = 'omit')
+            t_stat_3[j], p_value_3[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 2, j, -1], all_simulation_all_ID_permuted[i, :, 2, j, -1], equal_var = True, nan_policy = 'omit')
+            t_stat_4[j], p_value_4[j] = stats.ttest_ind(all_simulation_all_ID[i, :, 3, j, -1], all_simulation_all_ID_permuted[i, :, 3, j, -1], equal_var = True, nan_policy = 'omit')
             
         for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[0, :, -1])):
-            label = 'p = {:.4e}'.format(p_value_lp[j])
+            label = 'p = {:.4e}'.format(p_value_1[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'b')
             
         for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[1, :, -1])):
-            label = 'p = {:.4e}'.format(p_value_hp[j])
+            label = 'p = {:.4e}'.format(p_value_2[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'g')
             
         for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[2, :, -1])):
-            label = 'p = {:.4e}'.format(p_value_lp[j])
+            label = 'p = {:.4e}'.format(p_value_3[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'r')
             
         for j, (x, y) in enumerate(zip(range(0, i + 1), np.nanmean(all_simulation_all_ID_permuted[i], axis = 0)[3, :, -1])):
-            label = 'p = {:.4e}'.format(p_value_hp[j])
+            label = 'p = {:.4e}'.format(p_value_4[j])
             ax.annotate(label, (x, y), textcoords = "offset points", xytext = (0, 10), ha = 'center', color = 'c')
-            
-        all_simulation_group_layer_ID = np.array([])
-        
-        for j in range(number_group):
-            all_simulation_group_layer_ID_temp = np.array([])
-            layer_map = []
-            
-            for k in range(i + 1):
-                all_simulation_group_layer_ID_temp = np.concatenate(all_simulation_group_layer_ID_temp, all_simulation_all_ID_permuted[i, :, j, k, -1].flatten())
-                layer_map.append('Layer ' + str(k + 1))
-            
-            all_simulation_group_layer_ID = np.concatenate(all_simulation_group_layer_ID, all_simulation_group_layer_ID_temp)
-
-        df = pd.DataFrame({'ID': all_simulation_group_layer_ID,
-                           'Simulation': np.concatenate((np.tile(np.arange(number_simulation), 2), number_simulation + np.tile(np.arange(number_simulation), 2), 2 * number_simulation + np.tile(np.arange(number_simulation), 2), 3 * number_simulation + np.tile(np.arange(number_simulation), 2))),
-                           'Layer': np.tile(np.repeat(layer_map, number_simulation), number_group),
-                           'Group': np.concatenate((np.tile(['Group 1'], 2 * number_simulation), np.tile(['Group 2'], 2 * number_simulation), np.tile(['Group 3'], 2 * number_simulation), np.tile(['Group 4'], 2 * number_simulation)))})
-        
-        aov = pg.mixed_anova(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-        pg.print_table(aov)
-        
-        posthocs = pg.pairwise_ttests(dv = 'ID', within = 'Layer', between = 'Group', subject = 'Simulation', data = df)
-        pg.print_table(posthocs)
                 
     fig.savefig(parent_folder + '/Intrinsic Dimension with Permuted Labels.png')
     
@@ -2433,7 +2340,7 @@ def main():
     fig.suptitle('ID in the First Layer versus Transfer Accuracy', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_xlabel('% Transfer Accuracy')
@@ -2479,7 +2386,7 @@ def main():
     fig.suptitle('ID in the Last Layer versus Transfer Accuracy', fontsize = 20)
     
     for i in range(number_model):
-        ax = axs[0, i]
+        ax = axs[i]
         
         ax.set_title('DNN Model = ' + str(i + 1), fontsize = 12)
         ax.set_xlabel('% Transfer Accuracy')
@@ -2491,7 +2398,7 @@ def main():
         
         for j in range(number_group):
             x[j * number_simulation:(j + 1) * number_simulation] = all_simulation_transfer_accuracy[i].mean(2)[:, j]
-            y[j * number_simulation:(j + 1) * number_simulation] = all_simulation_all_ID[i, :, j, -1, -1]
+            y[j * number_simulation:(j + 1) * number_simulation] = all_simulation_all_ID[i, :, j, i, -1]
             point_label[j * number_simulation:(j + 1) * number_simulation] = j
               
         colours = ListedColormap(['b', 'g', 'r', 'c'])
