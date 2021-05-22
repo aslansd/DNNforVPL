@@ -1,2 +1,2 @@
 # DNNforVPL
-A deep learning model for visual perceptual learning
+Understanding generalization in a deep learning model of visual perceptual
