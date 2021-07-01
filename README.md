@@ -7,7 +7,7 @@ Dizaji, A. S., Manenti, G., Schwiedrzik, C. M. (2021). Training a deep neural ne
 In summary, DNNforVPL is a deep neural network model used to simulate visual perceptual learning on a specific task structure and data. The aim of the task is to test hypotheses regarding generalization/transfer in visual perceptual learning.
 
 ## Instructions:
-Download and save the whole repository in your local drive. Unzip the four stimuli folders keeping their original names. 
+Download and save the whole repository in your local drive. Unzip the four stimuli folders keeping their original folders and names. 
 
 The following packages are required to be installed before running the source codes and demos of this repository:
 - matplotlib
