@@ -1,6 +1,7 @@
 # DNNforVPL
 
 Here we bring all the codes and experiments used to produce the figures of the following paper:
+
 Dizaji, A. S., Manenti, G., Schwiedrzik, C. M. (2021). Training a deep neural network on variable task-irrelevant Gabor stimuli increases generalization without moving the locus of learning to higher layers. ArXiv.
 
 In summary, DNNforVPL is a deep neural network model used to simulate visual perceptual learning on a specific task structure and data. The aim of the task is to test hypotheses regarding generalization/transfer in visual perceptual learning.
