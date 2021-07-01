@@ -20,7 +20,7 @@ The following packages are required to be installed before running the source co
 - torch
 - torchvision
 
-![Schematic plot of DNN and Data](https://github.com/aslansd/DNNforVPL/blob/master/fig/Schematic Plot of DNN and Data.jpg)
+![Schematic plot of DNN and Data](https://github.com/aslansd/DNNforVPL/blob/master/fig/Schematic%20Plot%20of%20DNN%20and%20Data.jpg)
 
 ## Notes
 1. The 'intrinsic_dimension_2NN.py' was adapted from: https://github.com/ansuini/IntrinsicDimDeep.
