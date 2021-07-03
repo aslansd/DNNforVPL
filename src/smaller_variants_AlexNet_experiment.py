@@ -119,7 +119,7 @@ def save_checkpoint(state, is_best, group, filename):
         
 ### A fucntion which performs different experiments with the smaller variants of AlexNet
 
-def smaller_variants_alexnet(parent_folder = 'Smaller Variants of Alexnet_New Results', number_simulation = 5, number_PCA_component = 20, num_sample_artiphysiology = 1000):
+def smaller_variants_alexnet(parent_folder = 'Smaller Variants of Alexnet_New Results', number_simulation = 5, num_sample_artiphysiology = 1000):
     
     ### Initializing the main variables
         
@@ -132,8 +132,6 @@ def smaller_variants_alexnet(parent_folder = 'Smaller Variants of Alexnet_New Re
         
     number_model = 5
     number_group = 4
-    number_transfer_stimuli = 20
-    number_channel = [64, 192, 384, 256, 256]
         
     all_simulation_training_accuracy = []
     all_simulation_transfer_accuracy = []

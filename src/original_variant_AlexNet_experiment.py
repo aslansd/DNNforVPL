@@ -136,7 +136,6 @@ def original_variant_alexnet(parent_folder = 'Original Variant of Alexnet_New Re
     number_group = 4
     number_layer = 5
     number_layer_freeze = 6
-    number_transfer_stimuli = 21
     
     all_simulation_training_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 180), dtype = np.float32)
     all_simulation_transfer_accuracy = np.zeros((number_simulation, number_group, number_layer_freeze, 10), dtype = np.float32)
