@@ -101,21 +101,21 @@ def gen_W(X, Y):
 
 # Find KNN distances for a number of samples for normalizing bandwidth
 def find_knn(A, d):
-	np.random.seed(3334)
-	# np.random.seed()
-	# np.random.seed(seed = int(time.time()))
-	r = 500
+    np.random.seed(3334)
+    # np.random.seed()
+    # np.random.seed(seed = int(time.time()))
+    r = 500
 	
     # Random samples from A
-	A = A.reshape((-1, 1))
-	N = A.shape[0]
+    A = A.reshape((-1, 1))
+    N = A.shape[0]
 	
-	k = math.floor(0.43 * N ** (2 / 3 + 0.17 * (d / (d + 1))) * math.exp(-1.0 / np.max([10000, d ** 4])))
-	# print('k, d', k, d)
-	T = np.random.choice(A.reshape(-1,), size = r).reshape(-1, 1)
-	nbrs = NearestNeighbors(n_neighbors = k, algorithm = 'auto').fit(A)
-	distances, indices = nbrs.kneighbors(T)
-	d = np.mean(distances[:, -1])
+    k = math.floor(0.43 * N ** (2 / 3 + 0.17 * (d / (d + 1))) * math.exp(-1.0 / np.max([10000, d ** 4])))
+    # print('k, d', k, d)
+    T = np.random.choice(A.reshape(-1,), size = r).reshape(-1, 1)
+    nbrs = NearestNeighbors(n_neighbors = k, algorithm = 'auto').fit(A)
+    distances, indices = nbrs.kneighbors(T)
+    d = np.mean(distances[:, -1])
 	
     return d
 
@@ -132,26 +132,26 @@ def gen_eps(XW, YV):
 # Define H1 (LSH) for a vector X (X is just one sample)
 def H1(XW, b, eps):
 	
-	# Dimension of X
-	d_X = XW.shape[0]
-	# d_W = W.shape[1]
-	XW = XW.reshape(1, d_X)
+    # Dimension of X
+    d_X = XW.shape[0]
+    # d_W = W.shape[1]
+    XW = XW.reshape(1, d_X)
 
-	# If not scalar
-	if d_X > 1:
-		X_te = 1.0 * (np.squeeze(XW) + b) / eps	
-	elif eps > 0:
-		X_te = 1.0 * (XW + b) / eps
-	else:
-		X_te = XW
+    # If not scalar
+    if d_X > 1:
+        X_te = 1.0 * (np.squeeze(XW) + b) / eps	
+    elif eps > 0:
+        X_te = 1.0 * (XW + b) / eps
+    else:
+        X_te = XW
 
-	# Discretize X
-	X_t = np.floor(X_te)
-	if d_X > 1: 
-		R = tuple(X_t.tolist())
-	else:
+    # Discretize X
+    X_t = np.floor(X_te)
+    if d_X > 1: 
+        R = tuple(X_t.tolist())
+    else:
         R = np. asscalar(np.squeeze(X_t))
-	return R
+    return R
 
 # Compuate Hashing: Compute the number of collisions in each bucket
 def Hash(XW, YV, eps_X, eps_Y, b_X, b_Y):
@@ -217,168 +217,168 @@ def TSNE_DR(X_train, X_test = None, Y_train = None, **kwargs):
 def EDGE(X, Y, U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = True,
 		 ensemble_estimation = 'median', L_ensemble = 10, hashing = 'p-stable', stochastic = False):
 
-	# print('checkpoint 1, data transformed using TSNE')
+    # print('checkpoint 1, data transformed using TSNE')
 
-	gamma = np.array(gamma)
-	gamma = gamma * 0.4
-	epsilon = np.array(epsilon)
+    gamma = np.array(gamma)
+    gamma = gamma * 0.4
+    epsilon = np.array(epsilon)
 
-	if X.ndim == 1:
-		X = X.reshape((-1, 1))
-	if Y.ndim == 1:
-		Y = Y.reshape((-1, 1))
+    if X.ndim == 1:
+	    X = X.reshape((-1, 1))
+    if Y.ndim == 1:
+	    Y = Y.reshape((-1, 1))
 	
     # Num of samples and dim
-	N, d = X.shape[0], X.shape[1]
-	dy = Y.shape[1]
+    N, d = X.shape[0], X.shape[1]
+    dy = Y.shape[1]
 	
     # Normalize gamma based on the dimension
-	# gamma[0] = gamma[0] * min(1, 3 / (np.log2(d) + 1))
-	# gamma[1] = gamma[1] * min(1, 3 / (np.log2(dy) + 1))
+    # gamma[0] = gamma[0] * min(1, 3 / (np.log2(d) + 1))
+    # gamma[1] = gamma[1] * min(1, 3 / (np.log2(dy) + 1))
 	
-	# Find dimensions
-	dim_X, dim_Y  = X.shape[1], Y.shape[1]
-	dim = dim_X + dim_Y
+    # Find dimensions
+    dim_X, dim_Y  = X.shape[1], Y.shape[1]
+    dim = dim_X + dim_Y
 
     ### Hash type
 	
     # Check for dimentionality reduction hashing
-	if hashing == 'TSNE':
-		if gamma[0] > 0.05:
-			XW = TSNE_DR(X)
-			d_X_shrink = 2
-		else: 
-			XW = X
-			d_X_shrink = dim_X 
+    if hashing == 'TSNE':
+	    if gamma[0] > 0.05:
+		    XW = TSNE_DR(X)
+		    d_X_shrink = 2
+	    else: 
+		    XW = X
+		    d_X_shrink = dim_X 
 
-		if gamma[1] > 0.05:
-			YV = TSNE_DR(Y)
-			d_Y_shrink = 2
-		else:
-			YV = Y
-			d_Y_shrink = dim_Y
+	    if gamma[1] > 0.05:
+		    YV = TSNE_DR(Y)
+		    d_Y_shrink = 2
+	    else:
+		    YV = Y
+		    d_Y_shrink = dim_Y
 
-	if dim_X <= 6 and dim_Y <= 6:
-		hashing = 'floor'
-	if hashing == 'p-stable':	
-		# Generate random transformation matrices W and V 
-		(W, V) = gen_W(X, Y)
-		d_X_shrink, d_Y_shrink = W.shape[1], V.shape[1]
-		
+    if dim_X <= 6 and dim_Y <= 6:
+	    hashing = 'floor'
+    if hashing == 'p-stable':	
+	    # Generate random transformation matrices W and V 
+	    (W, V) = gen_W(X, Y)
+	    d_X_shrink, d_Y_shrink = W.shape[1], V.shape[1]
+        
         # Find inner products
-		XW, YV = np.dot(X,W), np.dot(Y,V)
+	    XW, YV = np.dot(X,W), np.dot(Y,V)
 	
-	elif hashing == 'floor':
-		# W = np.identity(dim_X)	
-		# V = np.identity(dim_Y)
-		d_X_shrink, d_Y_shrink = dim_X, dim_Y 
-		XW, YV = X, Y
+    elif hashing == 'floor':
+	    # W = np.identity(dim_X)	
+	    # V = np.identity(dim_Y)
+	    d_X_shrink, d_Y_shrink = dim_X, dim_Y 
+	    XW, YV = X, Y
 	
     ### Initial epsilon and apply smoothness gamma
-	
+    
     # If no manual epsilon is set for computing MI:
-	if epsilon[0] == 0:
-		# Generate auto epsilon and b
-		(eps_X_temp, eps_Y_temp) = gen_eps(XW, YV)
-		# print('eps_X_temp, eps_Y_temp', eps_X_temp, eps_Y_temp)
-		
+    if epsilon[0] == 0:
+	    # Generate auto epsilon and b
+	    (eps_X_temp, eps_Y_temp) = gen_eps(XW, YV)
+	    # print('eps_X_temp, eps_Y_temp', eps_X_temp, eps_Y_temp)
+
         # Normalizing factors for the bandwidths
-		cx, cy = 18 * d_X_shrink / np.max([(1 + 1. * math.log(dim_X)), 1]), 18 * d_Y_shrink/ np.max([(1 + 1. * math.log(dim_Y)), 1])
-		eps_X0, eps_Y0 = eps_X_temp * cx*gamma[0], eps_Y_temp * cy*gamma[1] 
-		# print('********eps_X0, eps_Y0', eps_X0, eps_Y0)
+	    cx, cy = 18 * d_X_shrink / np.max([(1 + 1. * math.log(dim_X)), 1]), 18 * d_Y_shrink/ np.max([(1 + 1. * math.log(dim_Y)), 1])
+	    eps_X0, eps_Y0 = eps_X_temp * cx*gamma[0], eps_Y_temp * cy*gamma[1] 
+	    # print('********eps_X0, eps_Y0', eps_X0, eps_Y0)
 	
     else:
-		eps_X_temp = np.ones(d_X_shrink,) * epsilon[0]
-		eps_Y_temp = np.ones(d_Y_shrink,) * epsilon[1]	
-		cx, cy = 15 * d_X_shrink / np.max([(1 + 1.0 * math.log(dim_X)), 1]), 15 * d_Y_shrink / np.max([(1 + 1.0 * math.log(dim_Y)), 1])
-		eps_X0, eps_Y0 = eps_X_temp * cx * gamma[0], eps_Y_temp * cy * gamma[1] 
-		# print('eps_X0, eps_Y0', eps_X0, eps_Y0)
+	    eps_X_temp = np.ones(d_X_shrink,) * epsilon[0]
+	    eps_Y_temp = np.ones(d_Y_shrink,) * epsilon[1]	
+	    cx, cy = 15 * d_X_shrink / np.max([(1 + 1.0 * math.log(dim_X)), 1]), 15 * d_Y_shrink / np.max([(1 + 1.0 * math.log(dim_Y)), 1])
+	    eps_X0, eps_Y0 = eps_X_temp * cx * gamma[0], eps_Y_temp * cy * gamma[1] 
+	    # print('eps_X0, eps_Y0', eps_X0, eps_Y0)
 
     # epsilon_vector
-	if epsilon_vector == 'fixed':
-		T = np.ones(L_ensemble)
-	elif epsilon_vector == 'range':
-		T = np.linspace(1, 1 + eps_range_factor, L_ensemble)
+    if epsilon_vector == 'fixed':
+	    T = np.ones(L_ensemble)
+    elif epsilon_vector == 'range':
+	    T = np.linspace(1, 1 + eps_range_factor, L_ensemble)
 
     ### Compute MI vector
 	
     # print('Compute MI Vector: ')
-	# MI vector
-	I_vec = np.zeros(L_ensemble)
+    # MI vector
+    I_vec = np.zeros(L_ensemble)
 
-	for j in range(L_ensemble):
-		# Apply epsilon_vector 
-		eps_X, eps_Y = eps_X0 * T[j], eps_Y0 * T[j]
-		# print('j, eps_X, eps_Y', j, eps_X, eps_Y)
+    for j in range(L_ensemble):
+	    # Apply epsilon_vector 
+	    eps_X, eps_Y = eps_X0 * T[j], eps_Y0 * T[j]
+	    # print('j, eps_X, eps_Y', j, eps_X, eps_Y)
 		
-        # Shifts of hashing
-		if stochastic == True:
-			np.random.seed()
-			f = 0.1
-			b_X = f * np.random.rand(d_X_shrink,) * eps_X
-			b_Y = f * np.random.rand(d_Y_shrink,) * eps_Y
-		
-        else:
-			b_X = np.linspace(0, 1, L_ensemble, endpoint = False)[j] * eps_X
-			b_Y = np.linspace(0, 1, L_ensemble, endpoint = False)[j] * eps_Y
+    # Shifts of hashing 
+    if stochastic == True:
+        np.random.seed()
+        f = 0.1
+        b_X = f * np.random.rand(d_X_shrink,) * eps_X
+        b_Y = f * np.random.rand(d_Y_shrink,) * eps_Y
 
-		I_vec[j] = Compute_MI(XW, YV, U, eps_X, eps_Y, b_X, b_Y)
+    else:
+        b_X = np.linspace(0, 1, L_ensemble, endpoint = False)[j] * eps_X
+        b_Y = np.linspace(0, 1, L_ensemble, endpoint = False)[j] * eps_Y
+
+    I_vec[j] = Compute_MI(XW, YV, U, eps_X, eps_Y, b_X, b_Y)
 
     # Ensemble method
-	if ensemble_estimation == 'average':
-	 	I = np.mean(I_vec)
-	elif ensemble_estimation == 'optimal_weights': 
-		weights = compute_weights(L_ensemble, d, T, N)
-		weights = weights.reshape(L_ensemble,)
-		I = np.dot(I_vec, weights)
-	elif ensemble_estimation == 'median':
-		I = np.median(I_vec)
+    if ensemble_estimation == 'average':
+	    I = np.mean(I_vec)
+    elif ensemble_estimation == 'optimal_weights': 
+	    weights = compute_weights(L_ensemble, d, T, N)
+	    weights = weights.reshape(L_ensemble,)
+	    I = np.dot(I_vec, weights)
+    elif ensemble_estimation == 'median':
+	    I = np.median(I_vec)
 
     # Normalize epsilon according to MI estimation (cross validation)
-	if normalize_epsilon == True:
-		gamma = gamma * math.pow(2, - math.sqrt(I * 2.0) + (0.5 / I))
-		normalize_epsilon = False
-		I = EDGE(X, Y, U, gamma, epsilon, epsilon_vector, eps_range_factor, normalize_epsilon, ensemble_estimation, L_ensemble,hashing, stochastic)
+    if normalize_epsilon == True:
+	    gamma = gamma * math.pow(2, - math.sqrt(I * 2.0) + (0.5 / I))
+	    normalize_epsilon = False
+	    I = EDGE(X, Y, U, gamma, epsilon, epsilon_vector, eps_range_factor, normalize_epsilon, ensemble_estimation, L_ensemble,hashing, stochastic)
 
-	return I
+    return I
 
 #### Quadratic Program for Ensemble Estimation
 
 # Needed only if you are using 'optimal_weights' for ensemble_estimation
 def compute_weights(L, d, T, N):	
-	# Create optimization variables.
-	cvx_eps = cvx.Variable()
-	cvx_w = cvx.Variable(L)
+    # Create optimization variables.
+    cvx_eps = cvx.Variable()
+    cvx_w = cvx.Variable(L)
 
-	# Create constraints:
-	constraints = [cvx.sum(cvx_w) == 1, cvx.pnorm(cvx_w, 2) - cvx_eps / 2 <= 0]
-	for i in range(1, L):
-		Tp = ((1.0 * T / N) ** (1.0 * i / (2 * d)))
-		cvx_mult = cvx_w.T * Tp
-		constraints.append(cvx.sum(cvx_mult) - cvx_eps * 2 <= 0)
+    # Create constraints:
+    constraints = [cvx.sum(cvx_w) == 1, cvx.pnorm(cvx_w, 2) - cvx_eps / 2 <= 0]
+    for i in range(1, L):
+	    Tp = ((1.0 * T / N) ** (1.0 * i / (2 * d)))
+	    cvx_mult = cvx_w.T * Tp
+	    constraints.append(cvx.sum(cvx_mult) - cvx_eps * 2 <= 0)
 	
-	# Form objective
-	obj = cvx.Minimize(cvx_eps)
+    # Form objective
+    obj = cvx.Minimize(cvx_eps)
 
-	# Form and solve problem
-	prob = cvx.Problem(obj, constraints)
-	prob.solve()  # Return the optimal value
-	sol = np.array(cvx_w.value)
+    # Form and solve problem
+    prob = cvx.Problem(obj, constraints)
+    prob.solve()  # Return the optimal value
+    sol = np.array(cvx_w.value)
 
-	return sol.T
+    return sol.T
 
 if __name__ == "__main__":
     # Fully dependent datasets
-	X = np.random.rand(10000, 100)
-	Y = np.random.rand(10000, 100)
+    X = np.random.rand(10000, 100)
+    Y = np.random.rand(10000, 100)
     
     # Estimated mutual information between X and Y using EDGE method
-	# I = EDGE(X, Y, U = 10, gamma = [1, 1], epsilon = (0.2, 0.2)) 
-	# I = EDGE(X, Y, U = 100, epsilon = [1, 1])	
+    # I = EDGE(X, Y, U = 10, gamma = [1, 1], epsilon = (0.2, 0.2)) 
+    # I = EDGE(X, Y, U = 100, epsilon = [1, 1])	
     # I = EDGE(X, Y, U = 10, gamma = [1, 1], epsilon = [0, 0], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = True,
-	#		   ensemble_estimation = 'optimal_weights', L_ensemble = 10, hashing = 'p-stable', stochastic = True)
-	# I = EDGE(X, Y, U = 10, gamma = [1.1, 1.1], epsilon = [0, 0], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = True,
-	#		   ensemble_estimation = 'optimal_weights', L_ensemble = 20, hashing = 'p-stable', stochastic = False)
+    #		   ensemble_estimation = 'optimal_weights', L_ensemble = 10, hashing = 'p-stable', stochastic = True)
+    # I = EDGE(X, Y, U = 10, gamma = [1.1, 1.1], epsilon = [0, 0], epsilon_vector = 'range', eps_range_factor = 0.1, normalize_epsilon = True,
+    #		   ensemble_estimation = 'optimal_weights', L_ensemble = 20, hashing = 'p-stable', stochastic = False)
 	
-	I = EDGE(X, Y)
-	print ('Estimated MI: ', I)
+    I = EDGE(X, Y)
+    print ('Estimated MI: ', I)

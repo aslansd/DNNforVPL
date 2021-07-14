@@ -22,10 +22,11 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.decomposition import PCA
 from torch.hub import load_state_dict_from_url
 
-from intrinsic_dimension import estimate
+from intrinsic_dimension_2NN import estimate
 from layer_rotation import layer_rotation
 from mutual_info_EDGE import EDGE
 from original_variant_AlexNet_model import DNNforVPL
+from reading_stimuli import reading_stimuli
 
 # The pretrained weights of AlexNet
 model_urls = {'alexnet': 'https://download.pytorch.org/models/alexnet-owt-4df8aa71.pth'}

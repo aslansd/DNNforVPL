@@ -21,8 +21,9 @@ from PIL import Image
 from scipy.spatial.distance import pdist, squareform
 from torch.hub import load_state_dict_from_url
 
-from intrinsic_dimension import estimate
+from intrinsic_dimension_2NN import estimate
 from smaller_variants_AlexNet_model import DNNforVPL_1, DNNforVPL_2, DNNforVPL_3, DNNforVPL_4, DNNforVPL_5
+from reading_stimuli import reading_stimuli
 
 # The pretrained weights of AlexNet
 model_urls = {'alexnet': 'https://download.pytorch.org/models/alexnet-owt-4df8aa71.pth'}
@@ -771,16 +772,16 @@ def smaller_variants_alexnet(parent_folder = 'Smaller Variants of Alexnet_New Re
                         top1.update(acc1[0], x_valid.size(0))
                         
                         # Save the validation accuracy for plotting
-                        all_simulation_transfer_accuracy[simulation_counter, group_counter, layer_freeze_counter, session - start_session] = acc1[0].item()
+                        all_simulation_transfer_accuracy[model_counter][simulation_counter, group_counter, session - start_session] = acc1[0].item()
             
                         # Measure elapsed time
                         batch_time.update(time.time() - end)
             
                         progress.display(1)
                         
-                    # Remember the best accuracy
-                    is_best = all_simulation_transfer_accuracy[simulation_counter, group_counter, layer_freeze_counter, session - start_session] >= best_acc1
-                    best_acc1 = max(all_simulation_transfer_accuracy[simulation_counter, group_counter, layer_freeze_counter, session - start_session], best_acc1)
+                    # Remember the best accuracy and save checkpoint
+                    is_best = all_simulation_transfer_accuracy[model_counter][simulation_counter, group_counter, session - start_session] >= best_acc1
+                    best_acc1 = max(all_simulation_transfer_accuracy[model_counter][simulation_counter, group_counter, session - start_session], best_acc1)
             
                 ### Training with Permuted Labels
                 
