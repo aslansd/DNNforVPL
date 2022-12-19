@@ -1,0 +1,10 @@
+cvxpy
+matplotlib
+numpy
+pandas
+pingouin
+PIL
+seaborn
+scipy
+sklearn
+torch
