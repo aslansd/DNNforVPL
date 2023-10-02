@@ -8,7 +8,7 @@ We bring also some results not brought in the paper.
 
 In summary, DNNforVPL is a deep neural network model used to simulate visual perceptual learning on a specific task and data structure. The aim of the task is to test hypotheses regarding generalization/transfer in visual perceptual learning.
 
-## Instructions:
+## Instructions
 Download and save the whole repository in your local drive. Unzip the four stimuli folders inside the data folder and put them in an appropriate location. To run the notebooks, you might need to change a few lines in the main codes to refer to the paths of the stimuli and results folders.
 
 The following packages are required to be installed before running the source codes and demos of this repository:
