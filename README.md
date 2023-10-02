@@ -25,7 +25,7 @@ The following packages are required to be installed before running the source co
 
 ## Schematic Plot of DNN and Data:
 <p align="center">
-  <img width="800" src="fig/Schematic Plot of DNN and Data.png" />
+  <img width="800" src="fig/Schematic_Plot_of_DNN_and_Data.png" />
 </p>
 
 ## Notes
